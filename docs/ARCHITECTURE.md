@@ -1,6 +1,7 @@
 # Arsitektur
 
 ## Gambaran
+
 Monolit Next.js (App Router). Satu repo, satu deploy. UI dan API hidup di aplikasi yang sama; database PostgreSQL terpisah.
 
 ```
@@ -23,16 +24,18 @@ Next.js
 ```
 
 ## Lapisan dan tanggung jawab
-| Lapisan | Boleh | Tidak boleh |
-|---|---|---|
+
+| Lapisan                       | Boleh                                                                    | Tidak boleh                          |
+| ----------------------------- | ------------------------------------------------------------------------ | ------------------------------------ |
 | Route Handler / Server Action | Validasi input (Zod), cek sesi dan role, panggil service, bentuk respons | Query Prisma langsung, aturan bisnis |
-| Service | Aturan bisnis, `prisma.$transaction`, melempar `AppError` | Mengakses `Request`/`Response`, UI |
-| Repository (opsional) | Query Prisma yang dipakai ulang | Aturan bisnis |
-| Komponen UI | Menampilkan data, memanggil API | Logika stok |
+| Service                       | Aturan bisnis, `prisma.$transaction`, melempar `AppError`                | Mengakses `Request`/`Response`, UI   |
+| Repository (opsional)         | Query Prisma yang dipakai ulang                                          | Aturan bisnis                        |
+| Komponen UI                   | Menampilkan data, memanggil API                                          | Logika stok                          |
 
 Alasan: aturan stok hanya ada di satu tempat (service), sehingga tidak bisa dilewati dari halaman atau endpoint lain.
 
 ## Struktur folder
+
 ```
 src/
 ├─ app/
@@ -59,6 +62,7 @@ db/      wms_schema_seed_postgres.sql
 ```
 
 ## Alur transaksi stok
+
 Semua mutasi stok melewati satu fungsi inti, `applyStockMovement`, agar aturan tidak terduplikasi.
 
 ```
@@ -81,19 +85,22 @@ postDeliveryOrder(id, userId)
 ```
 
 Prinsip:
+
 - **Kunci baris** (`FOR UPDATE` lewat `$queryRaw`) mencegah dua pengiriman bersamaan membuat stok minus.
 - **Constraint `CHECK (quantity >= 0)`** di database menjadi pengaman terakhir.
 - **`stock_movements` hanya ditambah, tidak pernah diubah atau dihapus.** Koreksi dilakukan dengan pergerakan baru.
 - Stok sistem = hasil jumlah pergerakan; tabel stok adalah salinan cepat yang harus selalu cocok.
 
 ## Penomoran dokumen
+
 Format `GR-2026-0001`, `DO-2026-0001`. Nomor urut diambil dari tabel counter di dalam transaksi yang sama agar tidak ada nomor ganda.
 
 ## Keputusan desain
-| Keputusan | Pilihan | Alasan |
-|---|---|---|
-| Gaya API | REST di Route Handlers | Mudah diuji dan didokumentasikan untuk portofolio |
-| ORM | Prisma | Migrasi dan tipe otomatis; raw SQL tetap bisa untuk locking |
-| Sesi | Auth.js, JWT | Cocok dengan Vercel serverless |
-| Validasi | Zod di server, skema dipakai ulang di form | Satu sumber kebenaran |
-| Tampilan data | Server Components untuk daftar, Client Components untuk form | Muat awal cepat |
+
+| Keputusan     | Pilihan                                                      | Alasan                                                      |
+| ------------- | ------------------------------------------------------------ | ----------------------------------------------------------- |
+| Gaya API      | REST di Route Handlers                                       | Mudah diuji dan didokumentasikan untuk portofolio           |
+| ORM           | Prisma                                                       | Migrasi dan tipe otomatis; raw SQL tetap bisa untuk locking |
+| Sesi          | Auth.js, JWT                                                 | Cocok dengan Vercel serverless                              |
+| Validasi      | Zod di server, skema dipakai ulang di form                   | Satu sumber kebenaran                                       |
+| Tampilan data | Server Components untuk daftar, Client Components untuk form | Muat awal cepat                                             |

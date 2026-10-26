@@ -1,18 +1,20 @@
 # Linting dan Format
 
 ## Alat
-| Alat | Tugas |
-|---|---|
-| TypeScript (`strict`) | Pemeriksaan tipe |
-| ESLint (flat config) | Kualitas kode, aturan React/Next, impor |
-| Prettier | Format; satu-satunya yang mengatur gaya |
-| `prettier-plugin-tailwindcss` | Mengurutkan class Tailwind |
-| Husky + lint-staged | Menjalankan cek pada file yang di-commit |
-| commitlint | Memeriksa format Conventional Commits |
+
+| Alat                          | Tugas                                    |
+| ----------------------------- | ---------------------------------------- |
+| TypeScript (`strict`)         | Pemeriksaan tipe                         |
+| ESLint (flat config)          | Kualitas kode, aturan React/Next, impor  |
+| Prettier                      | Format; satu-satunya yang mengatur gaya  |
+| `prettier-plugin-tailwindcss` | Mengurutkan class Tailwind               |
+| Husky + lint-staged           | Menjalankan cek pada file yang di-commit |
+| commitlint                    | Memeriksa format Conventional Commits    |
 
 ESLint tidak mengurus format; Prettier tidak mengurus kualitas. Pasang `eslint-config-prettier` agar tidak bentrok.
 
 ## Instalasi
+
 ```bash
 npm i -D eslint typescript-eslint eslint-config-next eslint-config-prettier \
   eslint-plugin-import prettier prettier-plugin-tailwindcss \
@@ -21,6 +23,7 @@ npx husky init
 ```
 
 ## `tsconfig.json` (bagian penting)
+
 ```json
 {
   "compilerOptions": {
@@ -35,6 +38,7 @@ npx husky init
 ```
 
 ## `eslint.config.mjs`
+
 ```js
 import { FlatCompat } from '@eslint/eslintrc';
 import tseslint from 'typescript-eslint';
@@ -61,16 +65,25 @@ export default tseslint.config(
     rules: {
       'no-restricted-imports': [
         'error',
-        { patterns: [{ group: ['@/server/db', '@prisma/client'], message: 'Akses database hanya lewat server/services.' }] },
+        {
+          patterns: [
+            {
+              group: ['@/server/db', '@prisma/client'],
+              message: 'Akses database hanya lewat server/services.',
+            },
+          ],
+        },
       ],
     },
   },
   prettier,
 );
 ```
+
 Aturan terakhir menegakkan arsitektur: komponen dan halaman tidak boleh mengimpor Prisma langsung. Pengecualian: Server Component yang memang memanggil service, bukan Prisma.
 
 ## `.prettierrc`
+
 ```json
 {
   "singleQuote": true,
@@ -82,6 +95,7 @@ Aturan terakhir menegakkan arsitektur: komponen dan halaman tidak boleh mengimpo
 ```
 
 ## `.editorconfig`
+
 ```
 root = true
 [*]
@@ -94,6 +108,7 @@ trim_trailing_whitespace = true
 ```
 
 ## lint-staged (`package.json`)
+
 ```json
 {
   "lint-staged": {
@@ -104,21 +119,29 @@ trim_trailing_whitespace = true
 ```
 
 ## Git hooks
+
 `.husky/pre-commit`:
+
 ```sh
 npx lint-staged
 ```
+
 `.husky/commit-msg`:
+
 ```sh
 npx commitlint --edit "$1"
 ```
+
 `commitlint.config.mjs`:
+
 ```js
 export default { extends: ['@commitlint/config-conventional'] };
 ```
+
 Pre-commit sengaja ringan (hanya file yang berubah). Typecheck dan tes penuh dijalankan di CI, bukan di hook.
 
 ## Skrip
+
 ```json
 {
   "lint": "eslint .",
@@ -129,7 +152,9 @@ Pre-commit sengaja ringan (hanya file yang berubah). Typecheck dan tes penuh dij
 ```
 
 ## Pengaturan editor (VS Code)
+
 `.vscode/settings.json`:
+
 ```json
 {
   "editor.formatOnSave": true,
@@ -140,6 +165,7 @@ Pre-commit sengaja ringan (hanya file yang berubah). Typecheck dan tes penuh dij
 ```
 
 ## Aturan praktis
+
 - Peringatan (warning) dianggap utang; jangan dibiarkan menumpuk.
 - `// eslint-disable` wajib disertai alasan di komentar dan sebisa mungkin hanya satu baris.
 - Jangan menonaktifkan aturan global hanya karena satu file bermasalah.
