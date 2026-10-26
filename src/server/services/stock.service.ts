@@ -286,3 +286,561 @@ export async function listStockMovements(
     },
   };
 }
+
+export interface StockSummaryByProductOptions {
+  q?: string;
+  categoryId?: string;
+  warehouseId?: string;
+  lowStockOnly?: boolean;
+  page?: number;
+  pageSize?: number;
+}
+
+export async function getStockSummaryByProduct(options: StockSummaryByProductOptions = {}) {
+  const page = Math.max(Number(options.page) || 1, 1);
+  const pageSize = Math.min(Math.max(Number(options.pageSize) || 20, 1), 100);
+  const skip = (page - 1) * pageSize;
+
+  const now = new Date();
+  const where: Prisma.ProductWhereInput = {
+    isActive: true,
+  };
+
+  if (options.categoryId) {
+    where.categoryId = options.categoryId;
+  }
+
+  if (options.q?.trim()) {
+    const query = options.q.trim();
+    where.OR = [
+      { sku: { contains: query, mode: 'insensitive' } },
+      { name: { contains: query, mode: 'insensitive' } },
+      { barcode: { contains: query, mode: 'insensitive' } },
+    ];
+  }
+
+  // Fetch products with their stocks filtered by warehouse if specified
+  const stockWhere: Prisma.StockWhereInput = {
+    quantity: { gt: 0 },
+  };
+  if (options.warehouseId) {
+    stockWhere.location = { warehouseId: options.warehouseId };
+  }
+
+  const [total, products] = await Promise.all([
+    prisma.product.count({ where }),
+    prisma.product.findMany({
+      where,
+      skip,
+      take: pageSize,
+      orderBy: { name: 'asc' },
+      include: {
+        category: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
+        stocks: {
+          where: stockWhere,
+          include: {
+            batch: true,
+            location: {
+              include: {
+                warehouse: true,
+              },
+            },
+          },
+        },
+      },
+    }),
+  ]);
+
+  const items = products.map((prod) => {
+    let totalQuantity = 0;
+    let availableQuantity = 0;
+    let expiredQuantity = 0;
+    const warehouseMap = new Map<
+      string,
+      { id: string; code: string; name: string; quantity: number }
+    >();
+
+    for (const s of prod.stocks) {
+      totalQuantity += s.quantity;
+
+      const isExpired = s.batch?.expiryDate && new Date(s.batch.expiryDate) < now;
+      if (isExpired) {
+        expiredQuantity += s.quantity;
+      } else {
+        availableQuantity += s.quantity;
+      }
+
+      const wh = s.location.warehouse;
+      const existingWh = warehouseMap.get(wh.id);
+      if (existingWh) {
+        existingWh.quantity += s.quantity;
+      } else {
+        warehouseMap.set(wh.id, {
+          id: wh.id,
+          code: wh.code,
+          name: wh.name,
+          quantity: s.quantity,
+        });
+      }
+    }
+
+    const costPriceNum = Number(prod.costPrice) || 0;
+    const totalValue = totalQuantity * costPriceNum;
+    const isLowStock = availableQuantity <= prod.minStock;
+
+    return {
+      product: {
+        id: prod.id,
+        sku: prod.sku,
+        barcode: prod.barcode,
+        name: prod.name,
+        uom: prod.uom,
+        minStock: prod.minStock,
+        costPrice: prod.costPrice,
+        trackExpiry: prod.trackExpiry,
+        category: prod.category,
+      },
+      totalQuantity,
+      availableQuantity,
+      expiredQuantity,
+      totalValue,
+      isLowStock,
+      warehouses: Array.from(warehouseMap.values()),
+    };
+  });
+
+  const filteredItems = options.lowStockOnly ? items.filter((i) => i.isLowStock) : items;
+
+  return {
+    data: filteredItems,
+    meta: {
+      page,
+      pageSize,
+      total,
+      totalPages: Math.ceil(total / pageSize) || 1,
+    },
+  };
+}
+
+export interface StockSummaryByLocationOptions {
+  warehouseId?: string;
+  zone?: string;
+  q?: string;
+  page?: number;
+  pageSize?: number;
+}
+
+export async function getStockSummaryByLocation(options: StockSummaryByLocationOptions = {}) {
+  const page = Math.max(Number(options.page) || 1, 1);
+  const pageSize = Math.min(Math.max(Number(options.pageSize) || 20, 1), 100);
+  const skip = (page - 1) * pageSize;
+
+  const where: Prisma.LocationWhereInput = {
+    isActive: true,
+  };
+
+  if (options.warehouseId) {
+    where.warehouseId = options.warehouseId;
+  }
+  if (options.zone) {
+    where.zone = options.zone;
+  }
+  if (options.q?.trim()) {
+    const query = options.q.trim();
+    where.OR = [
+      { code: { contains: query, mode: 'insensitive' } },
+      { warehouse: { name: { contains: query, mode: 'insensitive' } } },
+    ];
+  }
+
+  const [total, locations] = await Promise.all([
+    prisma.location.count({ where }),
+    prisma.location.findMany({
+      where,
+      skip,
+      take: pageSize,
+      orderBy: [{ warehouseId: 'asc' }, { code: 'asc' }],
+      include: {
+        warehouse: {
+          select: {
+            id: true,
+            code: true,
+            name: true,
+          },
+        },
+        stocks: {
+          where: { quantity: { gt: 0 } },
+          include: {
+            product: {
+              select: {
+                id: true,
+                sku: true,
+                name: true,
+                uom: true,
+                trackExpiry: true,
+              },
+            },
+            batch: {
+              select: {
+                id: true,
+                batchNo: true,
+                expiryDate: true,
+              },
+            },
+          },
+        },
+      },
+    }),
+  ]);
+
+  const items = locations.map((loc) => {
+    const totalQuantity = loc.stocks.reduce((sum, s) => sum + s.quantity, 0);
+
+    return {
+      location: {
+        id: loc.id,
+        code: loc.code,
+        zone: loc.zone,
+        rack: loc.rack,
+        level: loc.level,
+        isFrozen: loc.isFrozen,
+        isActive: loc.isActive,
+      },
+      warehouse: loc.warehouse,
+      totalQuantity,
+      totalItems: loc.stocks.length,
+      stocks: loc.stocks.map((s) => ({
+        stockId: s.id,
+        productId: s.productId,
+        productName: s.product.name,
+        sku: s.product.sku,
+        uom: s.product.uom,
+        batchNo: s.batch.batchNo,
+        expiryDate: s.batch.expiryDate,
+        quantity: s.quantity,
+      })),
+    };
+  });
+
+  return {
+    data: items,
+    meta: {
+      page,
+      pageSize,
+      total,
+      totalPages: Math.ceil(total / pageSize) || 1,
+    },
+  };
+}
+
+export interface StockCardOptions {
+  from?: Date | string;
+  to?: Date | string;
+  locationId?: string;
+  warehouseId?: string;
+  page?: number;
+  pageSize?: number;
+}
+
+export async function getProductStockCard(productId: string, options: StockCardOptions = {}) {
+  const page = Math.max(Number(options.page) || 1, 1);
+  const pageSize = Math.min(Math.max(Number(options.pageSize) || 50, 1), 200);
+  const skip = (page - 1) * pageSize;
+
+  const product = await prisma.product.findUnique({
+    where: { id: productId },
+    include: {
+      category: {
+        select: {
+          id: true,
+          name: true,
+        },
+      },
+    },
+  });
+
+  if (!product) {
+    throw new AppError('NOT_FOUND', 'Produk tidak ditemukan');
+  }
+
+  const where: Prisma.StockMovementWhereInput = {
+    productId,
+  };
+
+  if (options.locationId) {
+    where.locationId = options.locationId;
+  } else if (options.warehouseId) {
+    where.location = { warehouseId: options.warehouseId };
+  }
+
+  if (options.from || options.to) {
+    where.createdAt = {};
+    if (options.from) where.createdAt.gte = new Date(options.from);
+    if (options.to) where.createdAt.lte = new Date(options.to);
+  }
+
+  // Get current stock
+  const stockRows = await prisma.stock.findMany({
+    where: {
+      productId,
+      ...(options.locationId ? { locationId: options.locationId } : {}),
+      ...(options.warehouseId ? { location: { warehouseId: options.warehouseId } } : {}),
+    },
+  });
+  const currentStock = stockRows.reduce((sum, s) => sum + s.quantity, 0);
+
+  const [totalMovements, movements] = await Promise.all([
+    prisma.stockMovement.count({ where }),
+    prisma.stockMovement.findMany({
+      where,
+      skip,
+      take: pageSize,
+      orderBy: { createdAt: 'desc' },
+      include: {
+        location: {
+          select: {
+            id: true,
+            code: true,
+            warehouse: {
+              select: {
+                id: true,
+                code: true,
+                name: true,
+              },
+            },
+          },
+        },
+        batch: {
+          select: {
+            id: true,
+            batchNo: true,
+            expiryDate: true,
+          },
+        },
+        user: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+          },
+        },
+      },
+    }),
+  ]);
+
+  return {
+    product: {
+      id: product.id,
+      sku: product.sku,
+      barcode: product.barcode,
+      name: product.name,
+      uom: product.uom,
+      minStock: product.minStock,
+      costPrice: product.costPrice,
+      trackExpiry: product.trackExpiry,
+      category: product.category,
+    },
+    currentStock,
+    movements,
+    meta: {
+      page,
+      pageSize,
+      total: totalMovements,
+      totalPages: Math.ceil(totalMovements / pageSize) || 1,
+    },
+  };
+}
+
+export async function getLowStockProducts(options: { warehouseId?: string } = {}) {
+  const now = new Date();
+
+  const products = await prisma.product.findMany({
+    where: { isActive: true },
+    include: {
+      category: true,
+      stocks: {
+        where: options.warehouseId
+          ? {
+              quantity: { gt: 0 },
+              location: { warehouseId: options.warehouseId },
+            }
+          : { quantity: { gt: 0 } },
+        include: {
+          batch: true,
+          location: {
+            include: { warehouse: true },
+          },
+        },
+      },
+    },
+  });
+
+  const lowStockItems = [];
+
+  for (const prod of products) {
+    let availableQuantity = 0;
+    let totalQuantity = 0;
+
+    for (const s of prod.stocks) {
+      totalQuantity += s.quantity;
+      const isExpired = s.batch?.expiryDate && new Date(s.batch.expiryDate) < now;
+      if (!isExpired) {
+        availableQuantity += s.quantity;
+      }
+    }
+
+    if (availableQuantity <= prod.minStock) {
+      lowStockItems.push({
+        product: {
+          id: prod.id,
+          sku: prod.sku,
+          name: prod.name,
+          uom: prod.uom,
+          minStock: prod.minStock,
+          costPrice: prod.costPrice,
+          category: prod.category?.name || '-',
+        },
+        totalQuantity,
+        availableQuantity,
+        deficit: Math.max(0, prod.minStock - availableQuantity),
+      });
+    }
+  }
+
+  return lowStockItems;
+}
+
+export async function getExpiringBatches(options: { days?: number; warehouseId?: string } = {}) {
+  const days = options.days || 30;
+  const now = new Date();
+  const futureDate = new Date();
+  futureDate.setDate(now.getDate() + days);
+
+  const stocks = await prisma.stock.findMany({
+    where: {
+      quantity: { gt: 0 },
+      batch: {
+        expiryDate: {
+          gte: now,
+          lte: futureDate,
+        },
+      },
+      ...(options.warehouseId ? { location: { warehouseId: options.warehouseId } } : {}),
+    },
+    include: {
+      product: {
+        select: {
+          id: true,
+          sku: true,
+          name: true,
+          uom: true,
+        },
+      },
+      batch: true,
+      location: {
+        include: {
+          warehouse: true,
+        },
+      },
+    },
+    orderBy: {
+      batch: {
+        expiryDate: 'asc',
+      },
+    },
+  });
+
+  return stocks.map((s) => {
+    const expiry = s.batch.expiryDate!;
+    const diffTime = expiry.getTime() - now.getTime();
+    const daysRemaining = Math.max(0, Math.ceil(diffTime / (1000 * 60 * 60 * 24)));
+
+    return {
+      stockId: s.id,
+      productId: s.productId,
+      productName: s.product.name,
+      sku: s.product.sku,
+      uom: s.product.uom,
+      batchNo: s.batch.batchNo,
+      expiryDate: s.batch.expiryDate,
+      daysRemaining,
+      quantity: s.quantity,
+      locationCode: s.location.code,
+      warehouseName: s.location.warehouse.name,
+    };
+  });
+}
+
+/**
+ * Consistency Checker: verifies that for every product,
+ * SUM(stock_movements) == SUM(stock table)
+ * Roadmap requirement for T1.9: "jumlah seluruh pergerakan per produk sama dengan stok di tabel stok"
+ */
+export async function verifyStockConsistency(productId?: string) {
+  const where: Prisma.ProductWhereInput = productId ? { id: productId } : {};
+
+  const products = await prisma.product.findMany({
+    where,
+    select: {
+      id: true,
+      sku: true,
+      name: true,
+    },
+  });
+
+  const results = [];
+  let inconsistentCount = 0;
+
+  for (const prod of products) {
+    const [stockRows, movements] = await Promise.all([
+      prisma.stock.findMany({
+        where: { productId: prod.id },
+        select: { quantity: true },
+      }),
+      prisma.stockMovement.findMany({
+        where: { productId: prod.id },
+        select: { movementType: true, quantity: true },
+      }),
+    ]);
+
+    const currentStock = stockRows.reduce((sum, s) => sum + s.quantity, 0);
+
+    let movementSum = 0;
+    for (const m of movements) {
+      if (INCOMING_TYPES.has(m.movementType)) {
+        movementSum += m.quantity;
+      } else {
+        movementSum -= m.quantity;
+      }
+    }
+
+    const difference = movementSum - currentStock;
+    const isConsistent = difference === 0;
+
+    if (!isConsistent) {
+      inconsistentCount++;
+    }
+
+    results.push({
+      productId: prod.id,
+      sku: prod.sku,
+      name: prod.name,
+      currentStock,
+      movementSum,
+      difference,
+      isConsistent,
+    });
+  }
+
+  return {
+    isConsistent: inconsistentCount === 0,
+    totalCheckedProducts: products.length,
+    inconsistentCount,
+    results,
+  };
+}
