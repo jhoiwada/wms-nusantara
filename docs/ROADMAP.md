@@ -5,7 +5,7 @@ Cara pakai: kerjakan **satu tugas per sesi**, dari atas ke bawah. Tugas dianggap
 ## Status saat ini
 
 - Terakhir diperbarui: 2026-10-26
-- Sedang dikerjakan: T0.4 Env dan error dasar
+- Sedang dikerjakan: T0.5 CI
 - Aturan bisnis: sudah disetujui (`docs/BUSINESS_RULES.md`)
 - Sinkronisasi: `docs/DATABASE.md` sudah 100% cocok dengan `schema.prisma` dan `db/wms_schema_seed_postgres.sql`.
 
@@ -19,7 +19,7 @@ Cara pakai: kerjakan **satu tugas per sesi**, dari atas ke bawah. Tugas dianggap
       Selesai bila: commit dengan pesan salah ditolak; aturan larangan impor Prisma di komponen aktif.
 - [x] **T0.3 Database dan Prisma.** Docker Postgres, `schema.prisma` dari file SQL, migrasi baseline, seed (akun demo + data contoh).
       Selesai bila: `migrate dev` dan `db seed` berjalan dari database kosong; `DATABASE.md` sudah cocok dengan skema nyata.
-- [ ] **T0.4 Env dan error dasar.** `src/env.ts` (Zod), `db.ts` singleton, `AppError`, `handleError`, logger.
+- [x] **T0.4 Env dan error dasar.** `src/env.ts` (Zod), `db.ts` singleton, `AppError`, `handleError`, logger.
       Selesai bila: aplikasi gagal start jika env hilang; ada tes untuk `handleError`.
 - [ ] **T0.5 CI.** Workflow dari `PIPELINE.md`.
       Selesai bila: PR menjalankan lint, typecheck, test, build di GitHub Actions.
