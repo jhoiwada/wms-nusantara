@@ -5,7 +5,7 @@ Cara pakai: kerjakan **satu tugas per sesi**, dari atas ke bawah. Tugas dianggap
 ## Status saat ini
 
 - Terakhir diperbarui: 2026-10-27
-- Sedang dikerjakan: T1.10 Dashboard
+- Sedang dikerjakan: T1.11 E2E alur utama
 - Aturan bisnis: sudah disetujui (`docs/BUSINESS_RULES.md`)
 - Sinkronisasi: `docs/DATABASE.md` sudah 100% cocok dengan `schema.prisma` dan `db/wms_schema_seed_postgres.sql`.
 
@@ -38,7 +38,7 @@ Cara pakai: kerjakan **satu tugas per sesi**, dari atas ke bawah. Tugas dianggap
 - [x] **T1.8 Barang keluar (DO).** Draft, kirim dengan pemeriksaan stok, penolakan dengan pesan jelas; UI.
 - [x] **T1.9 Stok dan kartu stok.** Tampilan per produk dan per lokasi; kartu stok dengan saldo berjalan.
       Selesai bila: jumlah seluruh pergerakan per produk sama dengan stok di tabel stok (ada tes konsistensi).
-- [ ] **T1.10 Dashboard.** Ringkasan, stok menipis, nilai persediaan, transaksi terbaru, grafik masuk vs keluar.
+- [x] **T1.10 Dashboard.** Ringkasan, stok menipis, nilai persediaan, transaksi terbaru, grafik masuk vs keluar.
 - [ ] **T1.11 E2E alur utama.** Login → GR → DO → cek kartu stok.
 - [ ] **Rilis v0.1.0** dan deploy ke Vercel + Neon dengan akun demo.
 
