@@ -42,6 +42,13 @@ const eslintConfig = defineConfig([
       ],
     },
   },
+  {
+    // Izinkan console output pada skrip database dan CLI
+    files: ['prisma/**', 'scripts/**'],
+    rules: {
+      'no-console': 'off',
+    },
+  },
   prettier,
 ]);
 

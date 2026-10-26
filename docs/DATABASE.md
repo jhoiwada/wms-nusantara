@@ -8,12 +8,14 @@ PostgreSQL 15+. Sumber kebenaran skema awal: `db/wms_schema_seed_postgres.sql` (
 | ---------- | ----------------------------------------------------------------------------- |
 | Akses      | `users`                                                                       |
 | Master     | `categories`, `products`, `suppliers`, `customers`, `warehouses`, `locations` |
+| Batch      | `batches` (nomor batch & expired date per produk)                             |
 | Stok       | `stock` (stok per produk + lokasi + batch), `stock_movements` (kartu stok)    |
 | Penerimaan | `goods_receipts`, `goods_receipt_items`                                       |
 | Pengiriman | `delivery_orders`, `delivery_order_items`                                     |
 | Opname     | `stock_opnames`, `stock_opname_items`                                         |
+| Sistem     | `document_counters` (penomoran dokumen anti-tabrakan)                         |
 
-Untuk Tahap 2 mungkin perlu tambahan: `batches` (nomor batch, expired), `stock_transfers`, `document_counters`, `audit_logs`.
+Untuk pengembangan lanjutan (Tahap 2 & 3): `stock_transfers`, `audit_logs`.
 
 ## Relasi utama
 

@@ -5,9 +5,9 @@ Cara pakai: kerjakan **satu tugas per sesi**, dari atas ke bawah. Tugas dianggap
 ## Status saat ini
 
 - Terakhir diperbarui: 2026-10-26
-- Sedang dikerjakan: T0.3 Database dan Prisma
+- Sedang dikerjakan: T0.4 Env dan error dasar
 - Aturan bisnis: sudah disetujui (`docs/BUSINESS_RULES.md`)
-- Terbuka: `docs/DATABASE.md` masih perlu disinkronkan dengan `db/wms_schema_seed_postgres.sql` (dikerjakan di T0.3)
+- Sinkronisasi: `docs/DATABASE.md` sudah 100% cocok dengan `schema.prisma` dan `db/wms_schema_seed_postgres.sql`.
 
 ---
 
@@ -17,7 +17,7 @@ Cara pakai: kerjakan **satu tugas per sesi**, dari atas ke bawah. Tugas dianggap
       Selesai bila: `npm run dev`, `build`, `lint`, `typecheck` berjalan; halaman awal tampil.
 - [x] **T0.2 Lint, format, hooks.** Sesuai `LINTING.md` (ESLint, Prettier, Husky, commitlint).
       Selesai bila: commit dengan pesan salah ditolak; aturan larangan impor Prisma di komponen aktif.
-- [ ] **T0.3 Database dan Prisma.** Docker Postgres, `schema.prisma` dari file SQL, migrasi baseline, seed (akun demo + data contoh).
+- [x] **T0.3 Database dan Prisma.** Docker Postgres, `schema.prisma` dari file SQL, migrasi baseline, seed (akun demo + data contoh).
       Selesai bila: `migrate dev` dan `db seed` berjalan dari database kosong; `DATABASE.md` sudah cocok dengan skema nyata.
 - [ ] **T0.4 Env dan error dasar.** `src/env.ts` (Zod), `db.ts` singleton, `AppError`, `handleError`, logger.
       Selesai bila: aplikasi gagal start jika env hilang; ada tes untuk `handleError`.
