@@ -282,6 +282,7 @@ export function LineItemsEditor({
                           <input
                             type="date"
                             value={row.expiryDate}
+                            min={new Date().toISOString().split('T')[0]}
                             onChange={(e) =>
                               handleUpdateItem(index, { expiryDate: e.target.value })
                             }
@@ -289,6 +290,32 @@ export function LineItemsEditor({
                             required
                             className="h-7 w-full rounded border border-slate-300 bg-white px-2 text-xs text-slate-800 focus:ring-1 focus:ring-indigo-500 focus:outline-none"
                           />
+                          {row.expiryDate && (
+                            <div className="text-[10px]">
+                              {(() => {
+                                const today = new Date();
+                                today.setHours(0, 0, 0, 0);
+                                const exp = new Date(row.expiryDate);
+                                exp.setHours(0, 0, 0, 0);
+                                const days = Math.ceil(
+                                  (exp.getTime() - today.getTime()) / (1000 * 60 * 60 * 24),
+                                );
+                                return days >= 0 ? (
+                                  <span
+                                    className={
+                                      days <= 30 ? 'font-medium text-amber-600' : 'text-slate-500'
+                                    }
+                                  >
+                                    {days <= 30 ? '⚠️ ' : ''}Masa simpan: {days} hari
+                                  </span>
+                                ) : (
+                                  <span className="font-semibold text-rose-600">
+                                    Tanggal sudah terlewati!
+                                  </span>
+                                );
+                              })()}
+                            </div>
+                          )}
                         </div>
                       ) : (
                         <div className="py-1">

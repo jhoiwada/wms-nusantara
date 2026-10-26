@@ -43,6 +43,7 @@ vi.mock('@/server/db', () => ({
       update: vi.fn(),
     },
     deliveryOrderItem: {
+      create: vi.fn(),
       createMany: vi.fn(),
       deleteMany: vi.fn(),
       update: vi.fn(),
@@ -56,6 +57,7 @@ import {
   updateDeliveryOrder,
   shipDeliveryOrder,
   cancelDeliveryOrder,
+  getAvailableBatchesForDelivery,
 } from '../delivery-order.service';
 
 describe('Delivery Order Service (BR-08, BR-09, BR-15, BR-16, BR-17, BR-18, BR-22, BR-32)', () => {
@@ -434,6 +436,180 @@ describe('Delivery Order Service (BR-08, BR-09, BR-15, BR-16, BR-17, BR-18, BR-2
       await expect(shipDeliveryOrder('do-1', 'user-1')).rejects.toThrow(
         /sedang dibekukan karena proses opname.*BR-22/,
       );
+    });
+
+    it('splits allocation across multiple batches in strict FEFO order when single batch is insufficient (BR-08, BR-17)', async () => {
+      const mockDO = {
+        id: 'do-multi-batch',
+        orderNo: 'DO-2026-0002',
+        status: 'DRAFT',
+        items: [
+          {
+            id: 'item-split-1',
+            productId: 'prod-1',
+            locationId: 'loc-1',
+            batchId: null, // FEFO auto-allocation
+            quantity: 30, // Demands 30 units
+            product: mockProduct,
+            location: mockLocation,
+          },
+        ],
+      };
+
+      vi.mocked(prisma.deliveryOrder.findUnique).mockResolvedValue(mockDO as never);
+
+      // Batch 1: expires sooner (2026-11-15), has 18 units (< 30)
+      // Batch 2: expires later (2027-01-20), has 25 units
+      // Total unexpired available = 43 units (>= 30)
+      const mockCandidateStocks = [
+        {
+          id: 'stock-batch-1',
+          productId: 'prod-1',
+          locationId: 'loc-1',
+          batchId: 'batch-earlier',
+          quantity: 18,
+          batch: {
+            id: 'batch-earlier',
+            productId: 'prod-1',
+            batchNo: 'EARLY-01',
+            expiryDate: new Date('2026-11-15'),
+          },
+        },
+        {
+          id: 'stock-batch-2',
+          productId: 'prod-1',
+          locationId: 'loc-1',
+          batchId: 'batch-later',
+          quantity: 25,
+          batch: {
+            id: 'batch-later',
+            productId: 'prod-1',
+            batchNo: 'LATER-02',
+            expiryDate: new Date('2027-01-20'),
+          },
+        },
+      ];
+
+      vi.mocked(prisma.stock.findMany).mockResolvedValue(mockCandidateStocks as never);
+      vi.mocked(prisma.product.findUnique).mockResolvedValue(mockProduct as never);
+      vi.mocked(prisma.location.findUnique).mockResolvedValue(mockLocation as never);
+
+      // In the first slice (18 units from batch-earlier)
+      vi.mocked(prisma.batch.findUnique)
+        .mockResolvedValueOnce(mockCandidateStocks[0]!.batch as never)
+        .mockResolvedValueOnce(mockCandidateStocks[1]!.batch as never);
+
+      vi.mocked(prisma.$queryRaw)
+        .mockResolvedValueOnce([{ id: 'stock-batch-1', quantity: 18 }] as never)
+        .mockResolvedValueOnce([{ id: 'stock-batch-2', quantity: 25 }] as never);
+
+      vi.mocked(prisma.deliveryOrder.update).mockResolvedValue({
+        ...mockDO,
+        status: 'SHIPPED',
+        shippedAt: new Date(),
+      } as never);
+
+      const result = await shipDeliveryOrder('do-multi-batch', 'user-1');
+
+      expect(result.status).toBe('SHIPPED');
+
+      // First slice (18 units) updates original item
+      expect(prisma.deliveryOrderItem.update).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: { id: 'item-split-1' },
+          data: {
+            batchId: 'batch-earlier',
+            quantity: 18,
+          },
+        }),
+      );
+
+      // Second slice (remaining 12 units) creates companion delivery order item
+      expect(prisma.deliveryOrderItem.create).toHaveBeenCalledWith(
+        expect.objectContaining({
+          data: {
+            deliveryOrderId: 'do-multi-batch',
+            productId: 'prod-1',
+            locationId: 'loc-1',
+            batchId: 'batch-later',
+            quantity: 12,
+          },
+        }),
+      );
+
+      // Verify two OUT movements were applied in FEFO order
+      expect(prisma.stockMovement.create).toHaveBeenCalledTimes(2);
+      expect(prisma.stockMovement.create).toHaveBeenNthCalledWith(
+        1,
+        expect.objectContaining({
+          data: expect.objectContaining({
+            batchId: 'batch-earlier',
+            movementType: 'OUT',
+            quantity: 18,
+          }),
+        }),
+      );
+      expect(prisma.stockMovement.create).toHaveBeenNthCalledWith(
+        2,
+        expect.objectContaining({
+          data: expect.objectContaining({
+            batchId: 'batch-later',
+            movementType: 'OUT',
+            quantity: 12,
+          }),
+        }),
+      );
+    });
+  });
+
+  describe('getAvailableBatchesForDelivery (FEFO recommendation & near-expiry)', () => {
+    it('returns candidate batches sorted by FEFO with daysRemaining and near-expiry indicators (BR-08, BR-10)', async () => {
+      // Mock unexpired stocks in database
+      const mockCandidateStocks = [
+        {
+          id: 'stock-near',
+          productId: 'prod-1',
+          locationId: 'loc-1',
+          batchId: 'batch-near',
+          quantity: 15,
+          batch: {
+            id: 'batch-near',
+            batchNo: 'NEAR-01',
+            expiryDate: new Date(Date.now() + 10 * 24 * 60 * 60 * 1000), // In 10 days
+          },
+        },
+        {
+          id: 'stock-far',
+          productId: 'prod-1',
+          locationId: 'loc-1',
+          batchId: 'batch-far',
+          quantity: 40,
+          batch: {
+            id: 'batch-far',
+            batchNo: 'FAR-02',
+            expiryDate: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000), // In 90 days
+          },
+        },
+      ];
+
+      vi.mocked(prisma.stock.findMany).mockResolvedValue(mockCandidateStocks as never);
+
+      const batches = await getAvailableBatchesForDelivery({
+        productId: 'prod-1',
+        locationId: 'loc-1',
+      });
+
+      expect(batches).toHaveLength(2);
+      // First is recommended FEFO batch
+      expect(batches[0]!.batchNo).toBe('NEAR-01');
+      expect(batches[0]!.isFefoRecommended).toBe(true);
+      expect(batches[0]!.isNearExpiry).toBe(true); // <= 30 days
+      expect(batches[0]!.daysRemaining).toBeLessThanOrEqual(11);
+
+      // Second is farther out
+      expect(batches[1]!.batchNo).toBe('FAR-02');
+      expect(batches[1]!.isFefoRecommended).toBe(false);
+      expect(batches[1]!.isNearExpiry).toBe(false); // > 30 days
     });
   });
 });

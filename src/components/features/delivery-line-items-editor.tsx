@@ -37,6 +37,8 @@ interface BatchOption {
   expiryDate: string | null;
   availableQuantity: number;
   isFefoRecommended: boolean;
+  daysRemaining?: number | null;
+  isNearExpiry?: boolean;
 }
 
 interface DeliveryLineItemsEditorProps {
@@ -277,10 +279,16 @@ export function DeliveryLineItemsEditor({
                           const expStr = b.expiryDate
                             ? new Date(b.expiryDate).toLocaleDateString('id-ID')
                             : 'Tanpa Kadaluwarsa';
+                          const expiryNote = b.isNearExpiry
+                            ? ` ⚠️ [Hampir Expired - Sisa ${b.daysRemaining} hari]`
+                            : b.daysRemaining !== null && b.daysRemaining !== undefined
+                              ? ` [Sisa ${b.daysRemaining} hari]`
+                              : '';
                           return (
                             <option key={b.batchId} value={b.batchId}>
-                              {b.isFefoRecommended ? '★ ' : ''}
-                              {b.batchNo} | Exp: {expStr} (Stok: {b.availableQuantity})
+                              {b.isFefoRecommended ? '★ [FEFO] ' : ''}
+                              {b.batchNo} | Exp: {expStr}
+                              {expiryNote} (Stok: {b.availableQuantity})
                             </option>
                           );
                         })}

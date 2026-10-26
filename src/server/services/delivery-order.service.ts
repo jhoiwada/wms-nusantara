@@ -199,11 +199,17 @@ async function validateDeliveryOrderItems(
           `Batch pada baris ${idx + 1} tidak ditemukan atau tidak cocok dengan produk`,
         );
       }
-      if (batch.expiryDate && new Date(batch.expiryDate) < new Date()) {
-        throw new AppError(
-          'VALIDATION_ERROR',
-          `Batch '${batch.batchNo}' sudah kedaluwarsa dan tidak boleh dikirim (BR-09)`,
-        );
+      if (batch.expiryDate) {
+        const todayStart = new Date();
+        todayStart.setHours(0, 0, 0, 0);
+        const expDate = new Date(batch.expiryDate);
+        expDate.setHours(0, 0, 0, 0);
+        if (expDate < todayStart) {
+          throw new AppError(
+            'VALIDATION_ERROR',
+            `Batch '${batch.batchNo}' sudah kedaluwarsa dan tidak boleh dikirim (BR-09)`,
+          );
+        }
       }
     }
   }
@@ -413,32 +419,74 @@ export async function shipDeliveryOrder(id: string, userId: string) {
       throw new AppError('VALIDATION_ERROR', 'Dokumen pengiriman tidak memiliki item barang');
     }
 
-    const now = new Date();
+    const todayStart = new Date();
+    todayStart.setHours(0, 0, 0, 0);
 
     // 2. Process each item: allocate batch (FEFO) if needed, and applyStockMovement (OUT)
     for (const item of doOrder.items) {
-      let resolvedBatchId = item.batchId;
+      if (item.batchId) {
+        // Manual batch selection override (BR-08): Validate batch is not expired (BR-09)
+        const batch = item.batch ?? (await tx.batch.findUnique({ where: { id: item.batchId } }));
+        if (batch?.expiryDate) {
+          const expDate = new Date(batch.expiryDate);
+          expDate.setHours(0, 0, 0, 0);
+          if (expDate < todayStart) {
+            throw new AppError(
+              'VALIDATION_ERROR',
+              `Batch '${batch.batchNo}' sudah kedaluwarsa dan tidak boleh dikirim (BR-09)`,
+            );
+          }
+        }
 
-      // BR-08: If batch is not specified, auto-allocate using FEFO:
-      // Nearest unexpired batch at that location, then largest stock
-      if (!resolvedBatchId) {
+        // Deduct stock for manual batch
+        await applyStockMovement(
+          {
+            productId: item.productId,
+            locationId: item.locationId,
+            batchId: item.batchId,
+            movementType: 'OUT',
+            quantity: item.quantity,
+            refType: 'DELIVERY_ORDER',
+            refId: doOrder.id,
+            refNo: doOrder.orderNo,
+            userId,
+            notes: `Pengiriman barang DO ${doOrder.orderNo} (Batch manual ${item.batch?.batchNo || item.batchId})`,
+          },
+          { tx },
+        );
+      } else {
+        // BR-08: If batch is not specified, auto-allocate using FEFO:
+        // Nearest unexpired batch at that location, then largest stock
         const candidateStocks = await tx.stock.findMany({
           where: {
             productId: item.productId,
             locationId: item.locationId,
             quantity: { gt: 0 },
             batch: {
-              OR: [{ expiryDate: null }, { expiryDate: { gte: now } }],
+              OR: [{ expiryDate: null }, { expiryDate: { gte: todayStart } }],
             },
           },
           include: { batch: true },
           orderBy: [{ batch: { expiryDate: 'asc' } }, { quantity: 'desc' }],
         });
 
-        const bestStock = candidateStocks.find((s) => s.quantity >= item.quantity);
+        // Deterministic in-memory FEFO sort (earliest expiry first, non-expiring last, largest stock secondary)
+        candidateStocks.sort((a, b) => {
+          if (a.batch.expiryDate && b.batch.expiryDate) {
+            const diff =
+              new Date(a.batch.expiryDate).getTime() - new Date(b.batch.expiryDate).getTime();
+            if (diff !== 0) return diff;
+          } else if (a.batch.expiryDate && !b.batch.expiryDate) {
+            return -1;
+          } else if (!a.batch.expiryDate && b.batch.expiryDate) {
+            return 1;
+          }
+          return b.quantity - a.quantity;
+        });
 
-        if (!bestStock) {
-          const totalAvailable = candidateStocks.reduce((sum, s) => sum + s.quantity, 0);
+        const totalAvailable = candidateStocks.reduce((sum, s) => sum + s.quantity, 0);
+
+        if (totalAvailable < item.quantity) {
           throw new AppError(
             'INSUFFICIENT_STOCK',
             `Stok tidak mencukupi untuk produk '${item.product.name}' (${item.product.sku}) di lokasi '${item.location.code}'. Stok tersedia: ${totalAvailable}, diminta: ${item.quantity} (BR-17)`,
@@ -454,31 +502,80 @@ export async function shipDeliveryOrder(id: string, userId: string) {
           );
         }
 
-        resolvedBatchId = bestStock.batchId;
+        // Check if single batch satisfies entire line item (fast path)
+        const primaryStock = candidateStocks[0]!;
+        if (primaryStock.quantity >= item.quantity) {
+          await tx.deliveryOrderItem.update({
+            where: { id: item.id },
+            data: { batchId: primaryStock.batchId },
+          });
 
-        // Persist the allocated batch on the line item
-        await tx.deliveryOrderItem.update({
-          where: { id: item.id },
-          data: { batchId: resolvedBatchId },
-        });
+          await applyStockMovement(
+            {
+              productId: item.productId,
+              locationId: item.locationId,
+              batchId: primaryStock.batchId,
+              movementType: 'OUT',
+              quantity: item.quantity,
+              refType: 'DELIVERY_ORDER',
+              refId: doOrder.id,
+              refNo: doOrder.orderNo,
+              userId,
+              notes: `Pengiriman barang DO ${doOrder.orderNo} (FEFO Batch ${primaryStock.batch.batchNo})`,
+            },
+            { tx },
+          );
+        } else {
+          // Multi-batch FEFO splitting: deplete earliest candidate batches in order (BR-08, BR-17)
+          let remainingQty = item.quantity;
+          let isFirstSlice = true;
+
+          for (const stock of candidateStocks) {
+            if (remainingQty <= 0) break;
+
+            const sliceQty = Math.min(stock.quantity, remainingQty);
+
+            if (isFirstSlice) {
+              await tx.deliveryOrderItem.update({
+                where: { id: item.id },
+                data: {
+                  batchId: stock.batchId,
+                  quantity: sliceQty,
+                },
+              });
+              isFirstSlice = false;
+            } else {
+              await tx.deliveryOrderItem.create({
+                data: {
+                  deliveryOrderId: doOrder.id,
+                  productId: item.productId,
+                  locationId: item.locationId,
+                  batchId: stock.batchId,
+                  quantity: sliceQty,
+                },
+              });
+            }
+
+            await applyStockMovement(
+              {
+                productId: item.productId,
+                locationId: item.locationId,
+                batchId: stock.batchId,
+                movementType: 'OUT',
+                quantity: sliceQty,
+                refType: 'DELIVERY_ORDER',
+                refId: doOrder.id,
+                refNo: doOrder.orderNo,
+                userId,
+                notes: `Pengiriman barang DO ${doOrder.orderNo} (Split FEFO Batch ${stock.batch.batchNo})`,
+              },
+              { tx },
+            );
+
+            remainingQty -= sliceQty;
+          }
+        }
       }
-
-      // Execute atomic stock movement (BR-01, BR-17, BR-22, BR-29, BR-30)
-      await applyStockMovement(
-        {
-          productId: item.productId,
-          locationId: item.locationId,
-          batchId: resolvedBatchId,
-          movementType: 'OUT',
-          quantity: item.quantity,
-          refType: 'DELIVERY_ORDER',
-          refId: doOrder.id,
-          refNo: doOrder.orderNo,
-          userId,
-          notes: `Pengiriman barang DO ${doOrder.orderNo}`,
-        },
-        { tx },
-      );
     }
 
     // 3. Update DO status to SHIPPED
@@ -558,7 +655,8 @@ export async function getAvailableBatchesForDelivery(params: {
   productId: string;
   locationId: string;
 }) {
-  const now = new Date();
+  const todayStart = new Date();
+  todayStart.setHours(0, 0, 0, 0);
 
   const stocks = await prisma.stock.findMany({
     where: {
@@ -566,21 +664,47 @@ export async function getAvailableBatchesForDelivery(params: {
       locationId: params.locationId,
       quantity: { gt: 0 },
       batch: {
-        OR: [{ expiryDate: null }, { expiryDate: { gte: now } }],
+        OR: [{ expiryDate: null }, { expiryDate: { gte: todayStart } }],
       },
     },
     include: {
       batch: true,
     },
-    orderBy: [{ batch: { expiryDate: 'asc' } }, { quantity: 'desc' }],
   });
 
-  return stocks.map((s, index) => ({
-    stockId: s.id,
-    batchId: s.batchId,
-    batchNo: s.batch.batchNo,
-    expiryDate: s.batch.expiryDate,
-    availableQuantity: s.quantity,
-    isFefoRecommended: index === 0,
-  }));
+  // Sort candidate stocks with deterministic FEFO:
+  // Earliest expiry first; non-expiring last; largest quantity secondary
+  const sortedStocks = [...stocks].sort((a, b) => {
+    if (a.batch.expiryDate && b.batch.expiryDate) {
+      const diff = new Date(a.batch.expiryDate).getTime() - new Date(b.batch.expiryDate).getTime();
+      if (diff !== 0) return diff;
+    } else if (a.batch.expiryDate && !b.batch.expiryDate) {
+      return -1;
+    } else if (!a.batch.expiryDate && b.batch.expiryDate) {
+      return 1;
+    }
+    return b.quantity - a.quantity;
+  });
+
+  return sortedStocks.map((s, index) => {
+    let daysRemaining: number | null = null;
+    let isNearExpiry = false;
+
+    if (s.batch.expiryDate) {
+      const msDiff = new Date(s.batch.expiryDate).getTime() - todayStart.getTime();
+      daysRemaining = Math.max(0, Math.ceil(msDiff / (1000 * 60 * 60 * 24)));
+      isNearExpiry = daysRemaining <= 30; // BR-10 preview
+    }
+
+    return {
+      stockId: s.id,
+      batchId: s.batchId,
+      batchNo: s.batch.batchNo,
+      expiryDate: s.batch.expiryDate,
+      availableQuantity: s.quantity,
+      isFefoRecommended: index === 0,
+      daysRemaining,
+      isNearExpiry,
+    };
+  });
 }

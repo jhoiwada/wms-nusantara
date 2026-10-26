@@ -198,6 +198,63 @@ describe('Goods Receipt Service (BR-06, BR-07, BR-11, BR-12, BR-13, BR-14, BR-15
     });
   });
 
+  it('menolak produk trackExpiry jika tanggal kedaluwarsa sebelum tanggal terima atau di masa lalu (BR-06)', async () => {
+    vi.mocked(prisma.supplier.findUnique).mockResolvedValueOnce(mockSupplier as never);
+    vi.mocked(prisma.warehouse.findUnique).mockResolvedValueOnce(mockWarehouse as never);
+    vi.mocked(prisma.product.findMany).mockResolvedValueOnce([mockExpiryProduct] as never);
+    vi.mocked(prisma.location.findMany).mockResolvedValueOnce([mockLocation] as never);
+
+    await expect(
+      createGoodsReceipt(
+        {
+          supplierId: 'sup-1',
+          warehouseId: 'wh-1',
+          receivedAt: '2026-10-27',
+          items: [
+            {
+              productId: 'prod-exp',
+              locationId: 'loc-1',
+              quantity: 20,
+              batchNo: 'BATCH-PAST',
+              expiryDate: '2026-10-20', // Earlier than receivedDate!
+            },
+          ],
+        },
+        'user-1',
+      ),
+    ).rejects.toThrow(
+      /Tanggal kedaluwarsa tidak boleh lebih awal dari tanggal penerimaan barang.*BR-06/,
+    );
+  });
+
+  it('menolak penerimaan barang (RECEIVE) jika tanggal kedaluwarsa telah terlewati (BR-06)', async () => {
+    const mockGrWithExpiredItem = {
+      id: 'gr-exp',
+      receiptNo: 'GR-2026-0002',
+      status: 'DRAFT',
+      supplier: mockSupplier,
+      warehouse: mockWarehouse,
+      items: [
+        {
+          id: 'item-exp',
+          productId: 'prod-exp',
+          locationId: 'loc-1',
+          quantity: 20,
+          batchNo: 'EXP-PAST',
+          expiryDate: new Date('2020-01-01'), // Already passed!
+          product: mockExpiryProduct,
+          location: mockLocation,
+        },
+      ],
+    };
+
+    vi.mocked(prisma.goodsReceipt.findUnique).mockResolvedValueOnce(mockGrWithExpiredItem as never);
+
+    await expect(receiveGoodsReceipt('gr-exp', 'user-1')).rejects.toThrow(
+      /memiliki tanggal kedaluwarsa.*yang sudah terlewati saat penerimaan barang.*BR-06/,
+    );
+  });
+
   it('menerima barang (RECEIVE) secara atomik: stok bertambah dan status menjadi RECEIVED (BR-12)', async () => {
     const mockGrDetail = {
       id: 'gr-1',

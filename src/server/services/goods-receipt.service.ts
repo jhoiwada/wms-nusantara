@@ -234,10 +234,15 @@ async function validateGoodsReceiptItems(
         );
       }
       const parsedExp = new Date(item.expiryDate);
-      if (receivedDate && parsedExp < receivedDate) {
+      const minDate = receivedDate ? new Date(receivedDate) : new Date();
+      minDate.setHours(0, 0, 0, 0);
+      const expDateOnly = new Date(parsedExp);
+      expDateOnly.setHours(0, 0, 0, 0);
+
+      if (expDateOnly < minDate) {
         throw new AppError(
           'VALIDATION_ERROR',
-          `Baris #${rowNum}: Tanggal kedaluwarsa tidak boleh lebih awal dari tanggal penerimaan barang (BR-06)`,
+          `Baris #${rowNum}: Tanggal kedaluwarsa tidak boleh lebih awal dari tanggal penerimaan barang (${minDate.toISOString().split('T')[0]}) (BR-06)`,
         );
       }
       batchNo = item.batchNo.trim().toUpperCase();
@@ -430,6 +435,22 @@ export async function receiveGoodsReceipt(id: string, userId: string) {
 
   if (gr.items.length === 0) {
     throw new AppError('VALIDATION_ERROR', 'Dokumen penerimaan tidak memiliki item barang');
+  }
+
+  const todayStart = new Date();
+  todayStart.setHours(0, 0, 0, 0);
+
+  for (const item of gr.items) {
+    if (item.expiryDate) {
+      const itemExp = new Date(item.expiryDate);
+      itemExp.setHours(0, 0, 0, 0);
+      if (itemExp < todayStart) {
+        throw new AppError(
+          'VALIDATION_ERROR',
+          `Item '${item.product.name}' memiliki tanggal kedaluwarsa (${itemExp.toISOString().split('T')[0]}) yang sudah terlewati saat penerimaan barang (BR-06)`,
+        );
+      }
+    }
   }
 
   return prisma.$transaction(async (tx) => {
