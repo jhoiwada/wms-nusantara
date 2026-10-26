@@ -5,7 +5,7 @@ Cara pakai: kerjakan **satu tugas per sesi**, dari atas ke bawah. Tugas dianggap
 ## Status saat ini
 
 - Terakhir diperbarui: 2026-10-26
-- Sedang dikerjakan: T1.3 Master: kategori, supplier, customer
+- Sedang dikerjakan: T1.4 Master: produk
 - Aturan bisnis: sudah disetujui (`docs/BUSINESS_RULES.md`)
 - Sinkronisasi: `docs/DATABASE.md` sudah 100% cocok dengan `schema.prisma` dan `db/wms_schema_seed_postgres.sql`.
 
@@ -29,7 +29,7 @@ Cara pakai: kerjakan **satu tugas per sesi**, dari atas ke bawah. Tugas dianggap
 - [x] **T1.1 Autentikasi dan RBAC.** Login/logout, `requireRole`, middleware pengalihan, rate limit login.
       Selesai bila: tes menunjukkan tiap role mendapat 200/403 sesuai matriks di `SECURITY.md`.
 - [x] **T1.2 Layout dashboard.** `AppShell`, sidebar tersaring per role, komponen UI dasar, `DataTable`.
-- [ ] **T1.3 Master: kategori, supplier, customer.** CRUD + nonaktifkan (BR-31, BR-32).
+- [x] **T1.3 Master: kategori, supplier, customer.** CRUD + nonaktifkan (BR-31, BR-32).
 - [ ] **T1.4 Master: produk.** CRUD, SKU/barcode unik, `min_stock`, `track_expiry`, `cost_price`.
 - [ ] **T1.5 Master: gudang dan lokasi.** Validasi pola kode (BR-33).
 - [ ] **T1.6 `applyStockMovement` + tes.** Inti semua mutasi stok.
