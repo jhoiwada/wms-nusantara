@@ -5,7 +5,7 @@ Cara pakai: kerjakan **satu tugas per sesi**, dari atas ke bawah. Tugas dianggap
 ## Status saat ini
 
 - Terakhir diperbarui: 2026-10-27
-- Sedang dikerjakan: T1.8 Barang keluar (DO)
+- Sedang dikerjakan: T1.9 Stok dan kartu stok
 - Aturan bisnis: sudah disetujui (`docs/BUSINESS_RULES.md`)
 - Sinkronisasi: `docs/DATABASE.md` sudah 100% cocok dengan `schema.prisma` dan `db/wms_schema_seed_postgres.sql`.
 
@@ -35,7 +35,7 @@ Cara pakai: kerjakan **satu tugas per sesi**, dari atas ke bawah. Tugas dianggap
 - [x] **T1.6 `applyStockMovement` + tes.** Inti semua mutasi stok.
       Selesai bila: tes membuktikan stok tidak bisa minus, dua transaksi bersamaan tidak melewati batas, dan rollback saat gagal di tengah (BR-01, BR-12, BR-17).
 - [x] **T1.7 Barang masuk (GR).** Penomoran dokumen, draft, edit, terima, batal; UI daftar dan form `LineItemsEditor`.
-- [ ] **T1.8 Barang keluar (DO).** Draft, kirim dengan pemeriksaan stok, penolakan dengan pesan jelas; UI.
+- [x] **T1.8 Barang keluar (DO).** Draft, kirim dengan pemeriksaan stok, penolakan dengan pesan jelas; UI.
 - [ ] **T1.9 Stok dan kartu stok.** Tampilan per produk dan per lokasi; kartu stok dengan saldo berjalan.
       Selesai bila: jumlah seluruh pergerakan per produk sama dengan stok di tabel stok (ada tes konsistensi).
 - [ ] **T1.10 Dashboard.** Ringkasan, stok menipis, nilai persediaan, transaksi terbaru, grafik masuk vs keluar.
