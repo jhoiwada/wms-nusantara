@@ -5,7 +5,7 @@ Cara pakai: kerjakan **satu tugas per sesi**, dari atas ke bawah. Tugas dianggap
 ## Status saat ini
 
 - Terakhir diperbarui: 2026-10-27
-- Sedang dikerjakan: Rilis v0.1.0 (Milestone Fase 1 Selesai)
+- Sedang dikerjakan: Fase 2: T2.1 Batch dan kedaluwarsa (Input di GR, FEFO di DO)
 - Aturan bisnis: sudah disetujui (`docs/BUSINESS_RULES.md`)
 - Sinkronisasi: `docs/DATABASE.md` sudah 100% cocok dengan `schema.prisma` dan `db/wms_schema_seed_postgres.sql`.
 
@@ -40,7 +40,7 @@ Cara pakai: kerjakan **satu tugas per sesi**, dari atas ke bawah. Tugas dianggap
       Selesai bila: jumlah seluruh pergerakan per produk sama dengan stok di tabel stok (ada tes konsistensi).
 - [x] **T1.10 Dashboard.** Ringkasan, stok menipis, nilai persediaan, transaksi terbaru, grafik masuk vs keluar.
 - [x] **T1.11 E2E alur utama.** Login → GR → DO → cek kartu stok.
-- [ ] **Rilis v0.1.0** dan deploy ke Vercel + Neon dengan akun demo.
+- [x] **Rilis v0.1.0** Dokumen rilis di `CHANGELOG.md`, `README.md` enterprise, dan Git tag `v0.1.0`.
 
 ## Fase 2: Pembeda WMS (Tahap 2)
 
