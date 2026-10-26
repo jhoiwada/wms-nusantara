@@ -5,7 +5,7 @@ Cara pakai: kerjakan **satu tugas per sesi**, dari atas ke bawah. Tugas dianggap
 ## Status saat ini
 
 - Terakhir diperbarui: 2026-10-26
-- Sedang dikerjakan: T1.1 Autentikasi dan RBAC
+- Sedang dikerjakan: T1.2 Layout dashboard
 - Aturan bisnis: sudah disetujui (`docs/BUSINESS_RULES.md`)
 - Sinkronisasi: `docs/DATABASE.md` sudah 100% cocok dengan `schema.prisma` dan `db/wms_schema_seed_postgres.sql`.
 
@@ -26,7 +26,7 @@ Cara pakai: kerjakan **satu tugas per sesi**, dari atas ke bawah. Tugas dianggap
 
 ## Fase 1: Inti (Tahap 1)
 
-- [ ] **T1.1 Autentikasi dan RBAC.** Login/logout, `requireRole`, middleware pengalihan, rate limit login.
+- [x] **T1.1 Autentikasi dan RBAC.** Login/logout, `requireRole`, middleware pengalihan, rate limit login.
       Selesai bila: tes menunjukkan tiap role mendapat 200/403 sesuai matriks di `SECURITY.md`.
 - [ ] **T1.2 Layout dashboard.** `AppShell`, sidebar tersaring per role, komponen UI dasar, `DataTable`.
 - [ ] **T1.3 Master: kategori, supplier, customer.** CRUD + nonaktifkan (BR-31, BR-32).

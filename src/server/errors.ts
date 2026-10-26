@@ -66,7 +66,17 @@ export interface ErrorResult {
   response: ErrorResponse;
 }
 
-export function handleError(error: unknown): ErrorResult {
+export function formatError(error: unknown): ErrorResult {
+  // Rethrow Next.js internal control-flow errors (redirects, dynamic server bailouts, hanging promises)
+  if (
+    error &&
+    typeof error === 'object' &&
+    'digest' in error &&
+    typeof (error as Record<string, unknown>).digest === 'string'
+  ) {
+    throw error;
+  }
+
   if (error instanceof AppError) {
     return {
       statusCode: error.statusCode,
@@ -135,4 +145,18 @@ export function handleError(error: unknown): ErrorResult {
       },
     },
   };
+}
+
+export type ErrorApiResponse = Response & ErrorResult;
+
+export function handleError(error: unknown): ErrorApiResponse {
+  const result = formatError(error);
+  const res = Response.json(result.response, {
+    status: result.statusCode,
+  }) as ErrorApiResponse;
+
+  res.statusCode = result.statusCode;
+  res.response = result.response;
+
+  return res;
 }
