@@ -58,6 +58,7 @@ model User {
   createdStockOpnames   StockOpname[]   @relation("CreatedStockOpnames")
   approvedStockOpnames  StockOpname[]   @relation("ApprovedStockOpnames")
   stockMovements        StockMovement[]
+  auditLogs             AuditLog[]
 
   @@map("users")
 }
@@ -366,4 +367,27 @@ model DocumentCounter {
   updatedAt    DateTime @updatedAt @map("updated_at")
 
   @@map("document_counters")
+}
+
+model AuditLog {
+  id          String   @id @default(uuid())
+  userId      String?  @map("user_id")
+  userName    String?  @map("user_name")
+  userRole    String?  @map("user_role")
+  action      String
+  entity      String
+  entityId    String?  @map("entity_id")
+  description String
+  oldValues   Json?    @map("old_values")
+  newValues   Json?    @map("new_values")
+  ipAddress   String?  @map("ip_address")
+  userAgent   String?  @map("user_agent")
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([entity, entityId])
+  @@index([userId])
+  @@index([createdAt(sort: Desc)])
+  @@map("audit_logs")
 }

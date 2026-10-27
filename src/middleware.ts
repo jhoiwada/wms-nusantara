@@ -23,6 +23,7 @@ export function middleware(req: NextRequest) {
     pathname.startsWith('/stock-adjustments') ||
     pathname.startsWith('/stock-transfers') ||
     pathname.startsWith('/reports') ||
+    pathname.startsWith('/audit-logs') ||
     pathname.startsWith('/users');
 
   if (isProtectedPage && !token) {

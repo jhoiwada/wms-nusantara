@@ -85,6 +85,12 @@ const NAV_ITEMS: NavItem[] = [
     roles: ['ADMIN', 'MANAGER', 'STAFF', 'VIEWER'],
     section: 'Analisis',
   },
+  {
+    label: 'Audit Log',
+    href: '/audit-logs',
+    roles: ['ADMIN', 'MANAGER'],
+    section: 'Sistem',
+  },
   { label: 'Kelola Pengguna', href: '/users', roles: ['ADMIN'], section: 'Sistem' },
 ];
 

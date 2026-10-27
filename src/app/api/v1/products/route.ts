@@ -24,12 +24,16 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   try {
-    await requireRole(['ADMIN', 'MANAGER']);
+    const session = await requireRole(['ADMIN', 'MANAGER']);
 
     const body: unknown = await req.json();
     const validated = createProductSchema.parse(body);
 
-    const created = await createProduct(validated);
+    const created = await createProduct(validated, {
+      id: session.id,
+      name: session.name,
+      role: session.role,
+    });
     return Response.json({ data: created }, { status: 201 });
   } catch (error) {
     return handleError(error);

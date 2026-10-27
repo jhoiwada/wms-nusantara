@@ -26,13 +26,17 @@ export async function GET(_req: NextRequest, { params }: RouteParams) {
 
 export async function PATCH(req: NextRequest, { params }: RouteParams) {
   try {
-    await requireRole(['ADMIN', 'MANAGER']);
+    const session = await requireRole(['ADMIN', 'MANAGER']);
     const { id } = await params;
 
     const body: unknown = await req.json();
     const validated = updateProductSchema.parse(body);
 
-    const updated = await updateProduct(id, validated);
+    const updated = await updateProduct(id, validated, {
+      id: session.id,
+      name: session.name,
+      role: session.role,
+    });
     return Response.json({ data: updated });
   } catch (error) {
     return handleError(error);
@@ -41,11 +45,15 @@ export async function PATCH(req: NextRequest, { params }: RouteParams) {
 
 export async function DELETE(_req: NextRequest, { params }: RouteParams) {
   try {
-    await requireRole(['ADMIN', 'MANAGER']);
+    const session = await requireRole(['ADMIN', 'MANAGER']);
     const { id } = await params;
 
     // BR-31: Soft deactivation
-    const deactivated = await deactivateProduct(id);
+    const deactivated = await deactivateProduct(id, {
+      id: session.id,
+      name: session.name,
+      role: session.role,
+    });
     return Response.json({
       data: deactivated,
       message: 'Produk berhasil dinonaktifkan',

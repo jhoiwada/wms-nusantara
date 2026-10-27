@@ -54,7 +54,7 @@ Cara pakai: kerjakan **satu tugas per sesi**, dari atas ke bawah. Tugas dianggap
 ## Fase 3: Nilai tambah (Tahap 3, pilih sesuai waktu)
 
 - [x] **T3.1 Export Excel/PDF** laporan pergerakan dan nilai persediaan.
-- [ ] **T3.2 Audit log** perubahan master data dan aksi sensitif.
+- [x] **T3.2 Audit log** perubahan master data dan aksi sensitif.
 - [ ] **T3.3 Cetak label barcode.**
 - [ ] **T3.4 Scan barcode** lewat kamera HP di form GR/DO.
 - [ ] **T3.5 Denah gudang interaktif.**

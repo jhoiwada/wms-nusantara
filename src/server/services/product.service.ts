@@ -2,6 +2,7 @@ import { prisma } from '@/server/db';
 import { AppError } from '@/server/errors';
 import type { CreateProductInput, UpdateProductInput } from '@/schemas/product.schema';
 import { Prisma } from '@prisma/client';
+import { recordAuditLog, type AuditUserContext } from './audit-log.service';
 
 export interface ListProductsOptions {
   page?: number;
@@ -98,7 +99,7 @@ export async function getProductById(id: string) {
   return product;
 }
 
-export async function createProduct(input: CreateProductInput) {
+export async function createProduct(input: CreateProductInput, user?: AuditUserContext) {
   // Validate Category exists and is active (BR-32)
   const category = await prisma.category.findUnique({
     where: { id: input.categoryId },
@@ -132,7 +133,7 @@ export async function createProduct(input: CreateProductInput) {
     }
   }
 
-  return prisma.product.create({
+  const created = await prisma.product.create({
     data: {
       sku: input.sku.toUpperCase(),
       barcode: input.barcode || null,
@@ -154,9 +155,36 @@ export async function createProduct(input: CreateProductInput) {
       },
     },
   });
+
+  await recordAuditLog({
+    userId: user?.id,
+    userName: user?.name,
+    userRole: user?.role,
+    action: 'CREATE',
+    entity: 'PRODUCT',
+    entityId: created.id,
+    description: `Menambahkan master produk baru ${created.sku} (${created.name})`,
+    newValues: {
+      sku: created.sku,
+      barcode: created.barcode,
+      name: created.name,
+      uom: created.uom,
+      costPrice: Number(created.costPrice),
+      minStock: created.minStock,
+      categoryId: created.categoryId,
+    },
+    ipAddress: user?.ipAddress,
+    userAgent: user?.userAgent,
+  });
+
+  return created;
 }
 
-export async function updateProduct(id: string, input: UpdateProductInput) {
+export async function updateProduct(
+  id: string,
+  input: UpdateProductInput,
+  user?: AuditUserContext,
+) {
   const existing = await getProductById(id);
 
   // Check SKU uniqueness if changed
@@ -192,7 +220,20 @@ export async function updateProduct(id: string, input: UpdateProductInput) {
     }
   }
 
-  return prisma.product.update({
+  const oldValues = {
+    sku: existing.sku,
+    barcode: existing.barcode,
+    name: existing.name,
+    description: existing.description,
+    categoryId: existing.categoryId,
+    uom: existing.uom,
+    minStock: existing.minStock,
+    costPrice: Number(existing.costPrice),
+    trackExpiry: existing.trackExpiry,
+    isActive: existing.isActive,
+  };
+
+  const updated = await prisma.product.update({
     where: { id },
     data: {
       ...(input.sku !== undefined && { sku: input.sku.toUpperCase() }),
@@ -216,13 +257,58 @@ export async function updateProduct(id: string, input: UpdateProductInput) {
       },
     },
   });
+
+  const newValues = {
+    sku: updated.sku,
+    barcode: updated.barcode,
+    name: updated.name,
+    description: updated.description,
+    categoryId: updated.categoryId,
+    uom: updated.uom,
+    minStock: updated.minStock,
+    costPrice: Number(updated.costPrice),
+    trackExpiry: updated.trackExpiry,
+    isActive: updated.isActive,
+  };
+
+  await recordAuditLog({
+    userId: user?.id,
+    userName: user?.name,
+    userRole: user?.role,
+    action: 'UPDATE',
+    entity: 'PRODUCT',
+    entityId: updated.id,
+    description: `Memperbarui data master produk ${updated.sku} (${updated.name})`,
+    oldValues,
+    newValues,
+    ipAddress: user?.ipAddress,
+    userAgent: user?.userAgent,
+  });
+
+  return updated;
 }
 
-export async function deactivateProduct(id: string) {
-  await getProductById(id);
+export async function deactivateProduct(id: string, user?: AuditUserContext) {
+  const existing = await getProductById(id);
 
-  return prisma.product.update({
+  const updated = await prisma.product.update({
     where: { id },
     data: { isActive: false },
   });
+
+  await recordAuditLog({
+    userId: user?.id,
+    userName: user?.name,
+    userRole: user?.role,
+    action: 'STATUS_CHANGE',
+    entity: 'PRODUCT',
+    entityId: id,
+    description: `Menonaktifkan master produk ${existing.sku} (${existing.name})`,
+    oldValues: { isActive: existing.isActive },
+    newValues: { isActive: false },
+    ipAddress: user?.ipAddress,
+    userAgent: user?.userAgent,
+  });
+
+  return updated;
 }
