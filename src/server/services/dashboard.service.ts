@@ -167,6 +167,13 @@ export async function getDashboardSummary(warehouseId?: string): Promise<Dashboa
  * Supports ranges: 7d, 30d, 90d.
  * Guaranteed continuous sequence with zero-fill for days with no movements.
  */
+function toLocalDateKey(d: Date): string {
+  const year = d.getFullYear();
+  const month = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
+
 export async function getMovementChart(
   range: '7d' | '30d' | '90d' = '7d',
   warehouseId?: string,
@@ -191,11 +198,11 @@ export async function getMovementChart(
     orderBy: { createdAt: 'asc' },
   });
 
-  // Map movements by YYYY-MM-DD
+  // Map movements by local date YYYY-MM-DD
   const dailyMap = new Map<string, { incoming: number; outgoing: number }>();
 
   for (const m of movements) {
-    const dateKey = m.createdAt.toISOString().split('T')[0]!;
+    const dateKey = toLocalDateKey(m.createdAt);
     const entry = dailyMap.get(dateKey) || { incoming: 0, outgoing: 0 };
 
     if (INCOMING_TYPES.has(m.movementType)) {
@@ -206,13 +213,12 @@ export async function getMovementChart(
     dailyMap.set(dateKey, entry);
   }
 
-  // Generate complete continuous series
+  // Generate complete continuous series of exactly daysCount items
   const results: MovementChartItem[] = [];
-  const curr = new Date(startDate);
-  const today = new Date();
-
-  while (curr <= today) {
-    const dateKey = curr.toISOString().split('T')[0]!;
+  for (let i = 0; i < daysCount; i++) {
+    const curr = new Date(startDate);
+    curr.setDate(startDate.getDate() + i);
+    const dateKey = toLocalDateKey(curr);
     const entry = dailyMap.get(dateKey) || { incoming: 0, outgoing: 0 };
 
     const label = curr.toLocaleDateString('id-ID', {
@@ -226,8 +232,6 @@ export async function getMovementChart(
       incomingQty: entry.incoming,
       outgoingQty: entry.outgoing,
     });
-
-    curr.setDate(curr.getDate() + 1);
   }
 
   return results;

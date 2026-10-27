@@ -5,7 +5,7 @@ Cara pakai: kerjakan **satu tugas per sesi**, dari atas ke bawah. Tugas dianggap
 ## Status saat ini
 
 - Terakhir diperbarui: 2026-10-27
-- Sedang dikerjakan: Fase 2: T2.2 Peringatan expired (/stock/expiring, ExpiryBadge, panel dashboard)
+- Sedang dikerjakan: Fase 2: T2.3 Stock opname (Snapshot, pembekuan lokasi, submit, approve/reject - BR-20 s.d. BR-26)
 - Aturan bisnis: sudah disetujui (`docs/BUSINESS_RULES.md`)
 - Sinkronisasi: `docs/DATABASE.md` sudah 100% cocok dengan `schema.prisma` dan `db/wms_schema_seed_postgres.sql`.
 
@@ -45,7 +45,7 @@ Cara pakai: kerjakan **satu tugas per sesi**, dari atas ke bawah. Tugas dianggap
 ## Fase 2: Pembeda WMS (Tahap 2)
 
 - [x] **T2.1 Batch dan kedaluwarsa.** Input di GR, FEFO di DO (BR-06 s.d. BR-09).
-- [ ] **T2.2 Peringatan expired.** Endpoint `/stock/expiring`, `ExpiryBadge`, panel di dashboard.
+- [x] **T2.2 Peringatan expired.** Endpoint `/stock/expiring`, `ExpiryBadge`, panel di dashboard.
 - [ ] **T2.3 Stock opname.** Snapshot, pembekuan lokasi, submit, approve/reject, penyesuaian (BR-20 s.d. BR-26).
 - [ ] **T2.4 Penyesuaian stok manual.** Manager/Admin, wajib alasan (BR-26).
 - [ ] **T2.5 Transfer stok.** Antar rak dan antar gudang (BR-27, BR-28).

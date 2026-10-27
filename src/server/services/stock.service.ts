@@ -715,20 +715,71 @@ export async function getLowStockProducts(options: { warehouseId?: string } = {}
   return lowStockItems;
 }
 
-export async function getExpiringBatches(options: { days?: number; warehouseId?: string } = {}) {
-  const days = options.days || 30;
-  const now = new Date();
-  const futureDate = new Date();
-  futureDate.setDate(now.getDate() + days);
+export type ExpiryStatus = 'EXPIRED' | 'CRITICAL' | 'WARNING' | 'SAFE';
+
+export interface ExpiringBatchItem {
+  stockId: string;
+  productId: string;
+  productName: string;
+  sku: string;
+  uom: string;
+  category: string;
+  costPrice: number;
+  potentialLossValue: number;
+  batchId: string;
+  batchNo: string;
+  expiryDate: Date | null;
+  daysRemaining: number;
+  status: ExpiryStatus;
+  quantity: number;
+  locationId: string;
+  locationCode: string;
+  warehouseId: string;
+  warehouseName: string;
+}
+
+export interface GetExpiringBatchesOptions {
+  days?: number;
+  warehouseId?: string;
+  includeExpired?: boolean;
+  status?: 'ALL' | ExpiryStatus;
+}
+
+export type ExpiringBatchesResult = ExpiringBatchItem[] & {
+  summary: {
+    totalBatches: number;
+    expiredCount: number;
+    criticalCount: number;
+    warningCount: number;
+    safeCount: number;
+    totalPotentialLoss: number;
+    totalAtRiskUnits: number;
+  };
+  items: ExpiringBatchItem[];
+};
+
+export async function getExpiringBatches(
+  options: GetExpiringBatchesOptions = {},
+): Promise<ExpiringBatchesResult> {
+  const days = options.days !== undefined ? options.days : 30;
+  const includeExpired = options.includeExpired !== false;
+
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  const futureDate = new Date(today);
+  futureDate.setDate(today.getDate() + days);
+  futureDate.setHours(23, 59, 59, 999);
+
+  const expiryFilter: Prisma.DateTimeNullableFilter = includeExpired
+    ? { lte: futureDate }
+    : { gte: today, lte: futureDate };
 
   const stocks = await prisma.stock.findMany({
     where: {
       quantity: { gt: 0 },
       batch: {
-        expiryDate: {
-          gte: now,
-          lte: futureDate,
-        },
+        expiryDate: expiryFilter,
       },
       ...(options.warehouseId ? { location: { warehouseId: options.warehouseId } } : {}),
     },
@@ -739,6 +790,12 @@ export async function getExpiringBatches(options: { days?: number; warehouseId?:
           sku: true,
           name: true,
           uom: true,
+          costPrice: true,
+          category: {
+            select: {
+              name: true,
+            },
+          },
         },
       },
       batch: true,
@@ -755,10 +812,30 @@ export async function getExpiringBatches(options: { days?: number; warehouseId?:
     },
   });
 
-  return stocks.map((s) => {
-    const expiry = s.batch.expiryDate!;
-    const diffTime = expiry.getTime() - now.getTime();
-    const daysRemaining = Math.max(0, Math.ceil(diffTime / (1000 * 60 * 60 * 24)));
+  const allItems: ExpiringBatchItem[] = stocks.map((s) => {
+    const expDate = s.batch.expiryDate ? new Date(s.batch.expiryDate) : null;
+    let daysRemaining = 9999;
+    let status: ExpiryStatus = 'SAFE';
+
+    if (expDate) {
+      const expMidnight = new Date(expDate);
+      expMidnight.setHours(0, 0, 0, 0);
+      const diffMs = expMidnight.getTime() - today.getTime();
+      daysRemaining = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
+
+      if (daysRemaining < 0) {
+        status = 'EXPIRED';
+      } else if (daysRemaining <= 7) {
+        status = 'CRITICAL';
+      } else if (daysRemaining <= 30) {
+        status = 'WARNING';
+      } else {
+        status = 'SAFE';
+      }
+    }
+
+    const costPrice = Number(s.product.costPrice) || 0;
+    const potentialLossValue = s.quantity * costPrice;
 
     return {
       stockId: s.id,
@@ -766,14 +843,60 @@ export async function getExpiringBatches(options: { days?: number; warehouseId?:
       productName: s.product.name,
       sku: s.product.sku,
       uom: s.product.uom,
+      category: s.product.category?.name || 'Tanpa Kategori',
+      costPrice,
+      potentialLossValue,
+      batchId: s.batchId,
       batchNo: s.batch.batchNo,
       expiryDate: s.batch.expiryDate,
       daysRemaining,
+      status,
       quantity: s.quantity,
+      locationId: s.locationId,
       locationCode: s.location.code,
+      warehouseId: s.location.warehouseId,
       warehouseName: s.location.warehouse.name,
     };
   });
+
+  let expiredCount = 0;
+  let criticalCount = 0;
+  let warningCount = 0;
+  let safeCount = 0;
+  let totalPotentialLoss = 0;
+  let totalAtRiskUnits = 0;
+
+  for (const item of allItems) {
+    if (item.status === 'EXPIRED') expiredCount++;
+    else if (item.status === 'CRITICAL') criticalCount++;
+    else if (item.status === 'WARNING') warningCount++;
+    else safeCount++;
+
+    totalPotentialLoss += item.potentialLossValue;
+    totalAtRiskUnits += item.quantity;
+  }
+
+  const filteredItems =
+    options.status && options.status !== 'ALL'
+      ? allItems.filter((i) => i.status === options.status)
+      : allItems;
+
+  const summary = {
+    totalBatches: allItems.length,
+    expiredCount,
+    criticalCount,
+    warningCount,
+    safeCount,
+    totalPotentialLoss,
+    totalAtRiskUnits,
+  };
+
+  const result = Object.assign([...filteredItems], {
+    summary,
+    items: filteredItems,
+  });
+
+  return result as unknown as ExpiringBatchesResult;
 }
 
 /**

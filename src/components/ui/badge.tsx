@@ -67,3 +67,9 @@ export function Badge({ variant = 'default', className = '', children, ...props 
     </span>
   );
 }
+
+export {
+  ExpiryBadge,
+  type ExpiryBadgeProps,
+  type ExpiryStatus,
+} from '@/components/features/expiry-badge';

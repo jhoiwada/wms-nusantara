@@ -6,7 +6,39 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { DataTable, type Column } from '@/components/ui/data-table';
 import { MovementChart, type MovementChartPoint } from '@/components/features/movement-chart';
+import { ExpiryBadge, type ExpiryStatus } from '@/components/features/expiry-badge';
 import type { MovementType } from '@/types/document';
+
+interface ExpiringBatchItem {
+  stockId: string;
+  productId: string;
+  productName: string;
+  sku: string;
+  uom: string;
+  category: string;
+  costPrice: number;
+  potentialLossValue: number;
+  batchId: string;
+  batchNo: string;
+  expiryDate: string | null;
+  daysRemaining: number;
+  status: ExpiryStatus;
+  quantity: number;
+  locationId: string;
+  locationCode: string;
+  warehouseId: string;
+  warehouseName: string;
+}
+
+interface ExpiringSummaryData {
+  totalBatches: number;
+  expiredCount: number;
+  criticalCount: number;
+  warningCount: number;
+  safeCount: number;
+  totalPotentialLoss: number;
+  totalAtRiskUnits: number;
+}
 
 interface DashboardSummaryData {
   totalInventoryValue: number;
@@ -82,6 +114,14 @@ export default function DashboardPage() {
   // Recent movements state
   const [recentMovements, setRecentMovements] = useState<RecentMovementItem[]>([]);
   const [isLoadingMovements, setIsLoadingMovements] = useState(true);
+
+  // Expiring batches state (BR-10)
+  const [expiringBatches, setExpiringBatches] = useState<ExpiringBatchItem[]>([]);
+  const [expiringSummary, setExpiringSummary] = useState<ExpiringSummaryData | null>(null);
+  const [expiringFilterTab, setExpiringFilterTab] = useState<
+    'ALL' | 'EXPIRED' | 'CRITICAL' | 'WARNING'
+  >('ALL');
+  const [isLoadingExpiring, setIsLoadingExpiring] = useState(true);
 
   // Fetch warehouses for filter
   useEffect(() => {
@@ -160,6 +200,145 @@ export default function DashboardPage() {
       isMounted = false;
     };
   }, [selectedWarehouse]);
+
+  // Fetch expiring batches (BR-10)
+  useEffect(() => {
+    let isMounted = true;
+    const params = new URLSearchParams({ days: '30' });
+    if (selectedWarehouse !== 'ALL') params.append('warehouseId', selectedWarehouse);
+    if (expiringFilterTab !== 'ALL') params.append('status', expiringFilterTab);
+
+    fetch(`/api/v1/stock/expiring?${params.toString()}`)
+      .then((r) => r.json())
+      .then((json) => {
+        if (isMounted) {
+          setExpiringBatches(json.data || []);
+          if (json.meta) setExpiringSummary(json.meta);
+        }
+      })
+      .catch(() => {
+        if (isMounted) setExpiringBatches([]);
+      })
+      .finally(() => {
+        if (isMounted) setIsLoadingExpiring(false);
+      });
+
+    return () => {
+      isMounted = false;
+    };
+  }, [selectedWarehouse, expiringFilterTab]);
+
+  const expiringColumns: Column<ExpiringBatchItem>[] = [
+    {
+      key: 'product',
+      header: 'Produk & SKU',
+      sortable: true,
+      render: (row) => (
+        <div>
+          <div className="font-semibold text-slate-800 dark:text-slate-200">{row.productName}</div>
+          <div className="flex items-center gap-2 font-mono text-[11px] text-slate-500">
+            <span>{row.sku}</span>
+            <span className="text-slate-300 dark:text-slate-700">•</span>
+            <span>{row.category}</span>
+          </div>
+        </div>
+      ),
+    },
+    {
+      key: 'batchNo',
+      header: 'No. Batch',
+      sortable: true,
+      render: (row) => (
+        <span className="font-mono text-xs font-semibold text-slate-900 dark:text-slate-100">
+          {row.batchNo}
+        </span>
+      ),
+    },
+    {
+      key: 'location',
+      header: 'Lokasi Rak & Gudang',
+      render: (row) => (
+        <div>
+          <span className="font-mono text-xs font-bold text-slate-800 dark:text-slate-200">
+            {row.locationCode}
+          </span>
+          <div className="text-[11px] text-slate-500">{row.warehouseName}</div>
+        </div>
+      ),
+    },
+    {
+      key: 'quantity',
+      header: 'Sisa Stok',
+      align: 'right',
+      sortable: true,
+      render: (row) => (
+        <div className="font-mono text-xs font-bold text-slate-900 dark:text-slate-100">
+          {row.quantity.toLocaleString('id-ID')}{' '}
+          <span className="font-sans text-[11px] font-normal text-slate-500">{row.uom}</span>
+        </div>
+      ),
+    },
+    {
+      key: 'expiryDate',
+      header: 'Kedaluwarsa (Exp)',
+      sortable: true,
+      render: (row) => (
+        <div>
+          <div className="font-mono text-xs text-slate-700 dark:text-slate-300">
+            {row.expiryDate
+              ? new Date(row.expiryDate).toLocaleDateString('id-ID', {
+                  day: 'numeric',
+                  month: 'short',
+                  year: 'numeric',
+                })
+              : '-'}
+          </div>
+          <div className="mt-0.5">
+            <ExpiryBadge
+              expiryDate={row.expiryDate}
+              daysRemaining={row.daysRemaining}
+              status={row.status}
+            />
+          </div>
+        </div>
+      ),
+    },
+    {
+      key: 'potentialLossValue',
+      header: 'Nilai Risiko',
+      align: 'right',
+      sortable: true,
+      render: (row) => (
+        <div className="text-right">
+          <div className="font-mono text-xs font-semibold text-rose-700 dark:text-rose-400">
+            Rp {row.potentialLossValue.toLocaleString('id-ID')}
+          </div>
+          <div className="text-[10px] text-slate-400">
+            @ Rp {row.costPrice.toLocaleString('id-ID')}
+          </div>
+        </div>
+      ),
+    },
+    {
+      key: 'action',
+      header: 'Aksi FEFO',
+      align: 'center',
+      render: (row) => (
+        <div className="flex items-center justify-center gap-1.5">
+          <Link href="/delivery-orders/new">
+            <Button size="sm" variant="outline" className="h-6 px-2 text-[10px]">
+              Alokasi DO
+            </Button>
+          </Link>
+          <Link href={`/stock/${row.productId}/card`}>
+            <Button size="sm" variant="ghost" className="h-6 px-1.5 text-[10px] text-slate-500">
+              Kartu Stok
+            </Button>
+          </Link>
+        </div>
+      ),
+    },
+  ];
 
   const getMovementBadge = (type: MovementType) => {
     switch (type) {
@@ -368,15 +547,30 @@ export default function DashboardPage() {
         </Link>
 
         {/* Expiring Batches */}
-        <div className="rounded-lg border border-slate-200 bg-white p-4 dark:border-slate-800 dark:bg-slate-950">
-          <div className="text-xs font-medium text-rose-600 dark:text-rose-400">
-            Batch Hampir Expired (BR-10)
+        <a
+          href="#panel-expiring"
+          className="block rounded-lg border border-rose-200 bg-white p-4 transition-colors hover:border-rose-400 dark:border-rose-900/50 dark:bg-slate-950"
+        >
+          <div className="flex items-center justify-between text-xs font-medium text-rose-600 dark:text-rose-400">
+            <span>Batch Hampir Expired (BR-10)</span>
+            <span className="text-rose-500">↓</span>
           </div>
-          <div className="mt-1 font-mono text-2xl font-bold text-rose-700 dark:text-rose-400">
-            {isLoadingSummary ? '...' : `${summary?.expiringBatchesCount || 0} Batch`}
+          <div className="mt-1 flex items-baseline gap-2">
+            <span className="font-mono text-2xl font-bold text-rose-700 dark:text-rose-400">
+              {isLoadingSummary ? '...' : `${summary?.expiringBatchesCount || 0} Batch`}
+            </span>
+            {expiringSummary && expiringSummary.expiredCount > 0 && (
+              <span className="rounded bg-rose-100 px-1.5 py-0.5 text-[10px] font-bold text-rose-800 dark:bg-rose-950 dark:text-rose-300">
+                {expiringSummary.expiredCount} Expired!
+              </span>
+            )}
           </div>
-          <div className="mt-1 text-[11px] text-slate-400">Kadaluwarsa dalam 30 hari</div>
-        </div>
+          <div className="mt-1 text-[11px] text-slate-400">
+            {expiringSummary && expiringSummary.totalPotentialLoss > 0
+              ? `Potensi risiko Rp ${expiringSummary.totalPotentialLoss.toLocaleString('id-ID')}`
+              : 'Kadaluwarsa dalam 30 hari'}
+          </div>
+        </a>
       </div>
 
       {/* Operational Draft Alerts Banner */}
@@ -452,6 +646,131 @@ export default function DashboardPage() {
           ))}
         </div>
       )}
+
+      {/* Expiring Batches Alert Panel (BR-10) */}
+      <div
+        id="panel-expiring"
+        className="space-y-4 rounded-xl border border-rose-200 bg-white p-5 dark:border-rose-950/60 dark:bg-slate-950"
+      >
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <div className="flex items-center gap-2">
+              <span className="flex h-6 w-6 items-center justify-center rounded-full bg-rose-100 text-xs font-bold text-rose-700 dark:bg-rose-950 dark:text-rose-300">
+                ⚠️
+              </span>
+              <h2 className="text-base font-bold text-slate-900 dark:text-slate-100">
+                Peringatan Batch Kedaluwarsa (BR-10)
+              </h2>
+              {expiringSummary && expiringSummary.totalBatches > 0 && (
+                <span className="rounded-full bg-rose-100 px-2.5 py-0.5 text-xs font-bold text-rose-800 dark:bg-rose-950 dark:text-rose-300">
+                  {expiringSummary.totalBatches} Batch Perlu Perhatian
+                </span>
+              )}
+            </div>
+            <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
+              Pemantauan batch berisiko dengan sisa umur ≤ 30 hari. Segera jadwalkan pengiriman (DO)
+              dengan prioritas FEFO atau ajukan penyesuaian untuk batch yang telah kedaluwarsa.
+            </p>
+          </div>
+
+          {/* Potential Loss Badge */}
+          {expiringSummary && expiringSummary.totalPotentialLoss > 0 && (
+            <div className="rounded-lg border border-rose-200 bg-rose-50 px-3.5 py-2 text-right dark:border-rose-900/60 dark:bg-rose-950/40">
+              <div className="text-[10px] font-medium tracking-wide text-rose-600 uppercase dark:text-rose-400">
+                Total Nilai Risiko Persediaan
+              </div>
+              <div className="font-mono text-sm font-bold text-rose-700 dark:text-rose-300">
+                Rp {expiringSummary.totalPotentialLoss.toLocaleString('id-ID')}
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Status Filter Tabs */}
+        <div className="flex flex-wrap items-center gap-2 border-b border-slate-100 pb-3 dark:border-slate-800">
+          <button
+            type="button"
+            onClick={() => setExpiringFilterTab('ALL')}
+            className={`rounded-lg px-3 py-1.5 text-xs font-medium transition-colors ${
+              expiringFilterTab === 'ALL'
+                ? 'bg-slate-900 text-white dark:bg-slate-100 dark:text-slate-900'
+                : 'text-slate-600 hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-slate-900'
+            }`}
+          >
+            Semua Batch (≤ 30 hari)
+            {expiringSummary && (
+              <span className="py-0.2 ml-1.5 rounded-full bg-slate-200 px-1.5 text-[10px] text-slate-700 dark:bg-slate-800 dark:text-slate-300">
+                {expiringSummary.totalBatches}
+              </span>
+            )}
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setExpiringFilterTab('CRITICAL')}
+            className={`rounded-lg px-3 py-1.5 text-xs font-medium transition-colors ${
+              expiringFilterTab === 'CRITICAL'
+                ? 'bg-red-700 text-white dark:bg-red-600 dark:text-white'
+                : 'text-red-700 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-950/50'
+            }`}
+          >
+            Kritis (≤ 7 hari)
+            {expiringSummary && expiringSummary.criticalCount > 0 && (
+              <span className="py-0.2 ml-1.5 rounded-full bg-red-100 px-1.5 text-[10px] font-bold text-red-800 dark:bg-red-900 dark:text-red-200">
+                {expiringSummary.criticalCount}
+              </span>
+            )}
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setExpiringFilterTab('EXPIRED')}
+            className={`rounded-lg px-3 py-1.5 text-xs font-medium transition-colors ${
+              expiringFilterTab === 'EXPIRED'
+                ? 'bg-rose-800 text-white dark:bg-rose-700 dark:text-white'
+                : 'text-rose-700 hover:bg-rose-50 dark:text-rose-400 dark:hover:bg-rose-950/50'
+            }`}
+          >
+            Sudah Kedaluwarsa
+            {expiringSummary && expiringSummary.expiredCount > 0 && (
+              <span className="py-0.2 ml-1.5 rounded-full bg-rose-100 px-1.5 text-[10px] font-bold text-rose-800 dark:bg-rose-900 dark:text-rose-200">
+                {expiringSummary.expiredCount}
+              </span>
+            )}
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setExpiringFilterTab('WARNING')}
+            className={`rounded-lg px-3 py-1.5 text-xs font-medium transition-colors ${
+              expiringFilterTab === 'WARNING'
+                ? 'bg-amber-700 text-white dark:bg-amber-600 dark:text-white'
+                : 'text-amber-700 hover:bg-amber-50 dark:text-amber-400 dark:hover:bg-amber-950/50'
+            }`}
+          >
+            Mendekati Expired (8-30 hari)
+            {expiringSummary && (
+              <span className="py-0.2 ml-1.5 rounded-full bg-amber-100 px-1.5 text-[10px] text-amber-800 dark:bg-amber-900 dark:text-amber-200">
+                {expiringSummary.warningCount}
+              </span>
+            )}
+          </button>
+        </div>
+
+        {/* Expiring Batches Table */}
+        <DataTable
+          columns={expiringColumns}
+          data={expiringBatches}
+          isLoading={isLoadingExpiring}
+          searchPlaceholder="Cari batch, SKU, nama produk, atau lokasi rak..."
+          searchField={(item) =>
+            `${item.batchNo} ${item.sku} ${item.productName} ${item.locationCode} ${item.warehouseName}`
+          }
+          pageSize={5}
+          emptyTitle="Seluruh Batch Dalam Kondisi Aman"
+          emptyDescription="Tidak ada batch persediaan aktif yang mendekati atau telah melewati batas kedaluwarsa pada gudang terpilih."
+        />
+      </div>
 
       {/* Movement Table */}
       <div className="space-y-3">

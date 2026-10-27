@@ -18,6 +18,7 @@ vi.mock('@/server/db', () => ({
     stock: {
       create: vi.fn(),
       update: vi.fn(),
+      findMany: vi.fn(),
     },
     stockMovement: {
       create: vi.fn(),
@@ -28,7 +29,12 @@ vi.mock('@/server/db', () => ({
 }));
 
 import { prisma } from '@/server/db';
-import { applyStockMovement, applyStockMovements, getOrCreateDefaultBatch } from '../stock.service';
+import {
+  applyStockMovement,
+  applyStockMovements,
+  getOrCreateDefaultBatch,
+  getExpiringBatches,
+} from '../stock.service';
 
 describe('Stock Movement Service (BR-01, BR-03, BR-09, BR-12, BR-17, BR-22, BR-29, BR-30, BR-32)', () => {
   beforeEach(() => {
@@ -364,5 +370,161 @@ describe('Stock Movement Service (BR-01, BR-03, BR-09, BR-12, BR-17, BR-22, BR-2
     const batch = await getOrCreateDefaultBatch('prod-1');
     expect(batch.batchNo).toBe('DEFAULT');
     expect(batch.expiryDate).toBeNull();
+  });
+
+  describe('getExpiringBatches (BR-10)', () => {
+    it('returns expiring batches categorized into EXPIRED, CRITICAL, and WARNING with metrics', async () => {
+      const today = new Date();
+      const pastDate = new Date(today);
+      pastDate.setDate(today.getDate() - 10); // Expired 10 days ago
+
+      const criticalDate = new Date(today);
+      criticalDate.setDate(today.getDate() + 3); // 3 days remaining
+
+      const warningDate = new Date(today);
+      warningDate.setDate(today.getDate() + 20); // 20 days remaining
+
+      const mockStocks = [
+        {
+          id: 'stk-exp',
+          productId: 'prod-1',
+          batchId: 'batch-exp',
+          locationId: 'loc-1',
+          quantity: 10,
+          product: {
+            id: 'prod-1',
+            sku: 'SKU-001',
+            name: 'Minyak Goreng 2L',
+            uom: 'BTL',
+            costPrice: 35000,
+            category: { name: 'Minyak' },
+          },
+          batch: {
+            id: 'batch-exp',
+            batchNo: 'EXP-PAST',
+            expiryDate: pastDate,
+          },
+          location: {
+            id: 'loc-1',
+            code: 'A-01-01',
+            warehouseId: 'wh-1',
+            warehouse: { name: 'Gudang Jakarta' },
+          },
+        },
+        {
+          id: 'stk-crit',
+          productId: 'prod-1',
+          batchId: 'batch-crit',
+          locationId: 'loc-1',
+          quantity: 20,
+          product: {
+            id: 'prod-1',
+            sku: 'SKU-001',
+            name: 'Minyak Goreng 2L',
+            uom: 'BTL',
+            costPrice: 35000,
+            category: { name: 'Minyak' },
+          },
+          batch: {
+            id: 'batch-crit',
+            batchNo: 'CRIT-01',
+            expiryDate: criticalDate,
+          },
+          location: {
+            id: 'loc-1',
+            code: 'A-01-01',
+            warehouseId: 'wh-1',
+            warehouse: { name: 'Gudang Jakarta' },
+          },
+        },
+        {
+          id: 'stk-warn',
+          productId: 'prod-1',
+          batchId: 'batch-warn',
+          locationId: 'loc-1',
+          quantity: 30,
+          product: {
+            id: 'prod-1',
+            sku: 'SKU-001',
+            name: 'Minyak Goreng 2L',
+            uom: 'BTL',
+            costPrice: 35000,
+            category: { name: 'Minyak' },
+          },
+          batch: {
+            id: 'batch-warn',
+            batchNo: 'WARN-01',
+            expiryDate: warningDate,
+          },
+          location: {
+            id: 'loc-1',
+            code: 'A-01-01',
+            warehouseId: 'wh-1',
+            warehouse: { name: 'Gudang Jakarta' },
+          },
+        },
+      ];
+
+      vi.mocked(prisma.stock.findMany).mockResolvedValue(mockStocks as never);
+
+      const result = await getExpiringBatches({ days: 30, warehouseId: 'wh-1' });
+
+      expect(result.summary.totalBatches).toBe(3);
+      expect(result.summary.expiredCount).toBe(1);
+      expect(result.summary.criticalCount).toBe(1);
+      expect(result.summary.warningCount).toBe(1);
+
+      // Total units: 10 + 20 + 30 = 60
+      expect(result.summary.totalAtRiskUnits).toBe(60);
+      // Total potential loss: 60 * 35000 = 2,100,000
+      expect(result.summary.totalPotentialLoss).toBe(2100000);
+
+      // Verify item statuses
+      expect(result.items[0]!.status).toBe('EXPIRED');
+      expect(result.items[0]!.potentialLossValue).toBe(350000);
+      expect(result.items[1]!.status).toBe('CRITICAL');
+      expect(result.items[2]!.status).toBe('WARNING');
+    });
+
+    it('filters items by status when status parameter is specified', async () => {
+      const today = new Date();
+      const pastDate = new Date(today);
+      pastDate.setDate(today.getDate() - 5);
+
+      const futureDate = new Date(today);
+      futureDate.setDate(today.getDate() + 15);
+
+      const mockStocks = [
+        {
+          id: 'stk-exp',
+          productId: 'prod-1',
+          quantity: 10,
+          product: { sku: 'SKU-1', name: 'A', uom: 'PCS', costPrice: 10000, category: null },
+          batch: { batchNo: 'B-EXP', expiryDate: pastDate },
+          location: { code: 'A-01-01', warehouse: { name: 'WH-1' } },
+        },
+        {
+          id: 'stk-warn',
+          productId: 'prod-1',
+          quantity: 25,
+          product: { sku: 'SKU-1', name: 'A', uom: 'PCS', costPrice: 10000, category: null },
+          batch: { batchNo: 'B-WARN', expiryDate: futureDate },
+          location: { code: 'A-01-01', warehouse: { name: 'WH-1' } },
+        },
+      ];
+
+      vi.mocked(prisma.stock.findMany).mockResolvedValue(mockStocks as never);
+
+      const result = await getExpiringBatches({ status: 'EXPIRED' });
+
+      // Summary captures all fetched batches
+      expect(result.summary.totalBatches).toBe(2);
+      expect(result.summary.expiredCount).toBe(1);
+      expect(result.summary.warningCount).toBe(1);
+
+      // Items array contains only the filtered status
+      expect(result.items).toHaveLength(1);
+      expect(result.items[0]!.status).toBe('EXPIRED');
+    });
   });
 });
