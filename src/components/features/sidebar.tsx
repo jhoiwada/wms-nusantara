@@ -66,6 +66,12 @@ const NAV_ITEMS: NavItem[] = [
     roles: ['ADMIN', 'MANAGER', 'STAFF', 'VIEWER'],
     section: 'Operasional',
   },
+  {
+    label: 'Denah Gudang',
+    href: '/warehouse-map',
+    roles: ['ADMIN', 'MANAGER', 'STAFF', 'VIEWER'],
+    section: 'Operasional',
+  },
 
   // Master Data
   {

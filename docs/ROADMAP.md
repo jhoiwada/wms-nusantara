@@ -57,7 +57,7 @@ Cara pakai: kerjakan **satu tugas per sesi**, dari atas ke bawah. Tugas dianggap
 - [x] **T3.2 Audit log** perubahan master data dan aksi sensitif.
 - [x] **T3.3 Cetak label barcode.**
 - [x] **T3.4 Scan barcode** lewat kamera HP di form GR/DO.
-- [ ] **T3.5 Denah gudang interaktif.**
+- [x] **T3.5 Denah gudang interaktif.**
 - [ ] **T3.6 Retur dari customer** (jika diputuskan).
 
 ## Penutup portofolio

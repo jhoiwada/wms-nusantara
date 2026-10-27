@@ -8,6 +8,7 @@ import { Dialog } from '@/components/ui/dialog';
 import { DataTable, type Column } from '@/components/ui/data-table';
 import { LOCATION_CODE_REGEX } from '@/schemas/warehouse.schema';
 import { BarcodeLabelPrinter } from '@/components/features/barcode-label-printer';
+import { WarehouseMap } from '@/components/features/warehouse-map';
 
 interface WarehouseItem {
   id: string;
@@ -44,7 +45,7 @@ interface LocationItem {
 }
 
 export default function WarehousesPage() {
-  const [activeTab, setActiveTab] = useState<'warehouses' | 'locations'>('warehouses');
+  const [activeTab, setActiveTab] = useState<'warehouses' | 'locations' | 'map'>('warehouses');
 
   // Warehouses state
   const [warehouses, setWarehouses] = useState<WarehouseItem[]>([]);
@@ -592,7 +593,7 @@ export default function WarehousesPage() {
         </div>
 
         <div className="flex items-center gap-2">
-          {activeTab === 'warehouses' ? (
+          {activeTab === 'warehouses' && (
             <Button onClick={handleOpenAddWh} className="gap-2">
               <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path
@@ -604,7 +605,8 @@ export default function WarehousesPage() {
               </svg>
               Tambah Gudang
             </Button>
-          ) : (
+          )}
+          {activeTab === 'locations' && (
             <Button onClick={handleOpenAddLoc} className="gap-2">
               <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path
@@ -616,6 +618,24 @@ export default function WarehousesPage() {
               </svg>
               Tambah Lokasi Rak
             </Button>
+          )}
+          {activeTab === 'map' && (
+            <a
+              href="/warehouse-map"
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex items-center gap-2 rounded-lg border border-indigo-200 bg-white px-3 py-1.5 text-xs font-semibold text-indigo-700 shadow-sm hover:bg-indigo-50"
+            >
+              <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+                />
+              </svg>
+              Buka Layar Penuh
+            </a>
           )}
         </div>
       </div>
@@ -641,6 +661,16 @@ export default function WarehousesPage() {
           }`}
         >
           Lokasi Rak Penyimpanan ({locations.length})
+        </button>
+        <button
+          onClick={() => setActiveTab('map')}
+          className={`border-b-2 px-3 pb-3 text-sm font-semibold transition-colors ${
+            activeTab === 'map'
+              ? 'border-indigo-600 text-indigo-600'
+              : 'border-transparent text-slate-500 hover:text-slate-800'
+          }`}
+        >
+          Denah Interaktif (2D Map)
         </button>
       </div>
 
@@ -694,6 +724,13 @@ export default function WarehousesPage() {
             emptyTitle="Belum ada lokasi rak"
             emptyDescription="Tambahkan titik lokasi penyimpanan rak di gudang yang dipilih."
           />
+        </div>
+      )}
+
+      {/* Content Tab 3: Interactive Map */}
+      {activeTab === 'map' && (
+        <div className="pt-2">
+          <WarehouseMap />
         </div>
       )}
 
