@@ -48,6 +48,12 @@ const NAV_ITEMS: NavItem[] = [
     roles: ['ADMIN', 'MANAGER', 'STAFF', 'VIEWER'],
     section: 'Operasional',
   },
+  {
+    label: 'Penyesuaian Stok',
+    href: '/stock-adjustments',
+    roles: ['ADMIN', 'MANAGER'],
+    section: 'Operasional',
+  },
 
   // Master Data
   {

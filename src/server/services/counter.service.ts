@@ -1,7 +1,7 @@
 import { prisma } from '@/server/db';
 import type { Prisma } from '@prisma/client';
 
-export type DocumentPrefix = 'GR' | 'DO' | 'SO' | 'TR';
+export type DocumentPrefix = 'GR' | 'DO' | 'SO' | 'TR' | 'ADJ';
 
 /**
  * Atomic document numbering service per ARCHITECTURE.md and BR-15.
