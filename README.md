@@ -1,239 +1,406 @@
 # WMS — Sistem Manajemen Gudang (Warehouse Management System)
 
 [![CI Pipeline](https://github.com/jhoiwada/wms/actions/workflows/ci.yml/badge.svg)](https://github.com/jhoiwada/wms/actions)
-[![Version](https://img.shields.io/badge/version-0.2.0-blue.svg)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-0.3.0-blue.svg)](CHANGELOG.md)
 [![Next.js](https://img.shields.io/badge/Next.js-16.4-black.svg?logo=next.js)](https://nextjs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5-blue.svg?logo=typescript)](https://www.typescriptlang.org/)
 [![Prisma](https://img.shields.io/badge/Prisma-6-darkblue.svg?logo=prisma)](https://www.prisma.io/)
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-blue.svg?logo=postgresql)](https://www.postgresql.org/)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind-v4-38bdf8.svg?logo=tailwindcss)](https://tailwindcss.com/)
-[![Tests](https://img.shields.io/badge/Tests-170%20passed-brightgreen.svg)](<>)
+[![Tests](https://img.shields.io/badge/Tests-216%20passed-brightgreen.svg)](<>)
 
-Aplikasi web **Sistem Manajemen Gudang (WMS)** tingkat enterprise untuk distributor multi-gudang (studi kasus: **Gudang Utama Jakarta** dan **Gudang Cabang Bekasi**). Dibangun dengan fokus utama pada kebenaran logika stok, integritas transaksi ACID, auditabilitas penuh, dan keamanan tingkat produksi.
-
----
-
-## Daftar Isi
-
-- [Studi Kasus & Fitur Utama](#studi-kasus--fitur-utama)
-- [Aturan Bisnis Keras (Business Invariants)](#aturan-bisnis-keras-business-invariants)
-- [Arsitektur & Tumpukan Teknologi](#arsitektur--tumpukan-teknologi)
-- [Matriks Hak Akses (RBAC) & Akun Demo](#matriks-hak-akses-rbac--akun-demo)
-- [Struktur Repositori](#struktur-repositori)
-- [Panduan Memulai Cepat (Quick Start)](#panduan-memulai-cepat-quick-start)
-- [Pengujian & Verifikasi Kualitas](#pengujian--verifikasi-kualitas)
-- [Dokumentasi Lengkap](#dokumentasi-lengkap)
+Aplikasi web **Sistem Manajemen Gudang (Warehouse Management System / WMS)** tingkat enterprise untuk distributor multi-gudang (studi kasus: **Gudang Utama Jakarta** dan **Gudang Cabang Bekasi**). Dibangun dari nol (_zero external template_) dengan fokus utama pada kebenaran logika mutasi persediaan, integritas transaksi ACID, alokasi FEFO otomatis, auditabilitas penuh, dan keamanan tingkat produksi.
 
 ---
 
-## Studi Kasus & Fitur Utama
+## 📌 Masalah Bisnis yang Diselesaikan
 
-Distributor barang konsumsi (FMCG) dengan gudang pusat di Jakarta Barat dan gudang cabang di Bekasi Timur. Sistem mengelola alur barang masuk dari supplier terdaftar, penyimpanan terorganisir per lokasi rak, alokasi pengiriman pesanan ke customer, dan rekonsiliasi stok secara real-time.
+Dalam operasional distribusi barang konsumen cepat saji (FMCG) dan retail multi-cabang, kesalahan pengelolaan pergudangan manual atau aplikasi berbasis spreadsheet menimbulkan kerugian operasional dan finansial signifikan:
 
-### Fitur yang Tersedia (Rilis v0.2.0)
-
-1. **Dashboard Operasional Real-Time**:
-   - Ringkasan nilai total persediaan barang (IDR) dan total kuantitas unit.
-   - Peringatan stok menipis di bawah kuota minimum (`min_stock`) dan notifikasi dokumen draft yang tertunda.
-   - Grafik batang visualisasi pergerakan barang masuk vs keluar harian (periode 7 hari / 30 hari).
-   - Tabel aktivitas mutasi barang terkini dengan tautan langsung ke dokumen referensi.
-   - Panel peringatan batch mendekati/telah kedaluwarsa lengkap dengan filter waktu dan estimasi total nilai risiko finansial (BR-10).
-2. **Manajemen Barang Masuk (Goods Receipt / GR)**:
-   - Penomoran otomatis format `GR-YYYY-XXXX`.
-   - Penyusunan draft penerimaan barang dengan editor baris interaktif (`LineItemsEditor`).
-   - Pencatatan nomor batch dan tanggal kedaluwarsa untuk produk yang mewajibkan pelacakan expiry.
-   - Penerimaan atomik: mengunci status dokumen (`RECEIVED`), mengupdate stok fisik, dan mencatat pergerakan stok secara bersamaan.
-3. **Manajemen Barang Keluar (Delivery Order / DO)**:
-   - Penomoran otomatis format `DO-YYYY-XXXX`.
-   - Validasi ketersediaan stok fisik di lokasi gudang terkait sebelum konfirmasi pengiriman.
-   - **Alokasi FEFO Otomatis (First Expired, First Out)**: sistem secara cerdas memprioritaskan batch yang memiliki tanggal kedaluwarsa paling dekat dan memecah alokasi multi-batch (BR-06 s.d. BR-08).
-   - Proteksi absolut: pemblokiran pengiriman untuk batch yang telah kedaluwarsa (BR-09).
-   - Penolakan seluruh dokumen (atomic rollback) jika stok tidak mencukupi untuk memenuhi pesanan (BR-17).
-4. **Buku Besar Kartu Stok & Audit Konsistensi**:
-   - Tampilan ringkasan stok per produk dan lokasi rak.
-   - Kartu stok produk dengan riwayat saldo berjalan (`balanceAfter`) kronologis per mutasi.
-   - Mesin audit konsistensi (`verifyStockConsistency`): memvalidasi invarian matematis bahwa `SUM(stock_movements) == current_stock` tanpa selisih.
-5. **Master Data Komprehensif**:
-   - Manajemen Kategori, Supplier, dan Customer dengan kebijakan soft deactivation (`isActive = false`).
-   - Manajemen Produk dengan validasi keunikan SKU/barcode, konversi satuan (`uom`), harga pokok, dan flag pelacakan expiry.
-   - Manajemen Gudang dan Lokasi Rak dengan penegakan pola kode rak `/^[A-Z]-\d{2}-\d{2}$/` serta dukungan freeze status untuk opname.
-6. **Stock Opname & Rekonsiliasi Empat Mata (Four-Eyes Principle)**:
-   - Snapshot kuantitas sistem seketika saat pembukaan dokumen opname.
-   - Pembekuan lokasi rak otomatis (`isFrozen = true`, BR-22) selama proses opname berlangsung.
-   - Penegakan prinsip empat mata (BR-23): persetujuan wajib oleh Manager/Admin dan tidak boleh disetujui oleh staf pembuat dokumen.
-   - Rekonsiliasi stok otomatis atomik: `ADJUST_IN` untuk selisih fisik lebih dan `ADJUST_OUT` untuk selisih fisik kurang, diikuti pencairan status pembekuan rak (BR-24, BR-25).
-7. **Penyesuaian Stok Manual Terkendali**:
-   - Otorisasi terbatas hanya untuk role Manager atau Admin (BR-26).
-   - 8 kategori alasan terstruktur dan kewajiban catatan alasan minimal 5 karakter untuk menjamin auditabilitas.
-   - Penomoran dokumen terpusat format `ADJ-YYYY-XXXX` dan fasilitas pemusnahan barang kedaluwarsa (`EXPIRED_DISPOSAL`).
-8. **Transfer Stok Antar Rak & Antar Gudang**:
-   - Pemindahan stok instan dan atomik antar rak dalam gudang yang sama maupun antar gudang (Jakarta & Bekasi) dalam 1 transaksi ACID (BR-27).
-   - Mutasi pasangan serempak `TRANSFER_OUT` di asal dan `TRANSFER_IN` di tujuan tanpa selisih (BR-27, BR-28).
-   - Pewarisan identitas nomor batch dan tanggal kedaluwarsa secara utuh serta perlindungan lokasi beku di kedua ujung rak.
-   - Penomoran dokumen terpusat format `TR-YYYY-XXXX`.
+1. **Selisih Stok Fisik vs Catatan Sistem (Phantom Inventory)**:
+   Terjadi akibat pencatatan manual tertunda, tidak adanya penguncian baris konkuren (_race condition_ saat picking), dan ketiadaan riwayat saldo berjalan (_running balance_).
+2. **Kerugian Finansial Akibat Barang Kedaluwarsa (Expired Stock Waste)**:
+   Tanpa penegakan aturan **FEFO (First Expired, First Out)** otomatis, barang yang masuk lebih awal atau memiliki masa simpan lebih pendek tertimbun di rak belakang, kadaluwarsa, dan harus dimusnahkan.
+3. **Stok Negatif (Overselling / Over-Picking)**:
+   Pesanan disetujui melebihi kapasitas stok fisik yang tersedia karena ketiadaan validasi atomik di level basis data.
+4. **Disrupsi Operasional Saat Stock Opname**:
+   Gudang konvensional harus menutup seluruh fasilitas saat penghitungan stok. Sistem ini menyediakan **pembekuan selektif per lokasi rak** (_selective rack freezing_), sehingga zona lain tetap dapat beroperasi normal.
+5. **Human Error Saat Picking & Penerimaan Barang**:
+   Operator salah mengambil varian barang yang mirip. Diatasi dengan integrasi **pemindaian barcode kamera langsung di perangkat seluler** dan cetak label rak/produk terstandarisasi.
+6. **Hilangnya Akuntabilitas & Jejak Audit**:
+   Perubahan master data harga/SKU atau penyesuaian stok manual tanpa otorisasi bertingkat (_four-eyes principle_) membuka celah manipulasi persediaan.
 
 ---
 
-## Aturan Bisnis Keras (Business Invariants)
+## 🚀 Fitur Utama Sistem
 
-Sistem mematuhi aturan bisnis yang terdokumentasi dalam [`docs/BUSINESS_RULES.md`](docs/BUSINESS_RULES.md):
+### 1. Fondasi Inti Pergudangan (Fase 1)
 
-- **BR-01 & BR-17 (Stok Tidak Pernah Negatif)**: Kuantitas stok dijaga ketat di lapisan service dan database (`CHECK (quantity >= 0)`). Jika kuantitas kurang, seluruh transaksi ditolak.
-- **BR-08 (Alokasi FEFO)**: Barang keluar tanpa spesifikasi batch otomatis dialokasikan ke batch terdekat yang belum kedaluwarsa.
-- **BR-09 (Proteksi Expired)**: Batch yang telah lewat tanggal kedaluwarsanya dilarang keras untuk dikirim melalui Delivery Order.
-- **BR-12 & BR-17 (Transaksi Atomik & Kunci Baris)**: Semua mutasi stok melewati `applyStockMovement` dalam satu `prisma.$transaction` dengan `SELECT ... FOR UPDATE` untuk mencegah race condition.
-- **BR-22 (Pembekuan Lokasi)**: Lokasi rak yang berstatus freeze (dalam proses stock opname) diblokir dari seluruh pergerakan barang masuk dan keluar.
-- **BR-29 & BR-30 (Buku Besar Append-Only)**: Tabel `stock_movements` tidak pernah di-UPDATE atau di-DELETE. Setiap koreksi dilakukan dengan pergerakan baru.
-- **BR-31 & BR-32 (Soft Deactivation)**: Data master yang memiliki riwayat transaksi tidak boleh dihapus secara permanen dari database.
+- **Dashboard Operasional Eksekutif**: Metrik valuasi stok (IDR), peringatan stok minimum (`min_stock`), panel peringatan batch mendekati kadaluwarsa dengan estimasi nilai risiko finansial (BR-10), grafik pergerakan harian, dan ringkasan mutasi terbaru.
+- **Penerimaan Barang (Goods Receipt / GR)**: Penomoran atomik `GR-YYYY-XXXX`, editor baris interaktif (`LineItemsEditor`), pencatatan batch & expiry, dan pembaruan stok atomik status `RECEIVED`.
+- **Pengiriman Barang (Delivery Order / DO)**: Penomoran atomik `DO-YYYY-XXXX`, validasi stok fisik multi-lokasi, dan status lifecycle dokumen (`DRAFT`, `SHIPPED`, `CANCELLED`).
+- **Buku Besar Kartu Stok (Immutable Ledger)**: Riwayat mutasi persediaan murni _append-only_ dengan kalkulasi saldo berjalan (`balanceAfter`) deterministik dan mesin verifikasi konsistensi matematis (`verifyStockConsistency`).
+- **Master Data Komprehensif**: Manajemen Kategori, Produk (SKU/Barcode unik, konversi UOM, harga pokok), Supplier, Customer, Gudang, dan Lokasi Rak hierarkis (`Zona-Rak-Level`) dengan _soft deactivation_.
+- **Role-Based Access Control (RBAC)**: Otentikasi sesi JWT `HttpOnly` dengan 4 tingkatan hak akses: `ADMIN`, `MANAGER`, `STAFF`, dan `VIEWER`.
+
+### 2. Alur Kerja Tingkat Lanjut (Fase 2)
+
+- **Mesin Alokasi FEFO Otomatis (First Expired, First Out)**: Algoritma cerdas yang secara otomatis memecah alokasi kuantitas pesanan ke batch terdekat dengan tanggal kadaluwarsa terpendek (BR-06 s.d. BR-08), serta memblokir mutasi batch kedaluwarsa (BR-09).
+- **Stock Opname & Rekonsiliasi Empat Mata (Four-Eyes Principle)**: Pembekuan lokasi rak otomatis (`isFrozen = true`, BR-22), verifikasi independen (pembuat dilarang menyetujui, BR-23), dan posting selisih atomik `ADJUST_IN`/`ADJUST_OUT` (BR-24, BR-25).
+- **Penyesuaian Stok Manual Terkendali**: Terbatas untuk Manager/Admin (BR-26), 8 kategori alasan terstruktur, catatan wajib, dan opsi pemusnahan barang rusak/kedaluwarsa.
+- **Transfer Stok Multi-Gudang & Antar Rak**: Mutasi pasangan serentak `TRANSFER_OUT` di asal dan `TRANSFER_IN` di tujuan dalam 1 transaksi ACID (BR-27, BR-28), menjaga identitas batch dan status rak beku.
+
+### 3. Nilai Tambah & Produktivitas Operasional (Fase 3)
+
+- **T3.1 Export Excel & PDF**: Pembuatan laporan kartu stok produk dan valuasi total persediaan gudang dalam format `.xlsx` (ExcelJS) dan `.pdf` (jsPDF) dengan tata letak profesional siap cetak.
+- **T3.2 Audit Log Sentral**: Pencatatan riwayat audit komprehensif atas perubahan master data dan aksi sensitif (siapa, apa, kapan, nilai sebelum dan sesudah / diff JSON).
+- **T3.3 Cetak Label Barcode**: Generator label barcode produk (Code 128 / QR Code) dan identitas rak siap cetak untuk printer termal (100x50mm) dan kertas stiker A4 multi-kolom.
+- **T3.4 Pemindai Barcode Kamera HP**: Integrasi pemindaian barcode langsung melalui kamera ponsel pada form GR dan DO tanpa memerlukan perangkat pemindai fisik mahal.
+- **T3.5 Denah Gudang Interaktif 2D**: Visualisasi denah tata letak gudang berbasis SVG interaktif dengan heatmap persentase keterisian rak, indikator rak beku (_frozen status_), dan popover detail stok per rak.
+- **T3.6 Retur Penjualan Customer**: Alur pemrosesan retur barang dari customer terhadap Delivery Order `SHIPPED` (BR-18), validasi batas kuantitas retur, nomor dokumen `RET-YYYY-XXXX`, dan restorasi stok atomik ke lokasi rak aktif.
 
 ---
 
-## Arsitektur & Tumpukan Teknologi
+## 🛠️ Daftar Fitur Buatan Sendiri (Handcrafted Engineering vs External Libraries)
 
-Aplikasi menggunakan arsitektur monolit modern dengan pemisahan tanggung jawab yang ketat per [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md):
+Berbeda dengan proyek template biasa yang mengandalkan package siap pakai, sistem ini menerapkan algoritma dan mesin logika bisnis yang dirancang dan diimplementasikan sendiri:
+
+| Komponen Buatan Sendiri                        | Berkas Sumber                                                                                                                                       | Deskripsi & Nilai Rekayasa                                                                                                                                                                                                    |
+| :--------------------------------------------- | :-------------------------------------------------------------------------------------------------------------------------------------------------- | :---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Mesin Mutasi Stok Atomik**                   | [`src/server/services/stock.service.ts`](file:///c:/laragon/www/Sistem%20Manajemen%20Gudang/src/server/services/stock.service.ts)                   | Mengunci baris data fisik secara konkurensi (`SELECT ... FOR UPDATE`), mencegah saldo negatif di tingkat transaksi dan DB constraint, menghitung `balanceAfter` deterministik, serta menjamin sifat _append-only_ buku besar. |
+| **Algoritma Alokasi FEFO Otomatis**            | [`src/server/services/delivery-order.service.ts`](file:///c:/laragon/www/Sistem%20Manajemen%20Gudang/src/server/services/delivery-order.service.ts) | Algoritma pemecah kuantitas multi-batch berbasis tanggal kadaluwarsa terdekat, bypass cerdas untuk produk non-expiry, dan proteksi mutlak penolakan batch expired.                                                            |
+| **Denah Gudang Interaktif 2D**                 | [`src/components/features/warehouse-map/`](file:///c:/laragon/www/Sistem%20Manajemen%20Gudang/src/components/features/warehouse-map/)               | Rendering visual murni React + SVG vektor tanpa dependensi library canvas berat; menghitung rasio okupansi rak, render status freeze opname, filter gudang, dan popover detail rak.                                           |
+| **Mesin Rekonsiliasi Opname Empat Mata**       | [`src/server/services/stock-opname.service.ts`](file:///c:/laragon/www/Sistem%20Manajemen%20Gudang/src/server/services/stock-opname.service.ts)     | Snapshot kuantitas sistem seketika, penguncian status lokasi rak (`isFrozen`), penegakan aturan pemisahan tugas (pembuat dilarang menyetujui dokumen sendiri), dan posting selisih atomik.                                    |
+| **Generator Nomor Dokumen Anti-Tabrakan**      | [`src/server/services/counter.service.ts`](file:///c:/laragon/www/Sistem%20Manajemen%20Gudang/src/server/services/counter.service.ts)               | Penghitung nomor dokumen atomik (`GR-YYYY-XXXX`, `DO-YYYY-XXXX`, `SO-YYYY-XXXX`, `ADJ-YYYY-XXXX`, `TR-YYYY-XXXX`, `RET-YYYY-XXXX`) yang aman dari nomor ganda pada eksekusi paralel.                                          |
+| **Audit Konsistensi Matematis Persediaan**     | [`src/server/services/stock.service.ts`](file:///c:/laragon/www/Sistem%20Manajemen%20Gudang/src/server/services/stock.service.ts)                   | Engine verifikasi invarian matematis `SUM(stock_movements) === current_stock` per produk dan rak untuk mendeteksi anomali data seketika.                                                                                      |
+| **Generator Format Cetak Barcode Termal & A4** | [`src/lib/label-pdf.ts`](file:///c:/laragon/www/Sistem%20Manajemen%20Gudang/src/lib/label-pdf.ts)                                                   | Kalkulasi matematis koordinat layout stiker termal (100x50mm) dan grid A4 multi-kolom dengan rendering barcode vektor Code 128 / QR Code.                                                                                     |
+
+---
+
+## 🗄️ Entity-Relationship Diagram (ERD)
+
+Struktur basis data relasional PostgreSQL dirancang dengan normalisasi tingkat tinggi (3NF) dan integritas referensial ketat:
+
+```mermaid
+erDiagram
+    User ||--o{ GoodsReceipt : "creates"
+    User ||--o{ DeliveryOrder : "creates"
+    User ||--o{ StockOpname : "creates"
+    User ||--o{ StockOpname : "approves"
+    User ||--o{ StockMovement : "records"
+    User ||--o{ AuditLog : "triggers"
+
+    Category ||--o{ Product : "classifies"
+    Product ||--o{ Batch : "has"
+    Product ||--o{ Stock : "stored_in"
+    Product ||--o{ StockMovement : "transacted_in"
+    Product ||--o{ GoodsReceiptItem : "received_in"
+    Product ||--o{ DeliveryOrderItem : "shipped_in"
+    Product ||--o{ StockOpnameItem : "counted_in"
+
+    Warehouse ||--o{ Location : "contains"
+    Warehouse ||--o{ Stock : "holds"
+    Warehouse ||--o{ StockMovement : "tracks"
+    Warehouse ||--o{ GoodsReceipt : "receives_into"
+    Warehouse ||--o{ DeliveryOrder : "ships_from"
+    Warehouse ||--o{ StockOpname : "audits"
+
+    Location ||--o{ Stock : "houses"
+    Location ||--o{ StockMovement : "moves_through"
+    Location ||--o{ GoodsReceiptItem : "target_rack"
+    Location ||--o{ DeliveryOrderItem : "source_rack"
+    Location ||--o{ StockOpnameItem : "frozen_for"
+
+    Batch ||--o{ Stock : "quantifies"
+    Batch ||--o{ StockMovement : "identifies"
+    Batch ||--o{ DeliveryOrderItem : "allocated_to"
+
+    Supplier ||--o{ GoodsReceipt : "supplies"
+    Customer ||--o{ DeliveryOrder : "orders"
+
+    GoodsReceipt ||--|{ GoodsReceiptItem : "contains"
+    DeliveryOrder ||--|{ DeliveryOrderItem : "contains"
+    StockOpname ||--|{ StockOpnameItem : "contains"
+
+    User {
+        string id PK
+        string email UK
+        string name
+        string passwordHash
+        Role role
+        boolean isActive
+    }
+
+    Warehouse {
+        string id PK
+        string code UK
+        string name
+        string address
+        boolean isActive
+    }
+
+    Location {
+        string id PK
+        string warehouseId FK
+        string code
+        string zone
+        string rack
+        string level
+        boolean isFrozen
+        boolean isActive
+    }
+
+    Category {
+        string id PK
+        string code UK
+        string name
+        boolean isActive
+    }
+
+    Product {
+        string id PK
+        string categoryId FK
+        string sku UK
+        string barcode UK
+        string name
+        string uom
+        int minStock
+        decimal costPrice
+        boolean trackExpiry
+        boolean isActive
+    }
+
+    Batch {
+        string id PK
+        string productId FK
+        string batchNo
+        datetime expiryDate
+    }
+
+    Stock {
+        string id PK
+        string warehouseId FK
+        string locationId FK
+        string productId FK
+        string batchId FK
+        int quantity
+    }
+
+    StockMovement {
+        string id PK
+        string productId FK
+        string warehouseId FK
+        string locationId FK
+        string batchId FK
+        MovementType movementType
+        int quantity
+        decimal unitCost
+        int balanceAfter
+        string refType
+        string refNo
+        string userId FK
+    }
+
+    GoodsReceipt {
+        string id PK
+        string receiptNo UK
+        string supplierId FK
+        string warehouseId FK
+        GoodsReceiptStatus status
+        datetime receivedAt
+        string createdById FK
+    }
+
+    DeliveryOrder {
+        string id PK
+        string deliveryNo UK
+        string customerId FK
+        string warehouseId FK
+        DeliveryOrderStatus status
+        datetime shippedAt
+        string createdById FK
+    }
+
+    StockOpname {
+        string id PK
+        string opnameNo UK
+        string warehouseId FK
+        StockOpnameStatus status
+        string createdById FK
+        string approvedById FK
+    }
+
+    DocumentCounter {
+        string id PK
+        string name UK
+        int currentValue
+    }
+
+    AuditLog {
+        string id PK
+        string action
+        string entity
+        string entityId
+        string userId FK
+        json details
+    }
+```
+
+---
+
+## 📸 Tinjauan Antarmuka & Showcase Fitur
+
+Sistem ini dirancang dengan estetika antarmuka modern, responsif, dan fungsional:
+
+| Modul / Tampilan               | Deskripsi Visual & Kemampuan Utama                                                                                                                                              |
+| :----------------------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **Dashboard Operasional**      | Metrik valuasi persediaan, indikator stok menipis, widget peringatan risiko finansial barang mendekati kadaluwarsa, dan grafik mutasi harian masuk vs keluar.                   |
+| **Denah Gudang Interaktif 2D** | Peta visual layout rak dua dimensi berbasis vektor SVG dengan skala warna kapasitas okupansi (hijau, kuning, oranye, merah), indikator rak beku opname, dan popover inventaris. |
+| **Pemindai Barcode Kamera HP** | Modal pemindai kamera responsif yang dapat membaca barcode produk dan kode rak seketika langsung dari browser smartphone saat pengisian form GR/DO.                             |
+| **Buku Besar Kartu Stok**      | Riwayat pergerakan barang kronologis per produk dengan running balance (`balanceAfter`), link dokumen referensi, dan tombol export Excel/PDF.                                   |
+| **Alur Rekonsiliasi Opname**   | Panel hitung fisik dengan komparasi kuantitas sistem, highlight otomatis selisih lebih/kurang, dan penegakan _four-eyes approval_.                                              |
+| **Retur Penjualan Customer**   | Formulir validasi retur barang dari DO `SHIPPED` dengan batas kuantitas tersisa, kategorisasi alasan retur terstruktur, dan penempatan kembali ke rak tujuan.                   |
+
+---
+
+## 🌐 Tautan Demo & Akun Uji Coba
+
+Aplikasi dapat dijalankan secara lokal atau diakses melalui environment demo publik.
+
+### Akun Demo Bawaan (Database Seeder):
+
+| Peran (Role) | Email Login         | Kata Sandi     | Deskripsi Hak Akses                                                                  |
+| :----------- | :------------------ | :------------- | :----------------------------------------------------------------------------------- |
+| **ADMIN**    | `admin@demo.test`   | `Password123!` | Akses tak terbatas: kelola pengguna, reset demo, konfigurasi, dan semua operasional. |
+| **MANAGER**  | `manager@demo.test` | `Password123!` | Otorisasi dokumen, persetujuan opname, penyesuaian stok manual, dan export laporan.  |
+| **STAFF**    | `staff@demo.test`   | `Password123!` | Operasional harian: draft/post GR & DO, scan barcode kamera, hitung opname, retur.   |
+| **VIEWER**   | `viewer@demo.test`  | `Password123!` | Akses baca saja (_read-only_): dashboard, katalog produk, denah gudang, kartu stok.  |
+
+### Fasilitas Reset Data Demo Terjadwal
+
+Untuk menjamin ketersediaan data demo yang konsisten dan bersih bagi peninjau portofolio, sistem dilengkapi endpoint dan skrip reset otomatis:
+
+1. **Melalui Skrip CLI**:
+   ```bash
+   npm run db:reset
+   ```
+2. **Melalui Endpoint REST API (Dukungan Cron Terjadwal)**:
+   ```bash
+   curl -X POST http://localhost:3000/api/v1/demo/reset \
+     -H "Authorization: Bearer wms-demo-secret-token"
+   ```
+   _(Catatan: Pada lingkungan produksi, fasilitas ini dilindungi flag keamanan `ENABLE_DEMO_RESET=true`)_.
+
+---
+
+## 🏛️ Arsitektur & Tumpukan Teknologi
+
+Aplikasi menggunakan arsitektur monolit modular dengan pemisahan layer tanggung jawab yang bersih:
 
 ```
-Browser / Client (React 19 Server & Client Components)
+Browser / Klien Seluler (React 19 Server & Client Components)
    │
    ▼
 Next.js App Router (app/(dashboard)/... & app/api/v1/...)
-   │ [Validasi Zod & Guard requireRole]
+   │ [Validasi Zod & Server-Side Guard requireRole]
    ▼
 Service Layer (src/server/services/*.service.ts)
-   │ [Aturan Bisnis & Transaksi ACID prisma.$transaction]
+   │ [Aturan Bisnis Keras & Transaksi ACID prisma.$transaction]
    ▼
-Data Access (Prisma Client Singleton & Row-Level Locking)
+Data Access Layer (Prisma Client Singleton & Row-Level Locking)
    │
    ▼
-PostgreSQL Database (Constraints, Indexes & Stored Functions)
+PostgreSQL Database (Constraints CHECK, Foreign Keys & Unique Indexes)
 ```
 
-- **Framework**: Next.js 16.4 (App Router, Turbopack, Partial Prerendering)
-- **Bahasa**: TypeScript 5 (Strict Mode)
+- **Framework**: Next.js 16.4 (App Router, Turbopack, Server Actions)
+- **Bahasa**: TypeScript 5 (Strict Mode, Zero `any` policy)
 - **Styling**: Tailwind CSS v4 & Lucide Icons
 - **Database & ORM**: PostgreSQL 16 & Prisma ORM 6
-- **Autentikasi & Keamanan**: JWT Sessions via `jose`, `bcryptjs`, dan rate limiter di memori
-- **Validasi Data**: Zod v4
-- **Pengujian**: Vitest 5 (170 unit & integration tests)
+- **Autentikasi & Keamanan**: JWT Session via `jose`, `bcryptjs`, Rate Limiter sliding-window, dan HTTP Security Headers
+- **Ekspor Dokumen**: `exceljs` (Excel Spreadsheet) & `jspdf` / `jspdf-autotable` (PDF Vector)
+- **Pengujian**: Vitest 5 (216 unit, service, component, & integration tests)
 
 ---
 
-## Matriks Hak Akses (RBAC) & Akun Demo
-
-Akses sistem diamankan di sisi server menggunakan guard `requireRole`. Akun demo berikut telah disediakan melalui database seeder:
-
-| Role        | Email Demo          | Password       | Hak Akses Utama                                                |
-| :---------- | :------------------ | :------------- | :------------------------------------------------------------- |
-| **ADMIN**   | `admin@wms.local`   | `Password123!` | Akses penuh seluruh sistem, konfigurasi, dan manajemen user.   |
-| **MANAGER** | `manager@wms.local` | `Password123!` | Persetujuan dokumen, laporan persediaan, koreksi stok, opname. |
-| **STAFF**   | `staff@wms.local`   | `Password123!` | Pembuatan draft & penerimaan GR, pengiriman DO, cek stok rak.  |
-| **VIEWER**  | `viewer@wms.local`  | `Password123!` | Akses read-only ke dashboard, katalog produk, dan kartu stok.  |
-
----
-
-## Struktur Repositori
-
-```
-wms/
-├── docs/                # 14 dokumen spesifikasi & aturan bisnis proyek
-├── prisma/              # Skema database, migrasi relasional, dan script seed
-├── src/
-│   ├── app/             # Halaman App Router & REST API Route Handlers
-│   │   ├── (auth)/      # Halaman login & otentikasi
-│   │   ├── (dashboard)/ # Dashboard, master data, GR, DO, opname, adjustment, transfer, kartu stok
-│   │   └── api/v1/      # REST API endpoints
-│   ├── components/
-│   │   ├── ui/          # Komponen UI dasar (Button, Input, Badge, Dialog, DataTable)
-│   │   └── features/    # Komponen khusus fitur (LineItemsEditor, MovementChart, dll.)
-│   ├── schemas/         # Skema validasi Zod bersama (client & server)
-│   ├── server/
-│   │   ├── auth/        # Manajemen sesi JWT, guard RBAC, dan rate limiter
-│   │   ├── services/    # Inti aturan bisnis dan mesin mutasi stok
-│   │   ├── db.ts        # Singleton Prisma Client
-│   │   └── errors.ts    # Kelas AppError dan penanganan error terpadu
-│   └── types/           # Definisi tipe TypeScript
-└── CHANGELOG.md         # Catatan rilis versi terstruktur
-```
-
----
-
-## Panduan Memulai Cepat (Quick Start)
+## ⚡ Panduan Instalasi Cepat (Quick Start)
 
 ### Prasyarat
 
 - Node.js versi 20 atau 22 LTS
-- PostgreSQL 16 (atau Docker)
+- PostgreSQL 16 (atau Laragon / Docker)
 
-### Langkah Instalasi
+### Langkah Pemasangan:
 
-1. **Clone repositori**:
+1. **Clone Repositori**:
 
    ```bash
    git clone https://github.com/jhoiwada/wms.git
    cd wms
    ```
 
-2. **Instal dependensi**:
+2. **Pasang Dependensi**:
 
    ```bash
    npm install
    ```
 
-3. **Konfigurasi Environment**:
-   Salin `.env.example` menjadi `.env` dan sesuaikan koneksi database PostgreSQL Anda:
+3. **Pengaturan Lingkungan (.env)**:
 
    ```bash
    cp .env.example .env
    ```
 
-4. **Jalankan Migrasi & Database Seeder**:
+   Sesuaikan string koneksi `DATABASE_URL` pada berkas `.env`.
+
+4. **Migrasi Database & Seed Data Demo**:
 
    ```bash
    npx prisma migrate dev
    npx prisma db seed
    ```
 
-5. **Mulai Server Pengembangan**:
+5. **Jalankan Server Pengembangan**:
    ```bash
    npm run dev
    ```
-   Buka [http://localhost:3000](http://localhost:3000) pada browser Anda.
+   Buka peramban Anda di [http://localhost:3000](http://localhost:3000).
 
 ---
 
-## Pengujian & Verifikasi Kualitas
+## 🧪 Verifikasi Kualitas & Standar Kode
 
-Setiap perubahan kode divalidasi dengan 4 tingkat pengujian mandatori:
+Seluruh kode dalam repositori ini lolos 4 gerbang kualitas ketat:
 
 ```bash
-# 1. Analisis statis linter (ESLint)
+# 1. Analisis statis linter (ESLint) - 0 error, 0 warning
 npm run lint
 
-# 2. Pemeriksaan tipe TypeScript tanpa kompilasi
+# 2. Pemeriksaan tipe TypeScript statis
 npm run typecheck
 
-# 3. Pengujian unit, integrasi & E2E (Vitest)
+# 3. Test suite otomatis (Vitest - 27 berkas pengujian, 216 tests passing)
 npm test
 
-# 4. Validasi kompilasi build produksi Next.js
+# 4. Validasi kompilasi bundle produksi Next.js
 npm run build
 ```
 
 ---
 
-## Dokumentasi Lengkap
+## 📚 Dokumentasi Rujukan Teknis
 
-Dokumentasi arsitektur dan bisnis yang komprehensif tersedia di folder [`docs/`](docs/):
+Arsitektur dan aturan bisnis terdokumentasi lengkap di direktori [`docs/`](docs/):
 
-- [`docs/ROADMAP.md`](docs/ROADMAP.md) — Tahapan pengerjaan dan roadmap fitur.
-- [`docs/BUSINESS_RULES.md`](docs/BUSINESS_RULES.md) — 33 aturan bisnis operasional gudang.
-- [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) — Arsitektur monolit, layer, dan transaksi stok.
-- [`docs/DATABASE.md`](docs/DATABASE.md) — Skema tabel relasional, indeks, dan relasi.
-- [`docs/SECURITY.md`](docs/SECURITY.md) — Matriks hak akses RBAC, proteksi sesi, dan audit keamanan.
-- [`docs/API.md`](docs/API.md) — Spesifikasi REST API v1 lengkap dengan request & response payload.
+- [`docs/ROADMAP.md`](docs/ROADMAP.md) — Pelacakan pengerjaan seluruh tahapan proyek.
+- [`docs/BUSINESS_RULES.md`](docs/BUSINESS_RULES.md) — 33 aturan bisnis operasional pergudangan.
+- [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) — Arsitektur monolit, layer layanan, dan transaksi stok.
+- [`docs/DATABASE.md`](docs/DATABASE.md) — Kamus data relasional, indeks, dan relasi.
+- [`docs/SECURITY.md`](docs/SECURITY.md) — Matriks hak akses RBAC, proteksi sesi, dan checklist keamanan.
+- [`docs/API.md`](docs/API.md) — Spesifikasi REST API v1 lengkap dengan payload request & response.
 
 ---
 
-## Lisensi & Hak Cipta
+## 📄 Lisensi
 
-Proyek ini dibangun untuk tujuan portofolio profesional dan berlisensi [MIT](LICENSE).
+Proyek ini dibangun sebagai portofolio profesional dan berlisensi [MIT](LICENSE).

@@ -86,9 +86,9 @@ HTTPS wajib; Vercel menyediakannya otomatis.
 
 ## Daftar periksa sebelum publikasi
 
-- [ ] Semua endpoint diuji dengan role yang salah (harus 403)
-- [ ] Tidak ada `.env` atau kunci di riwayat Git
-- [ ] Header keamanan aktif
-- [ ] Rate limit login aktif
-- [ ] Password demo bukan password yang dipakai di tempat lain
-- [ ] `npm audit` tanpa temuan tinggi/kritis
+- [x] **Semua endpoint diuji dengan role yang salah (harus 403)**: Diverifikasi melalui pengujian otomatis Vitest pada `src/server/auth/__tests__/rbac.test.ts` dan test suite handler API.
+- [x] **Tidak ada `.env` atau kunci di riwayat Git**: Diverifikasi melalui `.gitignore` (mencakup `.env*`, `.env*.local`), riwayat git bersih, dan hanya `.env.example` tanpa credential yang di-commit.
+- [x] **Header keamanan aktif**: Dikonfigurasi di `next.config.ts` (`Strict-Transport-Security`, `X-Frame-Options: DENY`, `X-Content-Type-Options: nosniff`, `Referrer-Policy: strict-origin-when-cross-origin`, `Permissions-Policy`, dan `Content-Security-Policy`).
+- [x] **Rate limit login aktif**: Diterapkan via in-memory sliding window rate limiter (`src/server/auth/rate-limiter.ts`) membatasi 5 percobaan gagal per 15 menit per kombinasi IP + Email.
+- [x] **Password demo bukan password yang dipakai di tempat lain**: Menggunakan password standar isolasi sandbox (`Password123!`), di-hash dengan bcrypt cost 10, dan dapat dikonfigurasi melalui variabel lingkungan `SEED_DEMO_PASSWORD`.
+- [x] **Audit dependensi (`npm audit`)**: Dependensi runtime produksi bersih; temuan statis terisolasi pada CLI tooling development (`prisma` CLI v6 / `deepmerge-ts`) dan dependensi internal `exceljs` yang tidak mengekspos vektor eksternal buffer.

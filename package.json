@@ -11,7 +11,13 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
+    "db:reset": "tsx scripts/reset-demo.ts",
     "prepare": "husky"
+  },
+  "overrides": {
+    "exceljs": {
+      "uuid": "^11.1.1"
+    }
   },
   "dependencies": {
     "@prisma/client": "^6.19.3",

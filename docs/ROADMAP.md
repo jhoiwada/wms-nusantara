@@ -62,6 +62,6 @@ Cara pakai: kerjakan **satu tugas per sesi**, dari atas ke bawah. Tugas dianggap
 
 ## Penutup portofolio
 
-- [ ] README: masalah, fitur, ERD, screenshot, tautan demo, daftar fitur buatan sendiri
-- [ ] Data demo dan reset terjadwal
-- [ ] Daftar periksa keamanan di `SECURITY.md` terpenuhi
+- [x] **README**: masalah, fitur, ERD, screenshot, tautan demo, daftar fitur buatan sendiri
+- [x] **Data demo dan reset terjadwal**
+- [x] **Daftar periksa keamanan di `SECURITY.md` terpenuhi**
