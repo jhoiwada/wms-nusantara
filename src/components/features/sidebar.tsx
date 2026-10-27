@@ -72,6 +72,12 @@ const NAV_ITEMS: NavItem[] = [
     roles: ['ADMIN', 'MANAGER', 'STAFF', 'VIEWER'],
     section: 'Operasional',
   },
+  {
+    label: 'Retur Customer',
+    href: '/customer-returns',
+    roles: ['ADMIN', 'MANAGER', 'STAFF', 'VIEWER'],
+    section: 'Operasional',
+  },
 
   // Master Data
   {

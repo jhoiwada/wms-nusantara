@@ -18,6 +18,7 @@ export function middleware(req: NextRequest) {
     pathname.startsWith('/locations') ||
     pathname.startsWith('/goods-receipts') ||
     pathname.startsWith('/delivery-orders') ||
+    pathname.startsWith('/customer-returns') ||
     pathname.startsWith('/stock') ||
     pathname.startsWith('/stock-card') ||
     pathname.startsWith('/stock-opname') ||

@@ -58,7 +58,7 @@ Cara pakai: kerjakan **satu tugas per sesi**, dari atas ke bawah. Tugas dianggap
 - [x] **T3.3 Cetak label barcode.**
 - [x] **T3.4 Scan barcode** lewat kamera HP di form GR/DO.
 - [x] **T3.5 Denah gudang interaktif.**
-- [ ] **T3.6 Retur dari customer** (jika diputuskan).
+- [x] **T3.6 Retur dari customer.**
 
 ## Penutup portofolio
 

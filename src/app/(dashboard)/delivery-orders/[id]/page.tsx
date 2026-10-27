@@ -265,8 +265,19 @@ export default function DeliveryOrderDetailPage({ params }: PageProps) {
           )}
 
           {doOrder.status === 'SHIPPED' && (
-            <div className="rounded-md border border-emerald-200 bg-emerald-50 px-3 py-1.5 text-xs font-medium text-emerald-600 dark:border-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-400">
-              ✓ Pengiriman Selesai (Dokumen Final)
+            <div className="flex items-center gap-2">
+              <div className="rounded-md border border-emerald-200 bg-emerald-50 px-3 py-1.5 text-xs font-medium text-emerald-600 dark:border-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-400">
+                ✓ Pengiriman Selesai
+              </div>
+              <Link href="/customer-returns/new">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="border-indigo-200 text-xs text-indigo-600 hover:bg-indigo-50"
+                >
+                  Retur Barang
+                </Button>
+              </Link>
             </div>
           )}
 
