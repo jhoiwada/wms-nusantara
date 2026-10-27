@@ -1,12 +1,14 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { BarcodeScannerModal } from '@/components/features/barcode-scanner-modal';
 
 export interface ProductOption {
   id: string;
   sku: string;
+  barcode?: string | null;
   name: string;
   uom: string;
   trackExpiry: boolean;
@@ -43,6 +45,12 @@ interface LineItemsEditorProps {
   disabled?: boolean;
 }
 
+let lineKeyCounter = 0;
+function getNextLineKey(): string {
+  lineKeyCounter += 1;
+  return `item-${lineKeyCounter}`;
+}
+
 export function LineItemsEditor({
   items,
   onChange,
@@ -58,12 +66,76 @@ export function LineItemsEditor({
 
   const productMap = new Map(products.map((p) => [p.id, p]));
 
+  // Barcode scanning states
+  const [isScannerOpen, setIsScannerOpen] = useState(false);
+  const [quickBarcodeInput, setQuickBarcodeInput] = useState('');
+  const [scanFeedback, setScanFeedback] = useState<{
+    text: string;
+    type: 'success' | 'error';
+  } | null>(null);
+
+  const handleScanBarcode = (code: string): boolean => {
+    const clean = code.trim().toLowerCase();
+    if (!clean) return false;
+
+    // Search product by barcode or SKU
+    const matchedProduct = products.find(
+      (p) => (p.barcode && p.barcode.toLowerCase() === clean) || p.sku.toLowerCase() === clean,
+    );
+
+    if (matchedProduct) {
+      const existingIndex = items.findIndex((it) => it.productId === matchedProduct.id);
+      if (existingIndex !== -1) {
+        const currentQty = Number(items[existingIndex]?.quantity) || 1;
+        handleUpdateItem(existingIndex, { quantity: currentQty + 1 });
+        setScanFeedback({
+          text: `+1 Qty: ${matchedProduct.name} (Total: ${currentQty + 1})`,
+          type: 'success',
+        });
+      } else {
+        const defaultLocation = availableLocations[0];
+        const newItem: LineItemRow = {
+          key: getNextLineKey(),
+          productId: matchedProduct.id,
+          locationId: defaultLocation?.id || '',
+          quantity: 1,
+          unitPrice: Number(matchedProduct.costPrice) || 0,
+          batchNo: matchedProduct.trackExpiry ? '' : 'DEFAULT',
+          expiryDate: '',
+        };
+        onChange([...items, newItem]);
+        setScanFeedback({
+          text: `Ditambahkan: ${matchedProduct.name}`,
+          type: 'success',
+        });
+      }
+      return true;
+    }
+
+    // Check if location was scanned
+    const matchedLocation = availableLocations.find((l) => l.code.toLowerCase() === clean);
+    if (matchedLocation && items.length > 0) {
+      handleUpdateItem(items.length - 1, { locationId: matchedLocation.id });
+      setScanFeedback({
+        text: `Lokasi baris terakhir diatur ke ${matchedLocation.code}`,
+        type: 'success',
+      });
+      return true;
+    }
+
+    setScanFeedback({
+      text: `Barcode '${code}' tidak ditemukan di katalog produk atau lokasi rak gudang`,
+      type: 'error',
+    });
+    return false;
+  };
+
   const handleAddItem = () => {
     const defaultProduct = products[0];
     const defaultLocation = availableLocations[0];
 
     const newItem: LineItemRow = {
-      key: `item-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`,
+      key: getNextLineKey(),
       productId: defaultProduct?.id || '',
       locationId: defaultLocation?.id || '',
       quantity: 1,
@@ -134,25 +206,94 @@ export function LineItemsEditor({
         </div>
 
         {!disabled && (
-          <Button
-            type="button"
-            size="sm"
-            onClick={handleAddItem}
-            disabled={products.length === 0 || availableLocations.length === 0}
-            className="h-8 gap-1.5 text-xs"
-          >
-            <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M12 4v16m8-8H4"
+          <div className="flex flex-wrap items-center gap-2">
+            <div className="flex items-center gap-1.5">
+              <Input
+                placeholder="Scan / Ketik barcode..."
+                value={quickBarcodeInput}
+                onChange={(e) => setQuickBarcodeInput(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    e.preventDefault();
+                    if (quickBarcodeInput.trim()) {
+                      handleScanBarcode(quickBarcodeInput.trim());
+                      setQuickBarcodeInput('');
+                    }
+                  }
+                }}
+                disabled={disabled}
+                className="h-8 w-44 font-mono text-xs"
               />
-            </svg>
-            Tambah Baris Item
-          </Button>
+            </div>
+
+            <Button
+              type="button"
+              size="sm"
+              variant="outline"
+              onClick={() => setIsScannerOpen(true)}
+              disabled={disabled || products.length === 0}
+              className="h-8 gap-1.5 border-indigo-200 text-xs font-semibold text-indigo-700 shadow-xs hover:bg-indigo-50"
+            >
+              <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"
+                />
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"
+                />
+              </svg>
+              Scan Kamera HP
+            </Button>
+
+            <Button
+              type="button"
+              size="sm"
+              onClick={handleAddItem}
+              disabled={products.length === 0 || availableLocations.length === 0}
+              className="h-8 gap-1.5 text-xs"
+            >
+              <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M12 4v16m8-8H4"
+                />
+              </svg>
+              Tambah Baris
+            </Button>
+          </div>
         )}
       </div>
+
+      {/* Scan Feedback Banner */}
+      {scanFeedback && (
+        <div
+          className={`flex items-center justify-between rounded-md p-2.5 text-xs font-medium ${
+            scanFeedback.type === 'success'
+              ? 'border border-emerald-200 bg-emerald-50 text-emerald-800'
+              : 'border border-rose-200 bg-rose-50 text-rose-800'
+          }`}
+        >
+          <div className="flex items-center gap-2">
+            <span>{scanFeedback.type === 'success' ? '✅' : '⚠️'}</span>
+            <span>{scanFeedback.text}</span>
+          </div>
+          <button
+            type="button"
+            onClick={() => setScanFeedback(null)}
+            className="ml-2 text-slate-400 hover:text-slate-700"
+          >
+            &times;
+          </button>
+        </div>
+      )}
 
       {availableLocations.length === 0 && (
         <div className="rounded-lg border border-amber-200 bg-amber-50 p-3 text-xs text-amber-800">
@@ -397,6 +538,15 @@ export function LineItemsEditor({
           </table>
         </div>
       )}
+
+      {/* Barcode Scanner Modal */}
+      <BarcodeScannerModal
+        isOpen={isScannerOpen}
+        onClose={() => setIsScannerOpen(false)}
+        onScan={handleScanBarcode}
+        title="Scan Barcode Barang Masuk (GR)"
+        subtitle="Arahkan kamera HP ke barcode kemasan barang atau label rak"
+      />
     </div>
   );
 }
