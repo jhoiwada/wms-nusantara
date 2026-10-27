@@ -7,6 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { Dialog } from '@/components/ui/dialog';
 import { DataTable, type Column } from '@/components/ui/data-table';
 import { LOCATION_CODE_REGEX } from '@/schemas/warehouse.schema';
+import { BarcodeLabelPrinter } from '@/components/features/barcode-label-printer';
 
 interface WarehouseItem {
   id: string;
@@ -68,6 +69,7 @@ export default function WarehousesPage() {
   // Location Dialog state
   const [isLocDialogOpen, setIsLocDialogOpen] = useState(false);
   const [editingLoc, setEditingLoc] = useState<LocationItem | null>(null);
+  const [printingLoc, setPrintingLoc] = useState<LocationItem | null>(null);
   const [locFormWhId, setLocFormWhId] = useState('');
   const [locFormCode, setLocFormCode] = useState('');
   const [locFormError, setLocFormError] = useState<string | null>(null);
@@ -517,6 +519,15 @@ export default function WarehousesPage() {
           <Button
             size="sm"
             variant="ghost"
+            onClick={() => setPrintingLoc(item)}
+            className="h-7 px-2 text-xs text-indigo-600 hover:bg-indigo-50"
+            title="Cetak Label Rak"
+          >
+            Label
+          </Button>
+          <Button
+            size="sm"
+            variant="ghost"
             onClick={() => handleOpenEditLoc(item)}
             className="h-7 px-2 text-xs"
           >
@@ -882,6 +893,35 @@ export default function WarehousesPage() {
             </Button>
           </div>
         </form>
+      </Dialog>
+
+      {/* Location Barcode Label Dialog */}
+      <Dialog
+        isOpen={!!printingLoc}
+        onClose={() => setPrintingLoc(null)}
+        title={printingLoc ? `Cetak Label Rak: ${printingLoc.code}` : ''}
+      >
+        {printingLoc && (
+          <div className="pt-2">
+            <BarcodeLabelPrinter
+              isModal={true}
+              defaultPreset="100x50"
+              onClose={() => setPrintingLoc(null)}
+              initialItems={[
+                {
+                  id: `loc-${printingLoc.id}`,
+                  type: 'LOCATION',
+                  title: printingLoc.code,
+                  subtitle: `${printingLoc.warehouse.name} (${printingLoc.warehouse.code})`,
+                  barcodeValue: printingLoc.code,
+                  displayCode: printingLoc.code,
+                  secondaryInfo: `Zona ${printingLoc.zone} • Rak ${printingLoc.rack} • Tkt ${printingLoc.level}`,
+                  copies: 1,
+                },
+              ]}
+            />
+          </div>
+        )}
       </Dialog>
     </div>
   );

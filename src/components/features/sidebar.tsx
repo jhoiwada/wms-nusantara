@@ -60,6 +60,12 @@ const NAV_ITEMS: NavItem[] = [
     roles: ['ADMIN', 'MANAGER', 'STAFF'],
     section: 'Operasional',
   },
+  {
+    label: 'Cetak Label Barcode',
+    href: '/barcode-labels',
+    roles: ['ADMIN', 'MANAGER', 'STAFF', 'VIEWER'],
+    section: 'Operasional',
+  },
 
   // Master Data
   {

@@ -1,11 +1,13 @@
 'use client';
 
 import React, { useState, useEffect, useCallback, useTransition } from 'react';
+import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Dialog } from '@/components/ui/dialog';
 import { DataTable, type Column } from '@/components/ui/data-table';
+import { BarcodeLabelPrinter } from '@/components/features/barcode-label-printer';
 
 interface CategoryOption {
   id: string;
@@ -48,6 +50,7 @@ export default function ProductsPage() {
   // Dialog state
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<ProductItem | null>(null);
+  const [printingProduct, setPrintingProduct] = useState<ProductItem | null>(null);
 
   // Form states
   const [formSku, setFormSku] = useState('');
@@ -326,6 +329,15 @@ export default function ProductsPage() {
           <Button
             size="sm"
             variant="ghost"
+            onClick={() => setPrintingProduct(item)}
+            className="h-7 px-2 text-xs text-indigo-600 hover:bg-indigo-50"
+            title="Cetak Label Barcode"
+          >
+            Label
+          </Button>
+          <Button
+            size="sm"
+            variant="ghost"
             onClick={() => handleOpenEdit(item)}
             className="h-7 px-2 text-xs"
           >
@@ -387,6 +399,23 @@ export default function ProductsPage() {
               </option>
             ))}
           </select>
+          <Link href="/barcode-labels">
+            <Button
+              variant="outline"
+              size="sm"
+              className="h-9 gap-1.5 border-indigo-200 text-indigo-700 hover:bg-indigo-50"
+            >
+              <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"
+                />
+              </svg>
+              Cetak Label
+            </Button>
+          </Link>
           <Button onClick={handleOpenAdd} className="gap-2">
             <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path
@@ -588,6 +617,37 @@ export default function ProductsPage() {
             </Button>
           </div>
         </form>
+      </Dialog>
+
+      {/* Barcode Label Dialog */}
+      <Dialog
+        isOpen={!!printingProduct}
+        onClose={() => setPrintingProduct(null)}
+        title={printingProduct ? `Cetak Label: ${printingProduct.name}` : ''}
+      >
+        {printingProduct && (
+          <div className="pt-2">
+            <BarcodeLabelPrinter
+              isModal={true}
+              onClose={() => setPrintingProduct(null)}
+              initialItems={[
+                {
+                  id: `prod-${printingProduct.id}`,
+                  type: 'PRODUCT',
+                  title: printingProduct.name,
+                  subtitle: `Kategori: ${printingProduct.category.name}`,
+                  barcodeValue: printingProduct.barcode || printingProduct.sku,
+                  displayCode: printingProduct.barcode
+                    ? `${printingProduct.sku} | ${printingProduct.barcode}`
+                    : printingProduct.sku,
+                  secondaryInfo: `Rp ${Number(printingProduct.costPrice).toLocaleString('id-ID')} / ${printingProduct.uom}`,
+                  badgeText: printingProduct.trackExpiry ? 'FEFO' : undefined,
+                  copies: 1,
+                },
+              ]}
+            />
+          </div>
+        )}
       </Dialog>
     </div>
   );
