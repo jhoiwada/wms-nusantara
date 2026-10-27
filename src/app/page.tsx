@@ -1,3 +1,5 @@
+import Link from 'next/link';
+
 export default function HomePage() {
   return (
     <div className="flex min-h-screen flex-col bg-slate-950 text-slate-100 selection:bg-emerald-500/30 selection:text-emerald-200">
@@ -11,15 +13,21 @@ export default function HomePage() {
             <div>
               <span className="font-semibold tracking-tight text-white">WMS Core</span>
               <span className="ml-2 rounded border border-emerald-500/20 bg-emerald-500/10 px-1.5 py-0.5 font-mono text-xs text-emerald-400/90">
-                v0.1.0-alpha
+                v0.3.0
               </span>
             </div>
           </div>
           <nav className="flex items-center gap-4 text-sm text-slate-400">
-            <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-800/50 bg-emerald-950/50 px-2.5 py-1 text-xs font-medium text-emerald-400">
+            <span className="hidden items-center gap-1.5 rounded-full border border-emerald-800/50 bg-emerald-950/50 px-2.5 py-1 text-xs font-medium text-emerald-400 sm:inline-flex">
               <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-400" />
-              Fase 0: Fondasi Aktif
+              Sistem Aktif &amp; Terverifikasi
             </span>
+            <Link
+              href="/login"
+              className="inline-flex items-center justify-center rounded-lg bg-emerald-500 px-4 py-2 text-xs font-semibold text-slate-950 shadow-sm transition hover:bg-emerald-400"
+            >
+              Masuk / Login &rarr;
+            </Link>
           </nav>
         </div>
       </header>
@@ -38,9 +46,32 @@ export default function HomePage() {
           </h1>
           <p className="text-base leading-relaxed text-slate-400 md:text-lg">
             Aplikasi web monolit Next.js (App Router) + TypeScript Strict + PostgreSQL untuk
-            mencatat dan mengontrol barang masuk (GR), barang keluar (DO), lokasi rak 3D, serta
-            audit opname fisik.
+            mencatat dan mengontrol barang masuk (GR), barang keluar (DO), alokasi FEFO, denah
+            visual gudang 2D, scan barcode kamera, serta audit opname fisik.
           </p>
+
+          <div className="flex flex-wrap items-center gap-3 pt-3">
+            <Link
+              href="/login"
+              className="inline-flex items-center gap-2 rounded-lg bg-emerald-500 px-6 py-3 text-sm font-semibold text-slate-950 shadow-md transition hover:bg-emerald-400"
+            >
+              Masuk ke Aplikasi
+              <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M14 5l7 7m0 0l-7 7m7-7H3"
+                />
+              </svg>
+            </Link>
+            <Link
+              href="/dashboard"
+              className="inline-flex items-center gap-2 rounded-lg border border-slate-700 bg-slate-800/80 px-6 py-3 text-sm font-medium text-slate-200 transition hover:bg-slate-700 hover:text-white"
+            >
+              Buka Dashboard
+            </Link>
+          </div>
         </div>
 
         {/* Feature Cards Grid */}
@@ -144,7 +175,7 @@ export default function HomePage() {
       <footer className="border-t border-slate-800/80 py-6 text-center text-xs text-slate-500">
         <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-4 px-6 sm:flex-row">
           <span>&copy; 2026 WMS: Sistem Manajemen Gudang. Portofolio Proyek.</span>
-          <span className="font-mono text-slate-400">Fase 0: T0.1 Selesai</span>
+          <span className="font-mono text-slate-400">v0.3.0 — Production Ready</span>
         </div>
       </footer>
     </div>
