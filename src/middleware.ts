@@ -21,6 +21,7 @@ export function middleware(req: NextRequest) {
     pathname.startsWith('/stock-card') ||
     pathname.startsWith('/stock-opname') ||
     pathname.startsWith('/stock-adjustments') ||
+    pathname.startsWith('/stock-transfers') ||
     pathname.startsWith('/reports') ||
     pathname.startsWith('/users');
 

@@ -54,6 +54,12 @@ const NAV_ITEMS: NavItem[] = [
     roles: ['ADMIN', 'MANAGER'],
     section: 'Operasional',
   },
+  {
+    label: 'Transfer Stok',
+    href: '/stock-transfers',
+    roles: ['ADMIN', 'MANAGER', 'STAFF'],
+    section: 'Operasional',
+  },
 
   // Master Data
   {
