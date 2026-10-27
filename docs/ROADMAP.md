@@ -46,7 +46,7 @@ Cara pakai: kerjakan **satu tugas per sesi**, dari atas ke bawah. Tugas dianggap
 
 - [x] **T2.1 Batch dan kedaluwarsa.** Input di GR, FEFO di DO (BR-06 s.d. BR-09).
 - [x] **T2.2 Peringatan expired.** Endpoint `/stock/expiring`, `ExpiryBadge`, panel di dashboard.
-- [ ] **T2.3 Stock opname.** Snapshot, pembekuan lokasi, submit, approve/reject, penyesuaian (BR-20 s.d. BR-26).
+- [x] **T2.3 Stock opname.** Snapshot, pembekuan lokasi, submit, approve/reject, penyesuaian (BR-20 s.d. BR-26).
 - [ ] **T2.4 Penyesuaian stok manual.** Manager/Admin, wajib alasan (BR-26).
 - [ ] **T2.5 Transfer stok.** Antar rak dan antar gudang (BR-27, BR-28).
 - [ ] **Rilis v0.2.0.**

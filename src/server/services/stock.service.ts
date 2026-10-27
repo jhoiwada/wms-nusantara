@@ -47,7 +47,7 @@ export async function getOrCreateDefaultBatch(productId: string, tx?: Prisma.Tra
  */
 export async function applyStockMovement(
   input: ApplyStockMovementInput,
-  options?: { tx?: Prisma.TransactionClient },
+  options?: { tx?: Prisma.TransactionClient; allowFrozenLocation?: boolean },
 ): Promise<StockMovementResult> {
   const validated = applyStockMovementSchema.parse(input);
 
@@ -73,7 +73,7 @@ export async function applyStockMovement(
     if (!location.isActive) {
       throw new AppError('VALIDATION_ERROR', `Lokasi '${location.code}' tidak aktif (BR-32)`);
     }
-    if (location.isFrozen) {
+    if (location.isFrozen && !options?.allowFrozenLocation) {
       throw new AppError(
         'INVALID_STATE',
         `Lokasi '${location.code}' sedang dibekukan karena proses opname (BR-22)`,
@@ -190,12 +190,15 @@ export async function applyStockMovement(
  */
 export async function applyStockMovements(
   inputs: ApplyStockMovementInput[],
-  options?: { tx?: Prisma.TransactionClient },
+  options?: { tx?: Prisma.TransactionClient; allowFrozenLocation?: boolean },
 ): Promise<StockMovementResult[]> {
   const execute = async (tx: Prisma.TransactionClient): Promise<StockMovementResult[]> => {
     const results: StockMovementResult[] = [];
     for (const input of inputs) {
-      const res = await applyStockMovement(input, { tx });
+      const res = await applyStockMovement(input, {
+        tx,
+        allowFrozenLocation: options?.allowFrozenLocation,
+      });
       results.push(res);
     }
     return results;

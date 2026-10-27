@@ -45,7 +45,7 @@ const NAV_ITEMS: NavItem[] = [
   {
     label: 'Stock Opname',
     href: '/stock-opname',
-    roles: ['ADMIN', 'MANAGER', 'STAFF'],
+    roles: ['ADMIN', 'MANAGER', 'STAFF', 'VIEWER'],
     section: 'Operasional',
   },
 
