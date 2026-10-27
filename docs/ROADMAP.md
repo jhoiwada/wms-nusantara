@@ -49,7 +49,7 @@ Cara pakai: kerjakan **satu tugas per sesi**, dari atas ke bawah. Tugas dianggap
 - [x] **T2.3 Stock opname.** Snapshot, pembekuan lokasi, submit, approve/reject, penyesuaian (BR-20 s.d. BR-26).
 - [x] **T2.4 Penyesuaian stok manual.** Manager/Admin, wajib alasan (BR-26).
 - [x] **T2.5 Transfer stok.** Antar rak dan antar gudang (BR-27, BR-28).
-- [ ] **Rilis v0.2.0.**
+- [x] **Rilis v0.2.0.**
 
 ## Fase 3: Nilai tambah (Tahap 3, pilih sesuai waktu)
 

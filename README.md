@@ -1,13 +1,13 @@
 # WMS — Sistem Manajemen Gudang (Warehouse Management System)
 
 [![CI Pipeline](https://github.com/jhoiwada/wms/actions/workflows/ci.yml/badge.svg)](https://github.com/jhoiwada/wms/actions)
-[![Version](https://img.shields.io/badge/version-0.1.0-blue.svg)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-0.2.0-blue.svg)](CHANGELOG.md)
 [![Next.js](https://img.shields.io/badge/Next.js-16.4-black.svg?logo=next.js)](https://nextjs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5-blue.svg?logo=typescript)](https://www.typescriptlang.org/)
 [![Prisma](https://img.shields.io/badge/Prisma-6-darkblue.svg?logo=prisma)](https://www.prisma.io/)
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-blue.svg?logo=postgresql)](https://www.postgresql.org/)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind-v4-38bdf8.svg?logo=tailwindcss)](https://tailwindcss.com/)
-[![Tests](https://img.shields.io/badge/Tests-129%20passed-brightgreen.svg)](<>)
+[![Tests](https://img.shields.io/badge/Tests-170%20passed-brightgreen.svg)](<>)
 
 Aplikasi web **Sistem Manajemen Gudang (WMS)** tingkat enterprise untuk distributor multi-gudang (studi kasus: **Gudang Utama Jakarta** dan **Gudang Cabang Bekasi**). Dibangun dengan fokus utama pada kebenaran logika stok, integritas transaksi ACID, auditabilitas penuh, dan keamanan tingkat produksi.
 
@@ -30,13 +30,14 @@ Aplikasi web **Sistem Manajemen Gudang (WMS)** tingkat enterprise untuk distribu
 
 Distributor barang konsumsi (FMCG) dengan gudang pusat di Jakarta Barat dan gudang cabang di Bekasi Timur. Sistem mengelola alur barang masuk dari supplier terdaftar, penyimpanan terorganisir per lokasi rak, alokasi pengiriman pesanan ke customer, dan rekonsiliasi stok secara real-time.
 
-### Fitur yang Tersedia (Rilis v0.1.0)
+### Fitur yang Tersedia (Rilis v0.2.0)
 
 1. **Dashboard Operasional Real-Time**:
    - Ringkasan nilai total persediaan barang (IDR) dan total kuantitas unit.
    - Peringatan stok menipis di bawah kuota minimum (`min_stock`) dan notifikasi dokumen draft yang tertunda.
    - Grafik batang visualisasi pergerakan barang masuk vs keluar harian (periode 7 hari / 30 hari).
    - Tabel aktivitas mutasi barang terkini dengan tautan langsung ke dokumen referensi.
+   - Panel peringatan batch mendekati/telah kedaluwarsa lengkap dengan filter waktu dan estimasi total nilai risiko finansial (BR-10).
 2. **Manajemen Barang Masuk (Goods Receipt / GR)**:
    - Penomoran otomatis format `GR-YYYY-XXXX`.
    - Penyusunan draft penerimaan barang dengan editor baris interaktif (`LineItemsEditor`).
@@ -45,7 +46,8 @@ Distributor barang konsumsi (FMCG) dengan gudang pusat di Jakarta Barat dan guda
 3. **Manajemen Barang Keluar (Delivery Order / DO)**:
    - Penomoran otomatis format `DO-YYYY-XXXX`.
    - Validasi ketersediaan stok fisik di lokasi gudang terkait sebelum konfirmasi pengiriman.
-   - **Alokasi FEFO Otomatis (First Expired, First Out)**: sistem secara cerdas memprioritaskan batch yang memiliki tanggal kedaluwarsa paling dekat.
+   - **Alokasi FEFO Otomatis (First Expired, First Out)**: sistem secara cerdas memprioritaskan batch yang memiliki tanggal kedaluwarsa paling dekat dan memecah alokasi multi-batch (BR-06 s.d. BR-08).
+   - Proteksi absolut: pemblokiran pengiriman untuk batch yang telah kedaluwarsa (BR-09).
    - Penolakan seluruh dokumen (atomic rollback) jika stok tidak mencukupi untuk memenuhi pesanan (BR-17).
 4. **Buku Besar Kartu Stok & Audit Konsistensi**:
    - Tampilan ringkasan stok per produk dan lokasi rak.
@@ -55,6 +57,20 @@ Distributor barang konsumsi (FMCG) dengan gudang pusat di Jakarta Barat dan guda
    - Manajemen Kategori, Supplier, dan Customer dengan kebijakan soft deactivation (`isActive = false`).
    - Manajemen Produk dengan validasi keunikan SKU/barcode, konversi satuan (`uom`), harga pokok, dan flag pelacakan expiry.
    - Manajemen Gudang dan Lokasi Rak dengan penegakan pola kode rak `/^[A-Z]-\d{2}-\d{2}$/` serta dukungan freeze status untuk opname.
+6. **Stock Opname & Rekonsiliasi Empat Mata (Four-Eyes Principle)**:
+   - Snapshot kuantitas sistem seketika saat pembukaan dokumen opname.
+   - Pembekuan lokasi rak otomatis (`isFrozen = true`, BR-22) selama proses opname berlangsung.
+   - Penegakan prinsip empat mata (BR-23): persetujuan wajib oleh Manager/Admin dan tidak boleh disetujui oleh staf pembuat dokumen.
+   - Rekonsiliasi stok otomatis atomik: `ADJUST_IN` untuk selisih fisik lebih dan `ADJUST_OUT` untuk selisih fisik kurang, diikuti pencairan status pembekuan rak (BR-24, BR-25).
+7. **Penyesuaian Stok Manual Terkendali**:
+   - Otorisasi terbatas hanya untuk role Manager atau Admin (BR-26).
+   - 8 kategori alasan terstruktur dan kewajiban catatan alasan minimal 5 karakter untuk menjamin auditabilitas.
+   - Penomoran dokumen terpusat format `ADJ-YYYY-XXXX` dan fasilitas pemusnahan barang kedaluwarsa (`EXPIRED_DISPOSAL`).
+8. **Transfer Stok Antar Rak & Antar Gudang**:
+   - Pemindahan stok instan dan atomik antar rak dalam gudang yang sama maupun antar gudang (Jakarta & Bekasi) dalam 1 transaksi ACID (BR-27).
+   - Mutasi pasangan serempak `TRANSFER_OUT` di asal dan `TRANSFER_IN` di tujuan tanpa selisih (BR-27, BR-28).
+   - Pewarisan identitas nomor batch dan tanggal kedaluwarsa secara utuh serta perlindungan lokasi beku di kedua ujung rak.
+   - Penomoran dokumen terpusat format `TR-YYYY-XXXX`.
 
 ---
 
@@ -98,7 +114,7 @@ PostgreSQL Database (Constraints, Indexes & Stored Functions)
 - **Database & ORM**: PostgreSQL 16 & Prisma ORM 6
 - **Autentikasi & Keamanan**: JWT Sessions via `jose`, `bcryptjs`, dan rate limiter di memori
 - **Validasi Data**: Zod v4
-- **Pengujian**: Vitest 5 (129 unit & integration tests)
+- **Pengujian**: Vitest 5 (170 unit & integration tests)
 
 ---
 
@@ -124,7 +140,7 @@ wms/
 ├── src/
 │   ├── app/             # Halaman App Router & REST API Route Handlers
 │   │   ├── (auth)/      # Halaman login & otentikasi
-│   │   ├── (dashboard)/ # Halaman dashboard, master data, GR, DO, dan kartu stok
+│   │   ├── (dashboard)/ # Dashboard, master data, GR, DO, opname, adjustment, transfer, kartu stok
 │   │   └── api/v1/      # REST API endpoints
 │   ├── components/
 │   │   ├── ui/          # Komponen UI dasar (Button, Input, Badge, Dialog, DataTable)
