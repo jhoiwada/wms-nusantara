@@ -3,7 +3,7 @@
   "crons": [
     {
       "path": "/api/v1/demo/reset",
-      "schedule": "0 */4 * * *"
+      "schedule": "0 0 * * *"
     }
   ]
 }
