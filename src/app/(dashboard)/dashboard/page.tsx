@@ -101,6 +101,7 @@ interface WarehouseOption {
 export default function DashboardPage() {
   const [warehouses, setWarehouses] = useState<WarehouseOption[]>([]);
   const [selectedWarehouse, setSelectedWarehouse] = useState<string>('ALL');
+  const [isGuideOpen, setIsGuideOpen] = useState(false);
 
   // Summary state
   const [summary, setSummary] = useState<DashboardSummaryData | null>(null);
@@ -235,10 +236,10 @@ export default function DashboardPage() {
       sortable: true,
       render: (row) => (
         <div>
-          <div className="font-semibold text-slate-800 dark:text-slate-200">{row.productName}</div>
-          <div className="flex items-center gap-2 font-mono text-[11px] text-slate-500">
+          <div className="font-semibold text-zinc-800 dark:text-zinc-200">{row.productName}</div>
+          <div className="flex items-center gap-2 font-mono text-[11px] text-zinc-500">
             <span>{row.sku}</span>
-            <span className="text-slate-300 dark:text-slate-700">•</span>
+            <span className="text-zinc-300 dark:text-zinc-700">•</span>
             <span>{row.category}</span>
           </div>
         </div>
@@ -249,7 +250,7 @@ export default function DashboardPage() {
       header: 'No. Batch',
       sortable: true,
       render: (row) => (
-        <span className="font-mono text-xs font-semibold text-slate-900 dark:text-slate-100">
+        <span className="font-mono text-xs font-semibold text-zinc-900 dark:text-zinc-100">
           {row.batchNo}
         </span>
       ),
@@ -259,10 +260,10 @@ export default function DashboardPage() {
       header: 'Lokasi Rak & Gudang',
       render: (row) => (
         <div>
-          <span className="font-mono text-xs font-bold text-slate-800 dark:text-slate-200">
+          <span className="font-mono text-xs font-bold text-zinc-800 dark:text-zinc-200">
             {row.locationCode}
           </span>
-          <div className="text-[11px] text-slate-500">{row.warehouseName}</div>
+          <div className="text-[11px] text-zinc-500">{row.warehouseName}</div>
         </div>
       ),
     },
@@ -272,9 +273,9 @@ export default function DashboardPage() {
       align: 'right',
       sortable: true,
       render: (row) => (
-        <div className="font-mono text-xs font-bold text-slate-900 dark:text-slate-100">
+        <div className="font-mono text-xs font-bold text-zinc-900 dark:text-zinc-100">
           {row.quantity.toLocaleString('id-ID')}{' '}
-          <span className="font-sans text-[11px] font-normal text-slate-500">{row.uom}</span>
+          <span className="font-sans text-[11px] font-normal text-zinc-500">{row.uom}</span>
         </div>
       ),
     },
@@ -284,7 +285,7 @@ export default function DashboardPage() {
       sortable: true,
       render: (row) => (
         <div>
-          <div className="font-mono text-xs text-slate-700 dark:text-slate-300">
+          <div className="font-mono text-xs text-zinc-700 dark:text-zinc-300">
             {row.expiryDate
               ? new Date(row.expiryDate).toLocaleDateString('id-ID', {
                   day: 'numeric',
@@ -313,7 +314,7 @@ export default function DashboardPage() {
           <div className="font-mono text-xs font-semibold text-rose-700 dark:text-rose-400">
             Rp {row.potentialLossValue.toLocaleString('id-ID')}
           </div>
-          <div className="text-[10px] text-slate-400">
+          <div className="text-[10px] text-zinc-400">
             @ Rp {row.costPrice.toLocaleString('id-ID')}
           </div>
         </div>
@@ -331,7 +332,7 @@ export default function DashboardPage() {
             </Button>
           </Link>
           <Link href={`/stock/${row.productId}/card`}>
-            <Button size="sm" variant="ghost" className="h-6 px-1.5 text-[10px] text-slate-500">
+            <Button size="sm" variant="ghost" className="h-6 px-1.5 text-[10px] text-zinc-500">
               Kartu Stok
             </Button>
           </Link>
@@ -362,10 +363,10 @@ export default function DashboardPage() {
       sortable: true,
       render: (row) => (
         <div>
-          <span className="font-mono text-xs font-semibold text-slate-900 dark:text-slate-100">
+          <span className="font-mono text-xs font-semibold text-zinc-900 dark:text-zinc-100">
             {row.refNo}
           </span>
-          <div className="font-sans text-[10px] text-slate-500">{row.refType}</div>
+          <div className="font-sans text-[10px] text-zinc-500">{row.refType}</div>
         </div>
       ),
     },
@@ -381,8 +382,8 @@ export default function DashboardPage() {
       sortable: true,
       render: (row) => (
         <div>
-          <div className="font-semibold text-slate-800 dark:text-slate-200">{row.product.name}</div>
-          <div className="font-mono text-[11px] text-slate-500">{row.product.sku}</div>
+          <div className="font-semibold text-zinc-800 dark:text-zinc-200">{row.product.name}</div>
+          <div className="font-mono text-[11px] text-zinc-500">{row.product.sku}</div>
         </div>
       ),
     },
@@ -407,7 +408,7 @@ export default function DashboardPage() {
             >
               {isIncoming ? `+${row.quantity}` : `-${row.quantity}`}
             </span>{' '}
-            <span className="text-[11px] text-slate-500">{row.product.uom}</span>
+            <span className="text-[11px] text-zinc-500">{row.product.uom}</span>
           </div>
         );
       },
@@ -417,10 +418,10 @@ export default function DashboardPage() {
       header: 'Lokasi Rak & Gudang',
       render: (row) => (
         <div>
-          <span className="font-mono font-semibold text-slate-800 dark:text-slate-200">
+          <span className="font-mono font-semibold text-zinc-800 dark:text-zinc-200">
             {row.location.code}
           </span>
-          <span className="ml-1 text-[11px] text-slate-500">({row.location.warehouse.code})</span>
+          <span className="ml-1 text-[11px] text-zinc-500">({row.location.warehouse.code})</span>
         </div>
       ),
     },
@@ -429,7 +430,7 @@ export default function DashboardPage() {
       header: 'Saldo Setelah',
       align: 'right',
       render: (row) => (
-        <span className="font-mono text-xs font-bold text-slate-900 dark:text-slate-100">
+        <span className="font-mono text-xs font-bold text-zinc-900 dark:text-zinc-100">
           {row.balanceAfter}
         </span>
       ),
@@ -439,7 +440,7 @@ export default function DashboardPage() {
       header: 'Waktu Transaksi',
       align: 'right',
       render: (row) => (
-        <span className="text-[11px] text-slate-500">
+        <span className="text-[11px] text-zinc-500">
           {new Date(row.createdAt).toLocaleString('id-ID', {
             dateStyle: 'short',
             timeStyle: 'short',
@@ -452,12 +453,12 @@ export default function DashboardPage() {
   return (
     <div className="space-y-6">
       {/* Top Banner */}
-      <div className="flex flex-col gap-4 rounded-xl border border-slate-200 bg-white p-5 sm:flex-row sm:items-center sm:justify-between dark:border-slate-800 dark:bg-slate-950">
+      <div className="flex flex-col gap-4 rounded-xl border border-zinc-200 bg-white p-5 sm:flex-row sm:items-center sm:justify-between dark:border-zinc-800 dark:bg-[#111113]">
         <div>
-          <h1 className="text-xl font-bold tracking-tight text-slate-900 dark:text-slate-100">
+          <h1 className="text-xl font-bold tracking-tight text-zinc-900 dark:text-zinc-100">
             Pusat Kendali Operasional Gudang
           </h1>
-          <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
+          <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-400">
             Pemantauan pergerakan inventaris real-time multi-lokasi Jakarta &amp; Bekasi
           </p>
         </div>
@@ -467,7 +468,7 @@ export default function DashboardPage() {
           <div className="flex items-center gap-2">
             <label
               htmlFor="dashboard-warehouse-select"
-              className="text-xs whitespace-nowrap text-slate-500"
+              className="text-xs whitespace-nowrap text-zinc-500 dark:text-zinc-400"
             >
               Gudang:
             </label>
@@ -475,7 +476,7 @@ export default function DashboardPage() {
               id="dashboard-warehouse-select"
               value={selectedWarehouse}
               onChange={(e) => setSelectedWarehouse(e.target.value)}
-              className="rounded-md border border-slate-300 bg-white px-2 py-1.5 text-xs focus:ring-1 focus:ring-slate-950 focus:outline-none dark:border-slate-700 dark:bg-slate-900 dark:focus:ring-slate-300"
+              className="rounded-md border border-zinc-300 bg-white px-2 py-1.5 text-xs text-zinc-900 focus:ring-1 focus:ring-amber-500 focus:outline-none dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100 dark:focus:ring-amber-400"
             >
               <option value="ALL">Semua Gudang</option>
               {warehouses.map((wh) => (
@@ -501,47 +502,293 @@ export default function DashboardPage() {
         </div>
       </div>
 
+      {/* Enterprise Portfolio Showcase Guide Banner */}
+      <div className="rounded-xl border border-amber-500/25 bg-gradient-to-br from-amber-500/[0.07] via-amber-500/[0.02] to-transparent p-5 dark:border-amber-500/20 dark:from-amber-500/[0.06] dark:via-zinc-900/40">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex items-start gap-3">
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-amber-500 font-bold text-zinc-950 shadow-sm">
+              <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M13 10V3L4 14h7v7l9-11h-7z"
+                />
+              </svg>
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="rounded-full border border-amber-500/30 bg-amber-500/10 px-2.5 py-0.5 text-[10px] font-bold tracking-wider text-amber-700 uppercase dark:border-amber-400/20 dark:text-amber-400">
+                  Standar Operasional Prosedur (SOP)
+                </span>
+                <span className="text-xs text-zinc-400 dark:text-zinc-500">•</span>
+                <span className="text-xs font-medium text-zinc-500 dark:text-zinc-400">
+                  PT Nusantara Logistik Distribusi
+                </span>
+              </div>
+              <h2 className="mt-1 text-sm font-bold text-zinc-900 dark:text-zinc-100">
+                Alur Operasional Pergudangan &amp; Validasi Logika Bisnis NLD
+              </h2>
+              <p className="mt-0.5 text-xs text-zinc-600 dark:text-zinc-400">
+                Seluruh 18 modul pergudangan terhubung secara nyata ke basis data PostgreSQL
+                terpusat DC Pulogadung &amp; MM2100 Cikarang. Gunakan pintasan operasional di bawah
+                untuk mengeksekusi alur logistik sesuai standar perusahaan:
+              </p>
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={() => setIsGuideOpen(!isGuideOpen)}
+            className="inline-flex items-center gap-1.5 self-start rounded-lg border border-zinc-300 bg-white px-3 py-1.5 text-xs font-semibold text-zinc-700 shadow-xs transition hover:bg-zinc-50 sm:self-center dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-300 dark:hover:bg-zinc-800"
+          >
+            <span>{isGuideOpen ? 'Tutup Ringkasan Alur' : 'Buka Ringkasan Alur'}</span>
+            <svg
+              className={`h-3.5 w-3.5 transition-transform duration-200 ${isGuideOpen ? 'rotate-180' : ''}`}
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M19 9l-7 7-7-7"
+              />
+            </svg>
+          </button>
+        </div>
+
+        {isGuideOpen && (
+          <div className="mt-4 grid grid-cols-1 gap-3 border-t border-amber-500/15 pt-4 sm:grid-cols-2 lg:grid-cols-3">
+            {/* Guide Item 1 */}
+            <div className="flex flex-col justify-between rounded-lg border border-zinc-200/80 bg-white/90 p-3.5 transition hover:border-amber-400 dark:border-zinc-800 dark:bg-zinc-900/80 dark:hover:border-amber-500/50">
+              <div>
+                <div className="flex items-center justify-between">
+                  <span className="font-mono text-[10px] font-bold text-amber-700 dark:text-amber-400">
+                    BR-01 s/d BR-04
+                  </span>
+                  <span className="rounded bg-zinc-100 px-1.5 py-0.5 font-mono text-[10px] text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400">
+                    Inbound
+                  </span>
+                </div>
+                <h3 className="mt-1.5 text-xs font-bold text-zinc-900 dark:text-zinc-100">
+                  1. Penerimaan &amp; Barcode Scanner
+                </h3>
+                <p className="mt-1 text-[11px] leading-relaxed text-zinc-600 dark:text-zinc-400">
+                  Pencatatan batch, tanggal kedaluwarsa, alokasi multi-rak di DC Pulogadung /
+                  MM2100, dan modal barcode scanner terintegrasi.
+                </p>
+              </div>
+              <div className="mt-3 border-t border-zinc-100 pt-2 dark:border-zinc-800/80">
+                <Link
+                  href="/goods-receipts/new"
+                  className="inline-flex items-center gap-1 text-xs font-semibold text-amber-600 hover:text-amber-700 dark:text-amber-400 dark:hover:text-amber-300"
+                >
+                  Buka Penerimaan Barang Baru &rarr;
+                </Link>
+              </div>
+            </div>
+
+            {/* Guide Item 2 */}
+            <div className="flex flex-col justify-between rounded-lg border border-zinc-200/80 bg-white/90 p-3.5 transition hover:border-amber-400 dark:border-zinc-800 dark:bg-zinc-900/80 dark:hover:border-amber-500/50">
+              <div>
+                <div className="flex items-center justify-between">
+                  <span className="font-mono text-[10px] font-bold text-amber-700 dark:text-amber-400">
+                    BR-05 s/d BR-08
+                  </span>
+                  <span className="rounded bg-zinc-100 px-1.5 py-0.5 font-mono text-[10px] text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400">
+                    Outbound
+                  </span>
+                </div>
+                <h3 className="mt-1.5 text-xs font-bold text-zinc-900 dark:text-zinc-100">
+                  2. Engine Alokasi Otomatis FEFO
+                </h3>
+                <p className="mt-1 text-[11px] leading-relaxed text-zinc-600 dark:text-zinc-400">
+                  Mencegah kerugian kadaluwarsa dengan algoritma otomatis First-Expired, First-Out
+                  saat verifikasi pesanan pengeluaran barang.
+                </p>
+              </div>
+              <div className="mt-3 border-t border-zinc-100 pt-2 dark:border-zinc-800/80">
+                <Link
+                  href="/delivery-orders/new"
+                  className="inline-flex items-center gap-1 text-xs font-semibold text-amber-600 hover:text-amber-700 dark:text-amber-400 dark:hover:text-amber-300"
+                >
+                  Buka Pengeluaran Barang FEFO &rarr;
+                </Link>
+              </div>
+            </div>
+
+            {/* Guide Item 3 */}
+            <div className="flex flex-col justify-between rounded-lg border border-zinc-200/80 bg-white/90 p-3.5 transition hover:border-amber-400 dark:border-zinc-800 dark:bg-zinc-900/80 dark:hover:border-amber-500/50">
+              <div>
+                <div className="flex items-center justify-between">
+                  <span className="font-mono text-[10px] font-bold text-amber-700 dark:text-amber-400">
+                    BR-11 s/d BR-13
+                  </span>
+                  <span className="rounded bg-zinc-100 px-1.5 py-0.5 font-mono text-[10px] text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400">
+                    Audit Flow
+                  </span>
+                </div>
+                <h3 className="mt-1.5 text-xs font-bold text-zinc-900 dark:text-zinc-100">
+                  3. Stock Opname 4-Eyes Principle
+                </h3>
+                <p className="mt-1 text-[11px] leading-relaxed text-zinc-600 dark:text-zinc-400">
+                  Kepatuhan SOP pergudangan: Petugas melakukan blind-count, disusul review selisih
+                  &amp; persetujuan Manager sebelum mutasi koreksi.
+                </p>
+              </div>
+              <div className="mt-3 border-t border-zinc-100 pt-2 dark:border-zinc-800/80">
+                <Link
+                  href="/stock-opname"
+                  className="inline-flex items-center gap-1 text-xs font-semibold text-amber-600 hover:text-amber-700 dark:text-amber-400 dark:hover:text-amber-300"
+                >
+                  Review Siklus Opname &rarr;
+                </Link>
+              </div>
+            </div>
+
+            {/* Guide Item 4 */}
+            <div className="flex flex-col justify-between rounded-lg border border-zinc-200/80 bg-white/90 p-3.5 transition hover:border-amber-400 dark:border-zinc-800 dark:bg-zinc-900/80 dark:hover:border-amber-500/50">
+              <div>
+                <div className="flex items-center justify-between">
+                  <span className="font-mono text-[10px] font-bold text-amber-700 dark:text-amber-400">
+                    BR-14 &amp; BR-15
+                  </span>
+                  <span className="rounded bg-zinc-100 px-1.5 py-0.5 font-mono text-[10px] text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400">
+                    Quality
+                  </span>
+                </div>
+                <h3 className="mt-1.5 text-xs font-bold text-zinc-900 dark:text-zinc-100">
+                  4. Retur Konsumen &amp; QC Grading
+                </h3>
+                <p className="mt-1 text-[11px] leading-relaxed text-zinc-600 dark:text-zinc-400">
+                  Klasifikasi barang retur (GOOD / DAMAGED / EXPIRED) yang otomatis memisahkan stok
+                  siap jual dengan barang karantina.
+                </p>
+              </div>
+              <div className="mt-3 border-t border-zinc-100 pt-2 dark:border-zinc-800/80">
+                <Link
+                  href="/customer-returns"
+                  className="inline-flex items-center gap-1 text-xs font-semibold text-amber-600 hover:text-amber-700 dark:text-amber-400 dark:hover:text-amber-300"
+                >
+                  Buka Modul Retur Konsumen &rarr;
+                </Link>
+              </div>
+            </div>
+
+            {/* Guide Item 5 */}
+            <div className="flex flex-col justify-between rounded-lg border border-zinc-200/80 bg-white/90 p-3.5 transition hover:border-amber-400 dark:border-zinc-800 dark:bg-zinc-900/80 dark:hover:border-amber-500/50">
+              <div>
+                <div className="flex items-center justify-between">
+                  <span className="font-mono text-[10px] font-bold text-amber-700 dark:text-amber-400">
+                    BR-09, 10, 16
+                  </span>
+                  <span className="rounded bg-zinc-100 px-1.5 py-0.5 font-mono text-[10px] text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400">
+                    Ledger
+                  </span>
+                </div>
+                <h3 className="mt-1.5 text-xs font-bold text-zinc-900 dark:text-zinc-100">
+                  5. Kartu Stok &amp; Jejak Audit Central
+                </h3>
+                <p className="mt-1 text-[11px] leading-relaxed text-zinc-600 dark:text-zinc-400">
+                  Log mutasi immutable per batch, radar kedaluwarsa &lt;30 hari berisiko tinggi, dan
+                  rekaman audit lengkap setiap aksi pengguna.
+                </p>
+              </div>
+              <div className="mt-3 flex items-center gap-3 border-t border-zinc-100 pt-2 dark:border-zinc-800/80">
+                <Link
+                  href="/stock"
+                  className="text-xs font-semibold text-amber-600 hover:text-amber-700 dark:text-amber-400 dark:hover:text-amber-300"
+                >
+                  Posisi Stok &rarr;
+                </Link>
+                <span className="text-zinc-300 dark:text-zinc-700">•</span>
+                <Link
+                  href="/audit-logs"
+                  className="text-xs font-semibold text-amber-600 hover:text-amber-700 dark:text-amber-400 dark:hover:text-amber-300"
+                >
+                  Jejak Audit &rarr;
+                </Link>
+              </div>
+            </div>
+
+            {/* Guide Item 6 */}
+            <div className="flex flex-col justify-between rounded-lg border border-zinc-200/80 bg-white/90 p-3.5 transition hover:border-amber-400 dark:border-zinc-800 dark:bg-zinc-900/80 dark:hover:border-amber-500/50">
+              <div>
+                <div className="flex items-center justify-between">
+                  <span className="font-mono text-[10px] font-bold text-amber-700 dark:text-amber-400">
+                    Enterprise RBAC
+                  </span>
+                  <span className="rounded bg-zinc-100 px-1.5 py-0.5 font-mono text-[10px] text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400">
+                    Security
+                  </span>
+                </div>
+                <h3 className="mt-1.5 text-xs font-bold text-zinc-900 dark:text-zinc-100">
+                  6. Kelola Pengguna &amp; Anti-Lockout
+                </h3>
+                <p className="mt-1 text-[11px] leading-relaxed text-zinc-600 dark:text-zinc-400">
+                  Manajemen 4 tingkat otorisasi (Admin, Manager, Staff, Viewer), tata kelola peran,
+                  reset kata sandi, dan proteksi anti-lockout administrator sistem.
+                </p>
+              </div>
+              <div className="mt-3 border-t border-zinc-100 pt-2 dark:border-zinc-800/80">
+                <Link
+                  href="/users"
+                  className="inline-flex items-center gap-1 text-xs font-semibold text-amber-600 hover:text-amber-700 dark:text-amber-400 dark:hover:text-amber-300"
+                >
+                  Kelola Pengguna Sistem &rarr;
+                </Link>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+
       {/* KPI Cards */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-4">
         {/* Total Inventory Value */}
-        <div className="rounded-lg border border-slate-200 bg-white p-4 dark:border-slate-800 dark:bg-slate-950">
-          <div className="text-xs font-medium text-slate-500 dark:text-slate-400">
-            Total Nilai Persediaan (BR-05)
+        <div className="rounded-lg border border-zinc-200 bg-white p-4 dark:border-zinc-800 dark:bg-[#111113]">
+          <div className="text-xs font-medium text-zinc-500 dark:text-zinc-400">
+            Total Nilai Persediaan
           </div>
-          <div className="mt-1 font-mono text-2xl font-bold text-slate-900 dark:text-slate-100">
+          <div className="mt-1 font-mono text-2xl font-bold text-zinc-900 dark:text-zinc-100">
             {isLoadingSummary
               ? '...'
               : `Rp ${(summary?.totalInventoryValue || 0).toLocaleString('id-ID')}`}
           </div>
-          <div className="mt-1 text-[11px] text-slate-400">Berdasarkan harga beli saat ini</div>
+          <div className="mt-1 text-[11px] text-zinc-400 dark:text-zinc-500">
+            Berdasarkan harga beli saat ini
+          </div>
         </div>
 
         {/* Total Stock Units */}
-        <div className="rounded-lg border border-slate-200 bg-white p-4 dark:border-slate-800 dark:bg-slate-950">
-          <div className="text-xs font-medium text-slate-500 dark:text-slate-400">
+        <div className="rounded-lg border border-zinc-200 bg-white p-4 dark:border-zinc-800 dark:bg-[#111113]">
+          <div className="text-xs font-medium text-zinc-500 dark:text-zinc-400">
             Total Unit Persediaan
           </div>
-          <div className="mt-1 font-mono text-2xl font-bold text-slate-900 dark:text-slate-100">
+          <div className="mt-1 font-mono text-2xl font-bold text-zinc-900 dark:text-zinc-100">
             {isLoadingSummary
               ? '...'
               : `${(summary?.totalStockUnits || 0).toLocaleString('id-ID')} Unit`}
           </div>
-          <div className="mt-1 text-[11px] text-slate-400">Seluruh rak fisik aktif</div>
+          <div className="mt-1 text-[11px] text-zinc-400 dark:text-zinc-500">
+            Seluruh rak fisik aktif
+          </div>
         </div>
 
         {/* Low Stock Alerts */}
         <Link
           href="/stock"
-          className="block rounded-lg border border-amber-200 bg-white p-4 transition-colors hover:border-amber-400 dark:border-amber-900/50 dark:bg-slate-950"
+          className="block rounded-lg border border-amber-300/80 bg-amber-50/50 p-4 transition-colors hover:border-amber-400 dark:border-amber-900/60 dark:bg-amber-950/20"
         >
-          <div className="flex items-center justify-between text-xs font-medium text-amber-600 dark:text-amber-400">
-            <span>Stok Menipis (BR-04)</span>
+          <div className="flex items-center justify-between text-xs font-medium text-amber-700 dark:text-amber-400">
+            <span>Stok Menipis</span>
             <span className="text-amber-500">→</span>
           </div>
-          <div className="mt-1 font-mono text-2xl font-bold text-amber-700 dark:text-amber-400">
+          <div className="mt-1 font-mono text-2xl font-bold text-amber-800 dark:text-amber-300">
             {isLoadingSummary ? '...' : `${summary?.lowStockCount || 0} Produk`}
           </div>
-          <div className="mt-1 text-[11px] text-amber-600/80 dark:text-amber-400/80">
+          <div className="mt-1 text-[11px] text-amber-700/80 dark:text-amber-400/80">
             Di bawah stok minimum nasional
           </div>
         </Link>
@@ -549,10 +796,10 @@ export default function DashboardPage() {
         {/* Expiring Batches */}
         <a
           href="#panel-expiring"
-          className="block rounded-lg border border-rose-200 bg-white p-4 transition-colors hover:border-rose-400 dark:border-rose-900/50 dark:bg-slate-950"
+          className="block rounded-lg border border-rose-200 bg-white p-4 transition-colors hover:border-rose-400 dark:border-rose-900/50 dark:bg-[#111113]"
         >
           <div className="flex items-center justify-between text-xs font-medium text-rose-600 dark:text-rose-400">
-            <span>Batch Hampir Expired (BR-10)</span>
+            <span>Batch Hampir Kedaluwarsa</span>
             <span className="text-rose-500">↓</span>
           </div>
           <div className="mt-1 flex items-baseline gap-2">
@@ -565,7 +812,7 @@ export default function DashboardPage() {
               </span>
             )}
           </div>
-          <div className="mt-1 text-[11px] text-slate-400">
+          <div className="mt-1 text-[11px] text-zinc-400 dark:text-zinc-500">
             {expiringSummary && expiringSummary.totalPotentialLoss > 0
               ? `Potensi risiko Rp ${expiringSummary.totalPotentialLoss.toLocaleString('id-ID')}`
               : 'Kadaluwarsa dalam 30 hari'}
@@ -575,9 +822,21 @@ export default function DashboardPage() {
 
       {/* Operational Draft Alerts Banner */}
       {summary && (summary.draftGoodsReceipts > 0 || summary.draftDeliveryOrders > 0) && (
-        <div className="flex flex-col justify-between gap-3 rounded-lg border border-blue-200 bg-blue-50 p-4 text-xs text-blue-900 sm:flex-row sm:items-center dark:border-blue-800 dark:bg-blue-950/40 dark:text-blue-200">
+        <div className="flex flex-col justify-between gap-3 rounded-lg border border-amber-300 bg-amber-50/80 p-4 text-xs text-amber-950 sm:flex-row sm:items-center dark:border-amber-800/60 dark:bg-amber-950/30 dark:text-amber-200">
           <div className="flex items-center gap-2">
-            <span className="text-base font-bold">ℹ</span>
+            <svg
+              className="h-4 w-4 shrink-0 text-amber-600 dark:text-amber-400"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
+            </svg>
             <span>
               Ada <strong>{summary.draftGoodsReceipts} GR draf</strong> menunggu penerimaan dan{' '}
               <strong>{summary.draftDeliveryOrders} DO draf</strong> siap verifikasi pengiriman
@@ -617,27 +876,27 @@ export default function DashboardPage() {
           {summary.warehouses.map((wh) => (
             <div
               key={wh.id}
-              className="rounded-xl border border-slate-200 bg-white p-4 dark:border-slate-800 dark:bg-slate-950"
+              className="rounded-xl border border-zinc-200 bg-white p-4 dark:border-zinc-800 dark:bg-[#111113]"
             >
               <div className="mb-3 flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <span className="h-2 w-2 rounded-full bg-emerald-400" />
-                  <span className="text-xs font-semibold text-slate-900 dark:text-slate-100">
+                  <span className="h-2 w-2 rounded-full bg-amber-500" />
+                  <span className="text-xs font-bold text-zinc-900 dark:text-zinc-100">
                     {wh.name} ({wh.code})
                   </span>
                 </div>
-                <span className="font-mono text-[11px] text-slate-400">Multi-Rak Terdaftar</span>
+                <span className="font-mono text-[11px] text-zinc-400">Multi-Rak Terdaftar</span>
               </div>
               <div className="grid grid-cols-2 gap-2 text-center text-xs">
-                <div className="rounded-lg border border-slate-100 bg-slate-50 p-2.5 dark:border-slate-800 dark:bg-slate-900">
-                  <span className="block text-[10px] text-slate-400">Rak Aktif</span>
-                  <span className="font-mono text-sm font-semibold text-slate-900 dark:text-slate-100">
+                <div className="rounded-lg border border-zinc-100 bg-zinc-50 p-2.5 dark:border-zinc-800 dark:bg-zinc-900">
+                  <span className="block text-[10px] text-zinc-400">Rak Aktif</span>
+                  <span className="font-mono text-sm font-semibold text-zinc-900 dark:text-zinc-100">
                     {wh.activeRacks} Rak
                   </span>
                 </div>
-                <div className="rounded-lg border border-slate-100 bg-slate-50 p-2.5 dark:border-slate-800 dark:bg-slate-900">
-                  <span className="block text-[10px] text-slate-400">Total Unit Tersimpan</span>
-                  <span className="font-mono text-sm font-semibold text-emerald-600 dark:text-emerald-400">
+                <div className="rounded-lg border border-zinc-100 bg-zinc-50 p-2.5 dark:border-zinc-800 dark:bg-zinc-900">
+                  <span className="block text-[10px] text-zinc-400">Total Unit Tersimpan</span>
+                  <span className="font-mono text-sm font-bold text-amber-600 dark:text-amber-400">
                     {wh.totalUnits.toLocaleString('id-ID')} Unit
                   </span>
                 </div>
@@ -650,16 +909,23 @@ export default function DashboardPage() {
       {/* Expiring Batches Alert Panel (BR-10) */}
       <div
         id="panel-expiring"
-        className="space-y-4 rounded-xl border border-rose-200 bg-white p-5 dark:border-rose-950/60 dark:bg-slate-950"
+        className="space-y-4 rounded-xl border border-rose-200 bg-white p-5 dark:border-rose-950/60 dark:bg-[#111113]"
       >
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <div className="flex items-center gap-2">
-              <span className="flex h-6 w-6 items-center justify-center rounded-full bg-rose-100 text-xs font-bold text-rose-700 dark:bg-rose-950 dark:text-rose-300">
-                ⚠️
+              <span className="flex h-6 w-6 items-center justify-center rounded-full bg-rose-100 text-rose-700 dark:bg-rose-950 dark:text-rose-300">
+                <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+                  />
+                </svg>
               </span>
-              <h2 className="text-base font-bold text-slate-900 dark:text-slate-100">
-                Peringatan Batch Kedaluwarsa (BR-10)
+              <h2 className="text-base font-bold text-zinc-900 dark:text-zinc-100">
+                Peringatan Batch Kedaluwarsa
               </h2>
               {expiringSummary && expiringSummary.totalBatches > 0 && (
                 <span className="rounded-full bg-rose-100 px-2.5 py-0.5 text-xs font-bold text-rose-800 dark:bg-rose-950 dark:text-rose-300">
@@ -667,7 +933,7 @@ export default function DashboardPage() {
                 </span>
               )}
             </div>
-            <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
+            <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-400">
               Pemantauan batch berisiko dengan sisa umur ≤ 30 hari. Segera jadwalkan pengiriman (DO)
               dengan prioritas FEFO atau ajukan penyesuaian untuk batch yang telah kedaluwarsa.
             </p>
@@ -687,19 +953,19 @@ export default function DashboardPage() {
         </div>
 
         {/* Status Filter Tabs */}
-        <div className="flex flex-wrap items-center gap-2 border-b border-slate-100 pb-3 dark:border-slate-800">
+        <div className="flex flex-wrap items-center gap-2 border-b border-zinc-100 pb-3 dark:border-zinc-800">
           <button
             type="button"
             onClick={() => setExpiringFilterTab('ALL')}
             className={`rounded-lg px-3 py-1.5 text-xs font-medium transition-colors ${
               expiringFilterTab === 'ALL'
-                ? 'bg-slate-900 text-white dark:bg-slate-100 dark:text-slate-900'
-                : 'text-slate-600 hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-slate-900'
+                ? 'bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900'
+                : 'text-zinc-600 hover:bg-zinc-100 dark:text-zinc-400 dark:hover:bg-zinc-900'
             }`}
           >
             Semua Batch (≤ 30 hari)
             {expiringSummary && (
-              <span className="py-0.2 ml-1.5 rounded-full bg-slate-200 px-1.5 text-[10px] text-slate-700 dark:bg-slate-800 dark:text-slate-300">
+              <span className="py-0.2 ml-1.5 rounded-full bg-zinc-200 px-1.5 text-[10px] text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300">
                 {expiringSummary.totalBatches}
               </span>
             )}
@@ -733,7 +999,7 @@ export default function DashboardPage() {
           >
             Sudah Kedaluwarsa
             {expiringSummary && expiringSummary.expiredCount > 0 && (
-              <span className="py-0.2 ml-1.5 rounded-full bg-rose-100 px-1.5 text-[10px] font-bold text-rose-800 dark:bg-rose-900 dark:text-rose-200">
+              <span className="py-0.2 ml-1.5 rounded-full bg-rose-100 px-1.5 text-[10px] font-bold text-rose-800 dark:bg-rose-950 dark:text-rose-300">
                 {expiringSummary.expiredCount}
               </span>
             )}
@@ -744,7 +1010,7 @@ export default function DashboardPage() {
             onClick={() => setExpiringFilterTab('WARNING')}
             className={`rounded-lg px-3 py-1.5 text-xs font-medium transition-colors ${
               expiringFilterTab === 'WARNING'
-                ? 'bg-amber-700 text-white dark:bg-amber-600 dark:text-white'
+                ? 'bg-amber-600 font-bold text-white dark:bg-amber-500 dark:text-zinc-950'
                 : 'text-amber-700 hover:bg-amber-50 dark:text-amber-400 dark:hover:bg-amber-950/50'
             }`}
           >
@@ -775,12 +1041,12 @@ export default function DashboardPage() {
       {/* Movement Table */}
       <div className="space-y-3">
         <div className="flex items-center justify-between">
-          <h2 className="text-sm font-semibold tracking-wider text-slate-900 uppercase dark:text-slate-100">
-            Pergerakan Stok Terkini (Real-Time)
+          <h2 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">
+            Pergerakan Stok Terkini
           </h2>
           <Link
             href="/stock"
-            className="text-xs text-blue-600 hover:text-blue-800 hover:underline dark:text-blue-400"
+            className="text-xs font-semibold text-amber-600 hover:text-amber-700 hover:underline dark:text-amber-400"
           >
             Lihat Semua Stok →
           </Link>

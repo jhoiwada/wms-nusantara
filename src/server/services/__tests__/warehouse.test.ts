@@ -135,6 +135,23 @@ describe('Warehouse Service (BR-31, BR-32)', () => {
     expect(updated.name).toBe('Nama Baru');
   });
 
+  it('menolak penonaktifan gudang utama perusahaan (WH-PLG-01 / WH-MM2-01) di server publik', async () => {
+    vi.mocked(prisma.warehouse.findUnique).mockResolvedValueOnce({
+      id: 'wh-plg',
+      code: 'WH-PLG-01',
+      name: 'DC Pulogadung',
+      address: 'Kawasan Industri Pulogadung',
+      isActive: true,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      _count: { locations: 10 },
+    } as never);
+
+    await expect(deactivateWarehouse('wh-plg')).rejects.toThrow(
+      /tidak dapat dinonaktifkan di server publik/,
+    );
+  });
+
   it('berhasil memuat daftar gudang terpaginasi', async () => {
     vi.mocked(prisma.warehouse.count).mockResolvedValueOnce(1);
     vi.mocked(prisma.warehouse.findMany).mockResolvedValueOnce([

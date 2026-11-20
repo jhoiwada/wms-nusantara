@@ -167,7 +167,11 @@ export default function CustomersPage() {
       key: 'code',
       header: 'Kode',
       sortable: true,
-      render: (row) => <span className="font-mono font-semibold text-emerald-400">{row.code}</span>,
+      render: (row) => (
+        <span className="font-mono font-semibold text-emerald-700 dark:text-emerald-400">
+          {row.code}
+        </span>
+      ),
     },
     {
       key: 'name',
@@ -175,9 +179,11 @@ export default function CustomersPage() {
       sortable: true,
       render: (row) => (
         <div>
-          <div className="font-medium text-white">{row.name}</div>
+          <div className="font-medium text-slate-900 dark:text-white">{row.name}</div>
           {row.contactName && (
-            <div className="text-[11px] text-slate-400">PIC: {row.contactName}</div>
+            <div className="text-[11px] text-slate-500 dark:text-slate-400">
+              PIC: {row.contactName}
+            </div>
           )}
         </div>
       ),
@@ -187,9 +193,15 @@ export default function CustomersPage() {
       header: 'Kontak',
       render: (row) => (
         <div className="space-y-0.5 text-xs">
-          {row.phone && <div className="font-mono text-[11px] text-slate-300">{row.phone}</div>}
-          {row.email && <div className="text-[11px] text-slate-400">{row.email}</div>}
-          {!row.phone && !row.email && <div className="text-slate-500">-</div>}
+          {row.phone && (
+            <div className="font-mono text-[11px] text-slate-700 dark:text-slate-300">
+              {row.phone}
+            </div>
+          )}
+          {row.email && (
+            <div className="text-[11px] text-slate-500 dark:text-slate-400">{row.email}</div>
+          )}
+          {!row.phone && !row.email && <div className="text-slate-400">-</div>}
         </div>
       ),
     },
@@ -197,7 +209,9 @@ export default function CustomersPage() {
       key: 'address',
       header: 'Alamat Pengiriman',
       render: (row) => (
-        <span className="block max-w-xs truncate text-slate-400">{row.address || '-'}</span>
+        <span className="block max-w-xs truncate text-slate-600 dark:text-slate-400">
+          {row.address || '-'}
+        </span>
       ),
     },
     {
@@ -246,12 +260,12 @@ export default function CustomersPage() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex flex-col gap-3 rounded-xl border border-slate-800 bg-slate-900/50 p-5 sm:flex-row sm:items-center sm:justify-between">
+      <div className="flex flex-col gap-3 rounded-xl border border-slate-200 bg-white p-5 sm:flex-row sm:items-center sm:justify-between dark:border-slate-800 dark:bg-slate-900/50">
         <div>
-          <h1 className="text-xl font-bold tracking-tight text-white">
+          <h1 className="text-xl font-bold tracking-tight text-slate-900 dark:text-white">
             Master Customer (Pelanggan)
           </h1>
-          <p className="mt-1 text-xs text-slate-400">
+          <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
             Daftar toko, retail, dan mitra tujuan pengiriman barang keluar (DO)
           </p>
         </div>
@@ -282,7 +296,7 @@ export default function CustomersPage() {
         isOpen={isDialogOpen}
         onClose={() => setIsDialogOpen(false)}
         title={editingCustomer ? 'Edit Customer' : 'Tambah Customer Baru'}
-        description="Data customer digunakan sebagai tujuan Delivery Order (BR-31, BR-32)."
+        description="Data customer digunakan sebagai tujuan pengiriman dokumen Delivery Order."
         maxWidth="lg"
       >
         <form onSubmit={handleSubmit} className="mt-2 space-y-4">
@@ -338,7 +352,7 @@ export default function CustomersPage() {
           </div>
 
           <div>
-            <label className="mb-1.5 block text-xs font-medium text-slate-300">
+            <label className="mb-1.5 block text-xs font-medium text-slate-700 dark:text-slate-300">
               Alamat Pengiriman
             </label>
             <textarea
@@ -346,11 +360,11 @@ export default function CustomersPage() {
               onChange={(e) => setFormAddress(e.target.value)}
               placeholder="Alamat toko atau gudang tujuan..."
               rows={2}
-              className="w-full rounded-lg border border-slate-800 bg-slate-950/70 px-3.5 py-2 text-sm text-white placeholder-slate-500 transition focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 focus:outline-none"
+              className="w-full rounded-lg border border-slate-200 bg-white px-3.5 py-2 text-sm text-slate-900 placeholder-slate-400 transition focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 focus:outline-none dark:border-slate-800 dark:bg-slate-950/70 dark:text-white dark:placeholder-slate-500"
             />
           </div>
 
-          <div className="flex items-center justify-end gap-2 border-t border-slate-800 pt-3">
+          <div className="flex items-center justify-end gap-2 border-t border-slate-200 pt-3 dark:border-slate-800">
             <Button
               type="button"
               variant="outline"

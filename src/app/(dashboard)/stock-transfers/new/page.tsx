@@ -157,12 +157,12 @@ export default function NewStockTransferPage() {
     setErrorMessage(null);
 
     if (isSameLocation) {
-      setErrorMessage('Lokasi asal dan tujuan tidak boleh sama (BR-28).');
+      setErrorMessage('Lokasi asal dan tujuan tidak boleh sama.');
       return;
     }
 
     if (isFrozenConflict) {
-      setErrorMessage('Lokasi rak asal atau tujuan sedang dibekukan karena proses opname (BR-22).');
+      setErrorMessage('Lokasi rak asal atau tujuan sedang dibekukan karena proses opname.');
       return;
     }
 
@@ -173,13 +173,13 @@ export default function NewStockTransferPage() {
 
     const qtyNumber = Number(quantity);
     if (isNaN(qtyNumber) || qtyNumber <= 0 || !Number.isInteger(qtyNumber)) {
-      setErrorMessage('Jumlah transfer harus bilangan bulat positif (BR-03).');
+      setErrorMessage('Jumlah transfer harus bilangan bulat positif.');
       return;
     }
 
     if (qtyNumber > selectedStockRow.quantity) {
       setErrorMessage(
-        `Jumlah transfer (${qtyNumber}) melebihi stok yang tersedia di rak asal (${selectedStockRow.quantity} ${selectedStockRow.product.uom}) (BR-01).`,
+        `Jumlah transfer (${qtyNumber}) melebihi stok yang tersedia di rak asal (${selectedStockRow.quantity} ${selectedStockRow.product.uom}).`,
       );
       return;
     }
@@ -219,26 +219,29 @@ export default function NewStockTransferPage() {
   return (
     <div className="mx-auto max-w-3xl space-y-6">
       {/* Breadcrumb */}
-      <div className="flex items-center gap-2 text-sm text-slate-400">
-        <Link href="/stock-transfers" className="hover:text-white">
+      <div className="flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400">
+        <Link
+          href="/stock-transfers"
+          className="transition-colors hover:text-emerald-600 dark:hover:text-white"
+        >
           Transfer Stok
         </Link>
         <span>/</span>
-        <span className="text-slate-200">Buat Transfer Baru</span>
+        <span className="font-medium text-slate-800 dark:text-slate-200">Buat Transfer Baru</span>
       </div>
 
-      <div className="rounded-xl border border-slate-800 bg-slate-900/60 p-6 backdrop-blur">
-        <h1 className="text-xl font-bold text-white">Buat Transfer Stok</h1>
-        <p className="mt-1 text-sm text-slate-400">
+      <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-xs dark:border-slate-800 dark:bg-slate-900/60">
+        <h1 className="text-xl font-bold text-slate-900 dark:text-white">Buat Transfer Stok</h1>
+        <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
           Pindahkan stok antar rak atau antar gudang secara atomik. Batch dan tanggal kedaluwarsa
-          ikut berpindah (BR-27, BR-28).
+          ikut berpindah.
         </p>
 
         {/* Business Rule Alert Banner */}
-        <div className="mt-4 rounded-xl border border-sky-500/30 bg-sky-950/20 p-4">
+        <div className="mt-4 rounded-xl border border-sky-200 bg-sky-50/70 p-4 dark:border-sky-500/30 dark:bg-sky-950/20">
           <div className="flex items-start gap-3">
             <svg
-              className="h-5 w-5 flex-shrink-0 text-sky-400"
+              className="h-5 w-5 flex-shrink-0 text-sky-600 dark:text-sky-400"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -250,9 +253,9 @@ export default function NewStockTransferPage() {
                 d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
               />
             </svg>
-            <div className="text-xs leading-relaxed text-sky-200/90">
-              <strong className="font-semibold text-sky-300">
-                Prinsip Mutasi Atomik (BR-27 & BR-28):
+            <div className="text-xs leading-relaxed text-sky-900 dark:text-sky-200/90">
+              <strong className="font-semibold text-sky-800 dark:text-sky-300">
+                Prinsip Mutasi Atomik:
               </strong>
               <p className="mt-1">
                 Transfer stok mengeksekusi mutasi <strong>TRANSFER_OUT</strong> pada lokasi asal dan{' '}
@@ -264,26 +267,28 @@ export default function NewStockTransferPage() {
         </div>
 
         {errorMessage && (
-          <div className="mt-4 rounded-lg border border-rose-500/30 bg-rose-950/40 p-4 text-sm text-rose-300">
+          <div className="mt-4 rounded-lg border border-rose-200 bg-rose-50 p-4 text-sm text-rose-800 dark:border-rose-500/30 dark:bg-rose-950/40 dark:text-rose-300">
             {errorMessage}
           </div>
         )}
 
         <form onSubmit={handleSubmit} className="mt-6 space-y-6">
           {/* Section 1: Lokasi Asal */}
-          <div className="space-y-4 rounded-lg border border-slate-800 bg-slate-950/40 p-4">
-            <h2 className="text-xs font-bold tracking-wider text-amber-400 uppercase">
+          <div className="space-y-4 rounded-lg border border-slate-200 bg-slate-50/70 p-4 dark:border-slate-800 dark:bg-slate-950/40">
+            <h2 className="text-xs font-bold tracking-wider text-amber-700 uppercase dark:text-amber-400">
               1. Lokasi Rak Asal (Sumber Stok)
             </h2>
 
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div className="space-y-1.5">
-                <label className="text-xs font-semibold text-slate-300">Gudang Asal</label>
+                <label className="text-xs font-semibold text-slate-700 dark:text-slate-300">
+                  Gudang Asal
+                </label>
                 <select
                   value={sourceWarehouseId}
                   onChange={(e) => setSourceWarehouseId(e.target.value)}
                   disabled={isSubmitting}
-                  className="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-slate-200 focus:border-emerald-500 focus:outline-none"
+                  className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 focus:border-emerald-500 focus:outline-none dark:border-slate-700 dark:bg-slate-950 dark:text-slate-200"
                 >
                   {warehouses.map((w) => (
                     <option key={w.id} value={w.id}>
@@ -294,12 +299,14 @@ export default function NewStockTransferPage() {
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-xs font-semibold text-slate-300">Rak Asal</label>
+                <label className="text-xs font-semibold text-slate-700 dark:text-slate-300">
+                  Rak Asal
+                </label>
                 <select
                   value={selectedSourceLocationId}
                   onChange={(e) => handleSourceLocationChange(e.target.value)}
                   disabled={isSubmitting}
-                  className="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-slate-200 focus:border-emerald-500 focus:outline-none"
+                  className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 focus:border-emerald-500 focus:outline-none dark:border-slate-700 dark:bg-slate-950 dark:text-slate-200"
                 >
                   {sourceLocations.map((loc) => (
                     <option key={loc.id} value={loc.id} disabled={loc.isFrozen}>
@@ -308,23 +315,23 @@ export default function NewStockTransferPage() {
                   ))}
                 </select>
                 {sourceLocObj?.isFrozen && (
-                  <p className="text-xs text-rose-400">
-                    Rak asal sedang dibekukan karena opname (BR-22).
+                  <p className="text-xs text-rose-600 dark:text-rose-400">
+                    Rak asal sedang dibekukan karena opname.
                   </p>
                 )}
               </div>
             </div>
 
             {/* Select product/batch from source location */}
-            <div className="space-y-1.5 border-t border-slate-800/80 pt-2">
-              <label className="text-xs font-semibold text-slate-300">
-                Pilih Barang & Batch Stok di Rak Asal <span className="text-rose-400">*</span>
+            <div className="space-y-1.5 border-t border-slate-200 pt-2 dark:border-slate-800/80">
+              <label className="text-xs font-semibold text-slate-700 dark:text-slate-300">
+                Pilih Barang &amp; Batch Stok di Rak Asal <span className="text-rose-500">*</span>
               </label>
               <select
                 value={selectedStockId}
                 onChange={(e) => setSelectedStockId(e.target.value)}
                 disabled={isSubmitting || availableStocks.length === 0}
-                className="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-slate-200 focus:border-emerald-500 focus:outline-none"
+                className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 focus:border-emerald-500 focus:outline-none dark:border-slate-700 dark:bg-slate-950 dark:text-slate-200"
               >
                 {availableStocks.length === 0 ? (
                   <option value="">(Tidak ada stok di rak asal ini)</option>
@@ -342,23 +349,23 @@ export default function NewStockTransferPage() {
               </select>
 
               {selectedStockRow && (
-                <div className="mt-2 flex items-center gap-4 rounded border border-slate-800 bg-slate-900/40 p-2.5 text-xs text-slate-300">
+                <div className="mt-2 flex items-center gap-4 rounded border border-slate-200 bg-white p-2.5 text-xs text-slate-700 dark:border-slate-800 dark:bg-slate-900/40 dark:text-slate-300">
                   <div>
                     Stok Tersedia:{' '}
-                    <strong className="font-mono text-emerald-400">
+                    <strong className="font-mono text-emerald-700 dark:text-emerald-400">
                       {selectedStockRow.quantity} {selectedStockRow.product.uom}
                     </strong>
                   </div>
                   <div>
                     Batch:{' '}
-                    <strong className="font-mono text-slate-200">
+                    <strong className="font-mono text-slate-900 dark:text-slate-200">
                       {selectedStockRow.batch.batchNo}
                     </strong>
                   </div>
                   {selectedStockRow.batch.expiryDate && (
                     <div>
                       Exp:{' '}
-                      <strong className="text-slate-200">
+                      <strong className="text-slate-900 dark:text-slate-200">
                         {new Date(selectedStockRow.batch.expiryDate).toLocaleDateString('id-ID')}
                       </strong>
                     </div>
@@ -369,19 +376,21 @@ export default function NewStockTransferPage() {
           </div>
 
           {/* Section 2: Lokasi Tujuan */}
-          <div className="space-y-4 rounded-lg border border-slate-800 bg-slate-950/40 p-4">
-            <h2 className="text-xs font-bold tracking-wider text-sky-400 uppercase">
+          <div className="space-y-4 rounded-lg border border-slate-200 bg-slate-50/70 p-4 dark:border-slate-800 dark:bg-slate-950/40">
+            <h2 className="text-xs font-bold tracking-wider text-sky-700 uppercase dark:text-sky-400">
               2. Lokasi Rak Tujuan (Penerima Stok)
             </h2>
 
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div className="space-y-1.5">
-                <label className="text-xs font-semibold text-slate-300">Gudang Tujuan</label>
+                <label className="text-xs font-semibold text-slate-700 dark:text-slate-300">
+                  Gudang Tujuan
+                </label>
                 <select
                   value={targetWarehouseId}
                   onChange={(e) => setTargetWarehouseId(e.target.value)}
                   disabled={isSubmitting}
-                  className="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-slate-200 focus:border-emerald-500 focus:outline-none"
+                  className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 focus:border-emerald-500 focus:outline-none dark:border-slate-700 dark:bg-slate-950 dark:text-slate-200"
                 >
                   {warehouses.map((w) => (
                     <option key={w.id} value={w.id}>
@@ -392,12 +401,14 @@ export default function NewStockTransferPage() {
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-xs font-semibold text-slate-300">Rak Tujuan</label>
+                <label className="text-xs font-semibold text-slate-700 dark:text-slate-300">
+                  Rak Tujuan
+                </label>
                 <select
                   value={selectedTargetLocationId}
                   onChange={(e) => setSelectedTargetLocationId(e.target.value)}
                   disabled={isSubmitting}
-                  className="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-slate-200 focus:border-emerald-500 focus:outline-none"
+                  className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 focus:border-emerald-500 focus:outline-none dark:border-slate-700 dark:bg-slate-950 dark:text-slate-200"
                 >
                   {targetLocations.map((loc) => (
                     <option key={loc.id} value={loc.id} disabled={loc.isFrozen}>
@@ -406,17 +417,17 @@ export default function NewStockTransferPage() {
                   ))}
                 </select>
                 {targetLocObj?.isFrozen && (
-                  <p className="text-xs text-rose-400">
-                    Rak tujuan sedang dibekukan karena opname (BR-22).
+                  <p className="text-xs text-rose-600 dark:text-rose-400">
+                    Rak tujuan sedang dibekukan karena opname.
                   </p>
                 )}
               </div>
             </div>
 
             {isSameLocation && (
-              <div className="rounded-lg border border-rose-500/40 bg-rose-950/30 p-3 text-xs text-rose-300">
-                Peringatan BR-28: Lokasi asal dan tujuan tidak boleh sama. Pilih rak atau gudang
-                tujuan yang berbeda.
+              <div className="rounded-lg border border-rose-300 bg-rose-50 p-3 text-xs text-rose-800 dark:border-rose-500/40 dark:bg-rose-950/30 dark:text-rose-300">
+                Peringatan: Lokasi asal dan tujuan tidak boleh sama. Pilih rak atau gudang tujuan
+                yang berbeda.
               </div>
             )}
           </div>
@@ -424,8 +435,8 @@ export default function NewStockTransferPage() {
           {/* Section 3: Quantity & Notes */}
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div className="space-y-1.5">
-              <label className="text-xs font-semibold text-slate-300">
-                Jumlah Dipindahkan <span className="text-rose-400">*</span>
+              <label className="text-xs font-semibold text-slate-700 dark:text-slate-300">
+                Jumlah Dipindahkan <span className="text-rose-500">*</span>
               </label>
               <input
                 type="number"
@@ -435,12 +446,12 @@ export default function NewStockTransferPage() {
                 value={quantity}
                 onChange={(e) => setQuantity(e.target.value)}
                 disabled={isSubmitting || !selectedStockRow}
-                className="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 font-mono text-sm text-white focus:border-emerald-500 focus:outline-none"
+                className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 font-mono text-sm text-slate-900 focus:border-emerald-500 focus:outline-none dark:border-slate-700 dark:bg-slate-950 dark:text-white"
               />
             </div>
 
             <div className="space-y-1.5">
-              <label className="text-xs font-semibold text-slate-300">
+              <label className="text-xs font-semibold text-slate-700 dark:text-slate-300">
                 Catatan Transfer (Opsional)
               </label>
               <input
@@ -449,13 +460,13 @@ export default function NewStockTransferPage() {
                 onChange={(e) => setNotes(e.target.value)}
                 placeholder="Contoh: Pemindahan stok ke area display..."
                 disabled={isSubmitting}
-                className="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-slate-200 placeholder-slate-600 focus:border-emerald-500 focus:outline-none"
+                className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 placeholder-slate-400 focus:border-emerald-500 focus:outline-none dark:border-slate-700 dark:bg-slate-950 dark:text-slate-200 dark:placeholder-slate-600"
               />
             </div>
           </div>
 
           {/* Actions */}
-          <div className="flex items-center justify-end gap-3 border-t border-slate-800 pt-4">
+          <div className="flex items-center justify-end gap-3 border-t border-slate-200 pt-4 dark:border-slate-800">
             <Link href="/stock-transfers">
               <Button type="button" variant="outline" disabled={isSubmitting}>
                 Batal

@@ -158,13 +158,17 @@ export default function CategoriesPage() {
       key: 'name',
       header: 'Nama Kategori',
       sortable: true,
-      render: (row) => <span className="font-medium text-white">{row.name}</span>,
+      render: (row) => (
+        <span className="font-medium text-slate-900 dark:text-white">{row.name}</span>
+      ),
     },
     {
       key: 'description',
       header: 'Deskripsi',
       render: (row) => (
-        <span className="block max-w-xs truncate text-slate-400">{row.description || '-'}</span>
+        <span className="block max-w-xs truncate text-slate-600 dark:text-slate-400">
+          {row.description || '-'}
+        </span>
       ),
     },
     {
@@ -172,7 +176,7 @@ export default function CategoriesPage() {
       header: 'Total Produk',
       align: 'center',
       render: (row) => (
-        <span className="rounded-md border border-slate-800 bg-slate-950 px-2 py-0.5 text-xs text-slate-300">
+        <span className="rounded-md border border-slate-200 bg-slate-100 px-2 py-0.5 text-xs text-slate-700 dark:border-slate-800 dark:bg-slate-950 dark:text-slate-300">
           {row._count?.products ?? 0} item
         </span>
       ),
@@ -223,10 +227,12 @@ export default function CategoriesPage() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex flex-col gap-3 rounded-xl border border-slate-800 bg-slate-900/50 p-5 sm:flex-row sm:items-center sm:justify-between">
+      <div className="flex flex-col gap-3 rounded-xl border border-slate-200 bg-white p-5 sm:flex-row sm:items-center sm:justify-between dark:border-slate-800 dark:bg-slate-900/50">
         <div>
-          <h1 className="text-xl font-bold tracking-tight text-white">Master Kategori Produk</h1>
-          <p className="mt-1 text-xs text-slate-400">
+          <h1 className="text-xl font-bold tracking-tight text-slate-900 dark:text-white">
+            Master Kategori Produk
+          </h1>
+          <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
             Klasifikasi kelompok barang distributor (Makanan, Minuman, Obat, Elektronik)
           </p>
         </div>
@@ -255,7 +261,7 @@ export default function CategoriesPage() {
         isOpen={isDialogOpen}
         onClose={() => setIsDialogOpen(false)}
         title={editingCategory ? 'Edit Kategori' : 'Tambah Kategori Baru'}
-        description="Pastikan kode unik dan mudah dikenali dalam operasional gudang (BR-31)."
+        description="Pastikan kode unik dan mudah diidentifikasi dalam operasional gudang."
       >
         <form onSubmit={handleSubmit} className="mt-2 space-y-4">
           {formError && (
@@ -285,7 +291,7 @@ export default function CategoriesPage() {
           />
 
           <div>
-            <label className="mb-1.5 block text-xs font-medium text-slate-300">
+            <label className="mb-1.5 block text-xs font-medium text-slate-700 dark:text-slate-300">
               Deskripsi (Opsional)
             </label>
             <textarea
@@ -293,11 +299,11 @@ export default function CategoriesPage() {
               onChange={(e) => setFormDesc(e.target.value)}
               placeholder="Catatan tambahan mengenai kelompok produk ini..."
               rows={3}
-              className="w-full rounded-lg border border-slate-800 bg-slate-950/70 px-3.5 py-2 text-sm text-white placeholder-slate-500 transition focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 focus:outline-none"
+              className="w-full rounded-lg border border-slate-200 bg-white px-3.5 py-2 text-sm text-slate-900 placeholder-slate-400 transition focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 focus:outline-none dark:border-slate-800 dark:bg-slate-950/70 dark:text-white dark:placeholder-slate-500"
             />
           </div>
 
-          <div className="flex items-center justify-end gap-2 border-t border-slate-800 pt-3">
+          <div className="flex items-center justify-end gap-2 border-t border-slate-200 pt-3 dark:border-slate-800">
             <Button
               type="button"
               variant="outline"

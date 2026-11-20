@@ -243,9 +243,7 @@ export default function ProductStockCardPage({ params }: PageProps) {
           </div>
         </div>
         <div className="rounded-lg border border-slate-200 bg-white p-4 dark:border-slate-800 dark:bg-slate-950">
-          <div className="text-xs font-medium text-slate-500 dark:text-slate-400">
-            Stok Minimum (BR-04)
-          </div>
+          <div className="text-xs font-medium text-slate-500 dark:text-slate-400">Stok Minimum</div>
           <div className="mt-1 font-mono text-2xl font-bold text-slate-900 dark:text-slate-100">
             {product.minStock} {product.uom}
           </div>
@@ -265,7 +263,7 @@ export default function ProductStockCardPage({ params }: PageProps) {
         <div className="flex items-center gap-2">
           <label
             htmlFor="filter-stock-date-from"
-            className="text-xs whitespace-nowrap text-slate-500"
+            className="text-xs whitespace-nowrap text-slate-500 dark:text-slate-400"
           >
             Dari Tanggal:
           </label>
@@ -274,13 +272,13 @@ export default function ProductStockCardPage({ params }: PageProps) {
             type="date"
             value={fromDate}
             onChange={(e) => setFromDate(e.target.value)}
-            className="rounded-md border border-slate-300 bg-white px-2 py-1 text-xs dark:border-slate-700 dark:bg-slate-900"
+            className="rounded-md border border-slate-300 bg-white px-2 py-1 text-xs text-slate-900 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100"
           />
         </div>
         <div className="flex items-center gap-2">
           <label
             htmlFor="filter-stock-date-to"
-            className="text-xs whitespace-nowrap text-slate-500"
+            className="text-xs whitespace-nowrap text-slate-500 dark:text-slate-400"
           >
             Sampai Tanggal:
           </label>
@@ -289,7 +287,7 @@ export default function ProductStockCardPage({ params }: PageProps) {
             type="date"
             value={toDate}
             onChange={(e) => setToDate(e.target.value)}
-            className="rounded-md border border-slate-300 bg-white px-2 py-1 text-xs dark:border-slate-700 dark:bg-slate-900"
+            className="rounded-md border border-slate-300 bg-white px-2 py-1 text-xs text-slate-900 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100"
           />
         </div>
         {(fromDate || toDate) && (
@@ -311,7 +309,7 @@ export default function ProductStockCardPage({ params }: PageProps) {
       <div className="overflow-hidden rounded-lg border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-950">
         <div className="flex items-center justify-between border-b border-slate-200 p-4 dark:border-slate-800">
           <h2 className="text-sm font-semibold tracking-wider text-slate-900 uppercase dark:text-slate-100">
-            Riwayat Mutasi & Saldo Berjalan (BR-29, BR-30)
+            Riwayat Mutasi & Saldo Berjalan
           </h2>
           <span className="font-mono text-xs text-slate-500">
             {movements.length} Mutasi Tercatat

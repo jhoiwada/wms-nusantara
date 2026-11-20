@@ -56,3 +56,18 @@ export async function requireRole(
 export async function requireAuth(directTokenOrUser?: string | SessionUser): Promise<SessionUser> {
   return requireRole(ALL_ROLES, directTokenOrUser);
 }
+
+/**
+ * Mengambil sesi pengguna secara opsional tanpa melempar error.
+ * Digunakan pada komponen publik (seperti landing page) untuk mengenali pengguna yang sudah login.
+ */
+export async function getOptionalAuth(): Promise<SessionUser | null> {
+  try {
+    const cookieStore = await cookies();
+    const token = cookieStore.get(SESSION_COOKIE_NAME)?.value;
+    if (!token) return null;
+    return await verifySessionToken(token);
+  } catch {
+    return null;
+  }
+}

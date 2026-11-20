@@ -219,8 +219,8 @@ export function BarcodeScannerModal({
   }, [isOpen, facingMode, retryCount, stopCamera, handleProcessScan]);
 
   // Handle manual code submit
-  const handleManualSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleManualSubmit = (e?: React.SyntheticEvent) => {
+    if (e) e.preventDefault();
     if (manualCode.trim()) {
       handleProcessScan(manualCode.trim());
       setManualCode('');
@@ -383,7 +383,7 @@ export function BarcodeScannerModal({
 
         {/* Manual Barcode & Scanner Input Fallback */}
         <div className="p-5">
-          <form onSubmit={handleManualSubmit} className="space-y-3">
+          <div className="space-y-3">
             <div>
               <label className="mb-1 block text-xs font-semibold text-slate-700">
                 Input Barcode / Laser Scanner (Enter)
@@ -394,11 +394,18 @@ export function BarcodeScannerModal({
                   placeholder="Ketik SKU atau scan dengan alat barcode..."
                   value={manualCode}
                   onChange={(e) => setManualCode(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      e.preventDefault();
+                      handleManualSubmit(e);
+                    }
+                  }}
                   className="font-mono text-xs"
                 />
                 <Button
-                  type="submit"
+                  type="button"
                   size="sm"
+                  onClick={(e) => handleManualSubmit(e)}
                   className="bg-indigo-600 px-4 text-xs hover:bg-indigo-700"
                 >
                   Tambah
@@ -408,7 +415,7 @@ export function BarcodeScannerModal({
             <p className="text-[11px] text-slate-400">
               💡 Pemindai fisik USB/Bluetooth otomatis membaca ke kolom ini dan menekan Enter.
             </p>
-          </form>
+          </div>
 
           <div className="mt-4 flex justify-end border-t border-slate-100 pt-3">
             <Button variant="ghost" size="sm" onClick={onClose} className="text-xs">

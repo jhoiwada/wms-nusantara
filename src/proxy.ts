@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import { SESSION_COOKIE_NAME } from './server/auth/session';
 
-export function middleware(req: NextRequest) {
+export function proxy(req: NextRequest) {
   const { pathname } = req.nextUrl;
   const token = req.cookies.get(SESSION_COOKIE_NAME)?.value;
 
@@ -39,7 +39,14 @@ export function middleware(req: NextRequest) {
     return NextResponse.redirect(new URL('/dashboard', req.url));
   }
 
-  return NextResponse.next();
+  const res = NextResponse.next();
+  res.headers.set('X-Content-Type-Options', 'nosniff');
+  res.headers.set('X-Frame-Options', 'SAMEORIGIN');
+  res.headers.set('X-XSS-Protection', '1; mode=block');
+  res.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
+  res.headers.set('Permissions-Policy', 'camera=(self), microphone=(), geolocation=()');
+
+  return res;
 }
 
 export const config = {

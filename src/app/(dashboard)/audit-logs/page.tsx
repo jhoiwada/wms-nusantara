@@ -96,14 +96,14 @@ export default function AuditLogsPage() {
       sortable: true,
       render: (row) => (
         <div>
-          <div className="font-mono text-xs font-semibold text-slate-200">
+          <div className="font-mono text-xs font-semibold text-slate-900 dark:text-slate-100">
             {new Date(row.createdAt).toLocaleDateString('id-ID', {
               day: 'numeric',
               month: 'short',
               year: 'numeric',
             })}
           </div>
-          <div className="text-[11px] text-slate-400">
+          <div className="text-[11px] text-slate-500 dark:text-slate-400">
             {new Date(row.createdAt).toLocaleTimeString('id-ID', {
               hour: '2-digit',
               minute: '2-digit',
@@ -119,16 +119,16 @@ export default function AuditLogsPage() {
       header: 'Pengguna',
       render: (row) => (
         <div>
-          <div className="text-xs font-semibold text-white">
+          <div className="text-xs font-semibold text-slate-900 dark:text-slate-100">
             {row.userName || row.user?.name || 'Sistem / Anonim'}
           </div>
           <div className="mt-0.5 flex items-center gap-1.5">
             {row.userRole && (
-              <span className="py-0.2 rounded bg-slate-800 px-1.5 text-[10px] text-slate-300">
+              <span className="py-0.2 rounded bg-slate-100 px-1.5 text-[10px] font-medium text-slate-700 dark:bg-slate-800 dark:text-slate-300">
                 {row.userRole}
               </span>
             )}
-            <span className="max-w-[120px] truncate text-[10px] text-slate-400">
+            <span className="max-w-[120px] truncate text-[10px] text-slate-500 dark:text-slate-400">
               {row.user?.email}
             </span>
           </div>
@@ -141,7 +141,9 @@ export default function AuditLogsPage() {
       render: (row) => (
         <div className="space-y-1">
           <Badge variant={getActionBadgeVariant(row.action)}>{row.action}</Badge>
-          <div className="font-mono text-[11px] font-medium text-slate-300">{row.entity}</div>
+          <div className="font-mono text-[11px] font-medium text-slate-700 dark:text-slate-300">
+            {row.entity}
+          </div>
         </div>
       ),
     },
@@ -150,9 +152,13 @@ export default function AuditLogsPage() {
       header: 'Deskripsi Aktivitas',
       render: (row) => (
         <div>
-          <div className="text-xs font-medium text-slate-200">{row.description}</div>
+          <div className="text-xs font-medium text-slate-800 dark:text-slate-200">
+            {row.description}
+          </div>
           {row.entityId && (
-            <div className="font-mono text-[10px] text-slate-500">ID: {row.entityId}</div>
+            <div className="font-mono text-[10px] text-slate-400 dark:text-slate-500">
+              ID: {row.entityId}
+            </div>
           )}
         </div>
       ),
@@ -163,7 +169,7 @@ export default function AuditLogsPage() {
       render: (row) => {
         const hasValues = row.oldValues || row.newValues;
         if (!hasValues) {
-          return <span className="text-[11px] text-slate-500">-</span>;
+          return <span className="text-[11px] text-slate-400">-</span>;
         }
 
         return (
@@ -171,7 +177,7 @@ export default function AuditLogsPage() {
             variant="ghost"
             size="sm"
             onClick={() => setSelectedLog(row)}
-            className="text-[11px] text-emerald-400 hover:bg-emerald-950/40 hover:text-emerald-300"
+            className="text-[11px] font-medium text-emerald-600 hover:bg-emerald-50 hover:text-emerald-700 dark:text-emerald-400 dark:hover:bg-emerald-950/40 dark:hover:text-emerald-300"
           >
             Lihat Perubahan &rarr;
           </Button>
@@ -194,22 +200,24 @@ export default function AuditLogsPage() {
     <div className="space-y-6 pb-12">
       {/* Top Header */}
       <div>
-        <h1 className="text-2xl font-bold tracking-tight text-white">Audit Log Sistem</h1>
-        <p className="text-sm text-slate-400">
+        <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-100">
+          Audit Log Sistem
+        </h1>
+        <p className="text-sm text-slate-500 dark:text-slate-400">
           Pencatatan jejak audit tak-terhapuskan (*immutable audit trail*) untuk mutasi master data
           dan aksi operasional sensitif.
         </p>
       </div>
 
       {/* Filter Bar */}
-      <div className="flex flex-col gap-3 rounded-xl border border-slate-800 bg-slate-900/40 p-4 sm:flex-row sm:items-center">
+      <div className="flex flex-col gap-3 rounded-xl border border-slate-200 bg-white p-4 sm:flex-row sm:items-center dark:border-slate-800 dark:bg-slate-950">
         <div className="flex-1">
           <input
             type="text"
             placeholder="Cari deskripsi, nama petugas, atau ID entitas..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-1.5 text-xs text-white placeholder-slate-500 focus:border-emerald-500 focus:outline-none"
+            className="w-full rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-xs text-slate-900 placeholder-slate-400 focus:border-emerald-500 focus:outline-none dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:placeholder-slate-500"
           />
         </div>
 
@@ -217,7 +225,7 @@ export default function AuditLogsPage() {
           <select
             value={entity}
             onChange={(e) => setEntity(e.target.value)}
-            className="rounded-lg border border-slate-700 bg-slate-950 px-3 py-1.5 text-xs text-white focus:border-emerald-500 focus:outline-none"
+            className="rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-xs text-slate-900 focus:border-emerald-500 focus:outline-none dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100"
           >
             <option value="">Semua Entitas</option>
             <option value="PRODUCT">PRODUCT</option>
@@ -233,7 +241,7 @@ export default function AuditLogsPage() {
           <select
             value={action}
             onChange={(e) => setAction(e.target.value)}
-            className="rounded-lg border border-slate-700 bg-slate-950 px-3 py-1.5 text-xs text-white focus:border-emerald-500 focus:outline-none"
+            className="rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-xs text-slate-900 focus:border-emerald-500 focus:outline-none dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100"
           >
             <option value="">Semua Aksi</option>
             <option value="CREATE">CREATE</option>
@@ -246,20 +254,20 @@ export default function AuditLogsPage() {
             <option value="TRANSFER">TRANSFER</option>
           </select>
 
-          <div className="flex items-center gap-1 text-xs text-slate-300">
+          <div className="flex items-center gap-1 text-xs text-slate-600 dark:text-slate-400">
             <span>Tgl:</span>
             <input
               type="date"
               value={from}
               onChange={(e) => setFrom(e.target.value)}
-              className="rounded-lg border border-slate-700 bg-slate-950 px-2 py-1 text-xs text-white focus:border-emerald-500 focus:outline-none"
+              className="rounded-lg border border-slate-300 bg-white px-2 py-1 text-xs text-slate-900 focus:border-emerald-500 focus:outline-none dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100"
             />
             <span>-</span>
             <input
               type="date"
               value={to}
               onChange={(e) => setTo(e.target.value)}
-              className="rounded-lg border border-slate-700 bg-slate-950 px-2 py-1 text-xs text-white focus:border-emerald-500 focus:outline-none"
+              className="rounded-lg border border-slate-300 bg-white px-2 py-1 text-xs text-slate-900 focus:border-emerald-500 focus:outline-none dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100"
             />
           </div>
 
@@ -274,7 +282,7 @@ export default function AuditLogsPage() {
                 setFrom('');
                 setTo('');
               }}
-              className="text-xs text-slate-400 hover:text-white"
+              className="text-xs text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-100"
             >
               Reset
             </Button>
@@ -283,7 +291,7 @@ export default function AuditLogsPage() {
       </div>
 
       {/* Audit Log Data Table */}
-      <div className="rounded-xl border border-slate-800 bg-slate-900/60">
+      <div className="rounded-xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-950">
         <DataTable
           columns={columns}
           data={logs}
@@ -304,29 +312,29 @@ export default function AuditLogsPage() {
       >
         {selectedLog && (
           <div className="space-y-4">
-            <div className="grid grid-cols-2 gap-3 rounded-lg border border-slate-800 bg-slate-950/60 p-3 text-xs">
+            <div className="grid grid-cols-2 gap-3 rounded-lg border border-slate-200 bg-slate-50 p-3 text-xs dark:border-slate-800 dark:bg-slate-900/60">
               <div>
-                <span className="text-slate-400">Entitas:</span>{' '}
-                <span className="font-mono font-semibold text-emerald-400">
+                <span className="text-slate-500 dark:text-slate-400">Entitas:</span>{' '}
+                <span className="font-mono font-semibold text-emerald-600 dark:text-emerald-400">
                   {selectedLog.entity}
                 </span>
               </div>
               <div>
-                <span className="text-slate-400">Aksi:</span>{' '}
+                <span className="text-slate-500 dark:text-slate-400">Aksi:</span>{' '}
                 <Badge variant={getActionBadgeVariant(selectedLog.action)}>
                   {selectedLog.action}
                 </Badge>
               </div>
               <div>
-                <span className="text-slate-400">Petugas:</span>{' '}
-                <span className="font-semibold text-white">
+                <span className="text-slate-500 dark:text-slate-400">Petugas:</span>{' '}
+                <span className="font-semibold text-slate-900 dark:text-slate-100">
                   {selectedLog.userName || selectedLog.user?.name || '-'}
                 </span>{' '}
-                ({selectedLog.userRole || '-'})
+                <span className="text-slate-500">({selectedLog.userRole || '-'})</span>
               </div>
               <div>
-                <span className="text-slate-400">Waktu:</span>{' '}
-                <span className="font-mono text-slate-200">
+                <span className="text-slate-500 dark:text-slate-400">Waktu:</span>{' '}
+                <span className="font-mono text-slate-800 dark:text-slate-200">
                   {new Date(selectedLog.createdAt).toLocaleString('id-ID', {
                     timeZone: 'Asia/Jakarta',
                   })}{' '}
@@ -337,19 +345,19 @@ export default function AuditLogsPage() {
 
             {/* Comparison Table */}
             <div>
-              <div className="mb-2 text-xs font-semibold text-slate-300">
+              <div className="mb-2 text-xs font-semibold text-slate-800 dark:text-slate-200">
                 Perbandingan Nilai Sebelum dan Sesudah:
               </div>
-              <div className="max-h-80 overflow-y-auto rounded-lg border border-slate-800 bg-slate-950">
+              <div className="max-h-80 overflow-y-auto rounded-lg border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-950">
                 <table className="w-full text-left text-xs">
-                  <thead className="border-b border-slate-800 bg-slate-900/80 text-[11px] font-semibold text-slate-400 uppercase">
+                  <thead className="border-b border-slate-200 bg-slate-50 text-[11px] font-semibold text-slate-700 uppercase dark:border-slate-800 dark:bg-slate-900/80 dark:text-slate-400">
                     <tr>
                       <th className="px-3 py-2">Atribut / Kolom</th>
                       <th className="px-3 py-2">Nilai Sebelum (Old)</th>
                       <th className="px-3 py-2">Nilai Sesudah (New)</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-slate-800/60 font-mono">
+                  <tbody className="divide-y divide-slate-100 font-mono dark:divide-slate-800/60">
                     {diffKeys.map((key) => {
                       const oldVal = selectedLog.oldValues?.[key];
                       const newVal = selectedLog.newValues?.[key];
@@ -358,21 +366,27 @@ export default function AuditLogsPage() {
                       return (
                         <tr
                           key={key}
-                          className={isChanged ? 'bg-amber-950/15' : 'hover:bg-slate-900/40'}
+                          className={
+                            isChanged
+                              ? 'bg-amber-50/70 dark:bg-amber-950/20'
+                              : 'hover:bg-slate-50 dark:hover:bg-slate-900/40'
+                          }
                         >
-                          <td className="px-3 py-2 font-medium text-slate-300">{key}</td>
-                          <td className="px-3 py-2 break-all text-rose-400/90">
+                          <td className="px-3 py-2 font-medium text-slate-800 dark:text-slate-300">
+                            {key}
+                          </td>
+                          <td className="px-3 py-2 break-all text-rose-600 dark:text-rose-400">
                             {oldVal !== undefined ? (
                               JSON.stringify(oldVal)
                             ) : (
-                              <span className="text-slate-600">-</span>
+                              <span className="text-slate-400 dark:text-slate-600">-</span>
                             )}
                           </td>
-                          <td className="px-3 py-2 break-all text-emerald-400">
+                          <td className="px-3 py-2 break-all text-emerald-600 dark:text-emerald-400">
                             {newVal !== undefined ? (
                               JSON.stringify(newVal)
                             ) : (
-                              <span className="text-slate-600">-</span>
+                              <span className="text-slate-400 dark:text-slate-600">-</span>
                             )}
                           </td>
                         </tr>

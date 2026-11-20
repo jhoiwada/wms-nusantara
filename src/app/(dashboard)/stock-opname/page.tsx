@@ -116,7 +116,7 @@ export default function StockOpnameListPage() {
       render: (row) => (
         <Link
           href={`/stock-opname/${row.id}`}
-          className="font-mono font-semibold text-emerald-400 hover:text-emerald-300 hover:underline"
+          className="font-mono font-semibold text-emerald-700 hover:text-emerald-800 hover:underline dark:text-emerald-400 dark:hover:text-emerald-300"
         >
           {row.opnameNo}
         </Link>
@@ -128,7 +128,9 @@ export default function StockOpnameListPage() {
       sortable: true,
       render: (row) => (
         <div>
-          <span className="font-medium text-slate-200">{row.warehouse.name}</span>
+          <span className="font-medium text-slate-900 dark:text-slate-200">
+            {row.warehouse.name}
+          </span>
           <span className="ml-2 font-mono text-xs text-slate-500">[{row.warehouse.code}]</span>
         </div>
       ),
@@ -143,7 +145,9 @@ export default function StockOpnameListPage() {
       key: 'itemsCount',
       header: 'Jumlah Item',
       sortable: true,
-      render: (row) => <div className="font-mono text-slate-300">{row._count.items} item</div>,
+      render: (row) => (
+        <div className="font-mono text-slate-800 dark:text-slate-300">{row._count.items} item</div>
+      ),
     },
     {
       key: 'createdBy',
@@ -151,7 +155,7 @@ export default function StockOpnameListPage() {
       sortable: true,
       render: (row) => (
         <div>
-          <div className="text-slate-200">{row.createdBy.name}</div>
+          <div className="text-slate-900 dark:text-slate-200">{row.createdBy.name}</div>
           <div className="text-xs text-slate-500">Role: {row.createdBy.role}</div>
         </div>
       ),
@@ -161,8 +165,8 @@ export default function StockOpnameListPage() {
       header: 'Tanggal Dibuat',
       sortable: true,
       render: (row) => (
-        <span className="text-slate-400">
-          {new Date(row.createdAt).toLocaleDateString('id-ID', {
+        <span className="text-slate-600 dark:text-slate-400">
+          {new Date(row.createdAt).toLocaleString('id-ID', {
             year: 'numeric',
             month: 'short',
             day: 'numeric',
@@ -200,10 +204,12 @@ export default function StockOpnameListPage() {
       {/* Page Header */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-white">Stock Opname</h1>
-          <p className="text-sm text-slate-400">
-            Penghitungan fisik stok gudang, snapshot sistem, pembekuan lokasi rak, dan penyesuaian
-            atomik (BR-20 s.d. BR-26).
+          <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">
+            Stock Opname
+          </h1>
+          <p className="text-sm text-slate-500 dark:text-slate-400">
+            Penghitungan fisik stok gudang, snapshot sistem, pembekuan lokasi rak, dan rekonsiliasi
+            penyesuaian otomatis.
           </p>
         </div>
         <div>
@@ -225,34 +231,50 @@ export default function StockOpnameListPage() {
 
       {/* Highlights / KPI Cards */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-4">
-        <div className="rounded-xl border border-slate-800 bg-slate-900/60 p-4 backdrop-blur">
-          <div className="text-xs font-medium text-slate-400">Total Dokumen Opname</div>
-          <div className="mt-1 text-2xl font-bold text-white">{opnames.length}</div>
+        <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-xs dark:border-slate-800 dark:bg-slate-900/60">
+          <div className="text-xs font-medium text-slate-500 dark:text-slate-400">
+            Total Dokumen Opname
+          </div>
+          <div className="mt-1 text-2xl font-bold text-slate-900 dark:text-white">
+            {opnames.length}
+          </div>
         </div>
-        <div className="rounded-xl border border-amber-900/40 bg-amber-950/20 p-4 backdrop-blur">
-          <div className="text-xs font-medium text-amber-400">Draft (Dalam Penghitungan)</div>
-          <div className="mt-1 text-2xl font-bold text-amber-300">{draftCount}</div>
+        <div className="rounded-xl border border-amber-200 bg-amber-50/70 p-4 shadow-xs dark:border-amber-900/40 dark:bg-amber-950/20">
+          <div className="text-xs font-medium text-amber-800 dark:text-amber-400">
+            Draft (Dalam Penghitungan)
+          </div>
+          <div className="mt-1 text-2xl font-bold text-amber-700 dark:text-amber-300">
+            {draftCount}
+          </div>
         </div>
-        <div className="rounded-xl border border-sky-900/40 bg-sky-950/20 p-4 backdrop-blur">
-          <div className="text-xs font-medium text-sky-400">Submitted (Menunggu Approval)</div>
-          <div className="mt-1 text-2xl font-bold text-sky-300">{submittedCount}</div>
+        <div className="rounded-xl border border-sky-200 bg-sky-50/70 p-4 shadow-xs dark:border-sky-900/40 dark:bg-sky-950/20">
+          <div className="text-xs font-medium text-sky-800 dark:text-sky-400">
+            Submitted (Menunggu Approval)
+          </div>
+          <div className="mt-1 text-2xl font-bold text-sky-700 dark:text-sky-300">
+            {submittedCount}
+          </div>
         </div>
-        <div className="rounded-xl border border-emerald-900/40 bg-emerald-950/20 p-4 backdrop-blur">
-          <div className="text-xs font-medium text-emerald-400">Approved (Selesai Disesuaikan)</div>
-          <div className="mt-1 text-2xl font-bold text-emerald-300">{approvedCount}</div>
+        <div className="rounded-xl border border-emerald-200 bg-emerald-50/70 p-4 shadow-xs dark:border-emerald-900/40 dark:bg-emerald-950/20">
+          <div className="text-xs font-medium text-emerald-800 dark:text-emerald-400">
+            Approved (Selesai Disesuaikan)
+          </div>
+          <div className="mt-1 text-2xl font-bold text-emerald-700 dark:text-emerald-300">
+            {approvedCount}
+          </div>
         </div>
       </div>
 
       {/* Filter Bar */}
-      <div className="flex flex-col gap-3 rounded-xl border border-slate-800 bg-slate-900/60 p-4 backdrop-blur sm:flex-row sm:items-center">
+      <div className="flex flex-col gap-3 rounded-xl border border-slate-200 bg-white p-4 shadow-xs sm:flex-row sm:items-center dark:border-slate-800 dark:bg-slate-900/60">
         <div className="flex items-center gap-2">
-          <span className="text-xs font-semibold tracking-wider text-slate-400 uppercase">
+          <span className="text-xs font-semibold tracking-wider text-slate-600 uppercase dark:text-slate-400">
             Status:
           </span>
           <select
             value={selectedStatus}
             onChange={(e) => setSelectedStatus(e.target.value)}
-            className="rounded-lg border border-slate-700 bg-slate-950 px-3 py-1.5 text-sm text-slate-200 focus:border-emerald-500 focus:outline-none"
+            className="rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-sm text-slate-900 focus:border-emerald-500 focus:outline-none dark:border-slate-700 dark:bg-slate-950 dark:text-slate-200"
           >
             <option value="ALL">Semua Status</option>
             <option value="DRAFT">DRAFT</option>
@@ -263,13 +285,13 @@ export default function StockOpnameListPage() {
         </div>
 
         <div className="flex items-center gap-2">
-          <span className="text-xs font-semibold tracking-wider text-slate-400 uppercase">
+          <span className="text-xs font-semibold tracking-wider text-slate-600 uppercase dark:text-slate-400">
             Gudang:
           </span>
           <select
             value={selectedWarehouse}
             onChange={(e) => setSelectedWarehouse(e.target.value)}
-            className="rounded-lg border border-slate-700 bg-slate-950 px-3 py-1.5 text-sm text-slate-200 focus:border-emerald-500 focus:outline-none"
+            className="rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-sm text-slate-900 focus:border-emerald-500 focus:outline-none dark:border-slate-700 dark:bg-slate-950 dark:text-slate-200"
           >
             <option value="ALL">Semua Gudang</option>
             {warehouses.map((w) => (
@@ -285,7 +307,7 @@ export default function StockOpnameListPage() {
             size="sm"
             variant="ghost"
             onClick={() => setRefreshKey((k) => k + 1)}
-            className="text-slate-400 hover:text-white"
+            className="text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white"
           >
             Refresh
           </Button>
@@ -293,17 +315,15 @@ export default function StockOpnameListPage() {
       </div>
 
       {/* Data Table */}
-      <div className="rounded-xl border border-slate-800 bg-slate-900/60 p-4 backdrop-blur">
-        <DataTable
-          columns={columns}
-          data={opnames}
-          isLoading={isLoading}
-          searchPlaceholder="Cari nomor opname, gudang, pembuat..."
-          searchField={(row) => `${row.opnameNo} ${row.warehouse.name} ${row.createdBy.name}`}
-          emptyTitle="Belum ada dokumen stock opname"
-          emptyDescription="Belum ada dokumen stock opname yang sesuai dengan filter."
-        />
-      </div>
+      <DataTable
+        columns={columns}
+        data={opnames}
+        isLoading={isLoading}
+        searchPlaceholder="Cari nomor opname, gudang, pembuat..."
+        searchField={(row) => `${row.opnameNo} ${row.warehouse.name} ${row.createdBy.name}`}
+        emptyTitle="Belum ada dokumen stock opname"
+        emptyDescription="Belum ada dokumen stock opname yang sesuai dengan filter."
+      />
     </div>
   );
 }

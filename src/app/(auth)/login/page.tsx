@@ -2,40 +2,8 @@
 
 import { Suspense, useState, useTransition } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-
-interface DemoAccount {
-  role: string;
-  name: string;
-  email: string;
-  description: string;
-}
-
-const DEMO_ACCOUNTS: DemoAccount[] = [
-  {
-    role: 'ADMIN',
-    name: 'Budi Santoso',
-    email: 'admin@wms.local',
-    description: 'Akses penuh ke seluruh sistem, master data, opname & pengguna',
-  },
-  {
-    role: 'MANAGER',
-    name: 'Siti Rahma',
-    email: 'manager@wms.local',
-    description: 'Approval opname, pembatalan dokumen, dan pelaporan',
-  },
-  {
-    role: 'STAFF',
-    name: 'Agus Setiawan',
-    email: 'staff@wms.local',
-    description: 'Operasional gudang: Barang Masuk (GR), Barang Keluar (DO)',
-  },
-  {
-    role: 'VIEWER',
-    name: 'Dewi Lestari',
-    email: 'viewer@wms.local',
-    description: 'Hanya melihat stok, pergerakan, dan kartu stok',
-  },
-];
+import { ThemeToggle } from '@/components/features/theme-toggle';
+import { BrandLogo } from '@/components/ui/brand-logo';
 
 function LoginForm() {
   const router = useRouter();
@@ -48,18 +16,12 @@ function LoginForm() {
   const [showPassword, setShowPassword] = useState(false);
   const [isPending, startTransition] = useTransition();
 
-  const handleQuickFill = (account: DemoAccount) => {
-    setEmail(account.email);
-    setPassword('Password123!');
-    setError(null);
-  };
-
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError(null);
 
     if (!email.trim() || !password) {
-      setError('Email dan password wajib diisi');
+      setError('Email dan kata sandi wajib diisi');
       return;
     }
 
@@ -74,43 +36,61 @@ function LoginForm() {
         const json = await res.json();
 
         if (!res.ok) {
-          setError(json.error?.message || 'Login gagal. Silakan periksa kembali data Anda.');
+          setError(
+            json.error?.message || 'Autentikasi gagal. Periksa kembali email dan kata sandi Anda.',
+          );
           return;
         }
 
         router.push(callbackUrl);
         router.refresh();
       } catch {
-        setError('Terjadi kendala jaringan saat menghubungkan ke server.');
+        setError('Terjadi kendala jaringan saat menghubungkan ke gateway autentikasi.');
       }
     });
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-[#090d16] px-4 py-12 text-slate-100 selection:bg-emerald-500/30 selection:text-emerald-300">
+    <div className="relative flex min-h-screen items-center justify-center bg-[#fbfbfa] px-4 py-12 text-zinc-900 transition-colors selection:bg-amber-500/30 selection:text-amber-950 dark:bg-[#111113] dark:text-zinc-100 dark:selection:text-amber-200">
+      {/* Floating Theme Toggle */}
+      <div className="absolute top-4 right-4">
+        <ThemeToggle />
+      </div>
+
       <div className="w-full max-w-md">
         {/* Header Branding */}
         <div className="mb-8 text-center">
-          <div className="mb-3 inline-flex h-12 w-12 items-center justify-center rounded-xl border border-emerald-500/20 bg-emerald-500/10 text-lg font-semibold tracking-wider text-emerald-400">
-            WMS
+          <div className="mb-4 inline-flex">
+            <BrandLogo size="xl" />
           </div>
-          <h1 className="text-2xl font-bold tracking-tight text-white">Sistem Manajemen Gudang</h1>
-          <p className="mt-1 text-sm text-slate-400">
-            Distribusi multi-gudang Jakarta &amp; Bekasi
+          <h1 className="text-2xl font-black tracking-tight text-zinc-900 dark:text-zinc-100">
+            PT Nusantara Logistik Distribusi
+          </h1>
+          <p className="mt-1 text-xs font-medium text-zinc-500 dark:text-zinc-400">
+            Portal Otentikasi Terpusat DC Pulogadung &amp; MM2100 Cikarang
           </p>
         </div>
 
         {/* Login Card */}
-        <div className="rounded-2xl border border-slate-800 bg-slate-900/80 p-8 shadow-xl backdrop-blur-sm">
-          <h2 className="mb-1 text-lg font-semibold text-white">Masuk ke Portal</h2>
-          <p className="mb-6 text-xs text-slate-400">
-            Gunakan kredensial akun terdaftar untuk melanjutkan
-          </p>
+        <div className="rounded-2xl border border-zinc-200 bg-white p-7 shadow-lg dark:border-zinc-800 dark:bg-zinc-900/90">
+          <div className="mb-6 flex items-center justify-between border-b border-zinc-100 pb-4 dark:border-zinc-800">
+            <div>
+              <h2 className="text-base font-bold text-zinc-900 dark:text-zinc-100">
+                Masuk ke Portal WMS
+              </h2>
+              <p className="text-xs text-zinc-500 dark:text-zinc-400">
+                Masukkan akun resmi terdaftar untuk melanjutkan
+              </p>
+            </div>
+            <span className="rounded-md border border-emerald-500/20 bg-emerald-500/10 px-2 py-0.5 font-mono text-[10px] font-bold text-emerald-700 dark:text-emerald-400">
+              SSL SECURED
+            </span>
+          </div>
 
           {error && (
             <div
               role="alert"
-              className="mb-5 rounded-lg border border-rose-500/30 bg-rose-950/40 p-3.5 text-xs text-rose-300"
+              className="mb-5 rounded-xl border border-rose-300 bg-rose-50 p-3.5 text-xs text-rose-800 dark:border-rose-500/30 dark:bg-rose-950/40 dark:text-rose-300"
             >
               {error}
             </div>
@@ -118,30 +98,36 @@ function LoginForm() {
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label htmlFor="email" className="mb-1.5 block text-xs font-medium text-slate-300">
-                Alamat Email
+              <label
+                htmlFor="email"
+                className="mb-1.5 block text-xs font-semibold text-zinc-700 dark:text-zinc-300"
+              >
+                Alamat Email Resmi
               </label>
               <input
                 id="email"
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="nama@wms.local"
+                placeholder="nama@nldlogistics.co.id"
                 autoComplete="email"
                 required
-                className="w-full rounded-lg border border-slate-800 bg-slate-950/60 px-3.5 py-2.5 text-sm text-white placeholder-slate-500 transition focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 focus:outline-none"
+                className="w-full rounded-xl border border-zinc-300 bg-white px-3.5 py-2.5 text-sm text-zinc-900 placeholder-zinc-400 transition focus:border-amber-500 focus:ring-1 focus:ring-amber-500 focus:outline-none dark:border-zinc-700 dark:bg-zinc-950 dark:text-zinc-100 dark:placeholder-zinc-600"
               />
             </div>
 
             <div>
               <div className="mb-1.5 flex items-center justify-between">
-                <label htmlFor="password" className="block text-xs font-medium text-slate-300">
+                <label
+                  htmlFor="password"
+                  className="block text-xs font-semibold text-zinc-700 dark:text-zinc-300"
+                >
                   Kata Sandi
                 </label>
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="text-xs text-slate-400 transition hover:text-slate-200"
+                  className="text-xs text-zinc-500 transition hover:text-zinc-800 dark:text-zinc-400 dark:hover:text-zinc-200"
                   tabIndex={-1}
                 >
                   {showPassword ? 'Sembunyikan' : 'Perlihatkan'}
@@ -155,44 +141,55 @@ function LoginForm() {
                 placeholder="••••••••••••"
                 autoComplete="current-password"
                 required
-                className="w-full rounded-lg border border-slate-800 bg-slate-950/60 px-3.5 py-2.5 text-sm text-white placeholder-slate-500 transition focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 focus:outline-none"
+                className="w-full rounded-xl border border-zinc-300 bg-white px-3.5 py-2.5 text-sm text-zinc-900 placeholder-zinc-400 transition focus:border-amber-500 focus:ring-1 focus:ring-amber-500 focus:outline-none dark:border-zinc-700 dark:bg-zinc-950 dark:text-zinc-100 dark:placeholder-zinc-600"
               />
             </div>
 
             <button
               type="submit"
               disabled={isPending}
-              className="mt-2 w-full rounded-lg bg-emerald-600 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-emerald-500 focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 focus:ring-offset-slate-900 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50"
+              className="mt-2 w-full rounded-xl bg-amber-500 px-4 py-2.5 text-sm font-bold text-zinc-950 shadow-sm transition hover:bg-amber-400 focus:ring-2 focus:ring-amber-500 focus:ring-offset-2 focus:ring-offset-white focus:outline-none disabled:cursor-not-allowed disabled:opacity-50 dark:focus:ring-offset-zinc-900"
             >
-              {isPending ? 'Memvalidasi...' : 'Masuk'}
+              {isPending ? 'Memvalidasi Kredensial...' : 'Masuk ke Sistem WMS'}
             </button>
           </form>
 
-          {/* Quick Demo Switcher */}
-          <div className="mt-8 border-t border-slate-800/80 pt-6">
-            <div className="mb-3 flex items-center justify-between">
-              <span className="text-xs font-medium text-slate-400">Akun Demo Cepat</span>
-              <span className="font-mono text-[11px] text-slate-500">Password123!</span>
-            </div>
-            <div className="grid grid-cols-2 gap-2">
-              {DEMO_ACCOUNTS.map((acc) => (
-                <button
-                  key={acc.role}
-                  type="button"
-                  onClick={() => handleQuickFill(acc)}
-                  className="flex flex-col rounded-lg border border-slate-800 bg-slate-950/40 p-2.5 text-left transition hover:border-slate-700 hover:bg-slate-800/40"
-                >
-                  <span className="text-xs font-semibold text-emerald-400">{acc.role}</span>
-                  <span className="truncate text-[11px] text-slate-300">{acc.name}</span>
-                </button>
-              ))}
-            </div>
+          {/* Enterprise Security Notice */}
+          <div className="mt-6 flex items-start gap-2.5 rounded-xl border border-zinc-100 bg-zinc-50 p-3 text-[11px] leading-relaxed text-zinc-500 dark:border-zinc-800/80 dark:bg-zinc-950/60 dark:text-zinc-400">
+            <svg
+              className="mt-0.5 h-4 w-4 shrink-0 text-amber-500"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
+              />
+            </svg>
+            <span>
+              Akses sistem dipantau dan diaudit oleh tim keamanan internal. Percobaan login yang
+              gagal berulang kali akan memicu penguncian alamat IP otomatis (*Rate Limiter Active*).
+            </span>
+          </div>
+
+          {/* Corporate Support / IT Helpdesk Footer */}
+          <div className="mt-6 border-t border-zinc-100 pt-4 text-center dark:border-zinc-800">
+            <p className="text-[11px] text-zinc-500 dark:text-zinc-400">
+              Mengalami kendala otentikasi atau kehilangan hak akses? Hubungi Administrator TI
+              internal di{' '}
+              <span className="font-mono text-zinc-700 dark:text-zinc-300">
+                support@nldlogistics.co.id
+              </span>
+            </p>
           </div>
         </div>
 
-        {/* Security Note */}
-        <p className="mt-6 text-center text-xs text-slate-500">
-          Sesi terenkripsi HTTP-Only dengan masa berlaku 8 jam &amp; RBAC server-side.
+        <p className="mt-6 text-center text-xs text-zinc-400 dark:text-zinc-500">
+          PT Nusantara Logistik Distribusi &bull; Hak Cipta &copy; 2026. Seluruh hak dilindungi
+          undang-undang.
         </p>
       </div>
     </div>
@@ -201,7 +198,7 @@ function LoginForm() {
 
 export default function LoginPage() {
   return (
-    <Suspense fallback={<div className="min-h-screen bg-[#090d16]" />}>
+    <Suspense fallback={<div className="min-h-screen bg-[#fbfbfa] dark:bg-[#111113]" />}>
       <LoginForm />
     </Suspense>
   );

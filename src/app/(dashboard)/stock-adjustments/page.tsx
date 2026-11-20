@@ -84,7 +84,7 @@ export default function StockAdjustmentsListPage() {
         <div>
           <span className="font-mono font-semibold text-emerald-400">{row.refNo}</span>
           <div className="text-[11px] text-slate-500">
-            {new Date(row.createdAt).toLocaleDateString('id-ID', {
+            {new Date(row.createdAt).toLocaleString('id-ID', {
               day: 'numeric',
               month: 'short',
               year: 'numeric',
@@ -112,7 +112,7 @@ export default function StockAdjustmentsListPage() {
       sortable: true,
       render: (row) => (
         <div>
-          <div className="font-medium text-slate-200">{row.product.name}</div>
+          <div className="font-medium text-slate-900 dark:text-slate-200">{row.product.name}</div>
           <div className="font-mono text-xs text-slate-500">
             {row.product.sku} · {row.product.uom}
           </div>
@@ -125,8 +125,10 @@ export default function StockAdjustmentsListPage() {
       sortable: true,
       render: (row) => (
         <div>
-          <div className="text-slate-200">{row.location.warehouse.name}</div>
-          <div className="font-mono text-xs text-slate-400">Rak {row.location.code}</div>
+          <div className="text-slate-900 dark:text-slate-200">{row.location.warehouse.name}</div>
+          <div className="font-mono text-xs text-slate-600 dark:text-slate-400">
+            Rak {row.location.code}
+          </div>
         </div>
       ),
     },
@@ -136,7 +138,9 @@ export default function StockAdjustmentsListPage() {
       sortable: true,
       render: (row) => (
         <div>
-          <span className="font-mono text-xs text-slate-300">{row.batch.batchNo}</span>
+          <span className="font-mono text-xs text-slate-800 dark:text-slate-300">
+            {row.batch.batchNo}
+          </span>
           {row.batch.expiryDate && (
             <div className="text-[11px] text-slate-500">
               Exp: {new Date(row.batch.expiryDate).toLocaleDateString('id-ID')}
@@ -153,7 +157,9 @@ export default function StockAdjustmentsListPage() {
         <div className="text-right">
           <span
             className={`font-mono font-bold ${
-              row.movementType === 'ADJUST_IN' ? 'text-emerald-400' : 'text-rose-400'
+              row.movementType === 'ADJUST_IN'
+                ? 'text-emerald-700 dark:text-emerald-400'
+                : 'text-rose-700 dark:text-rose-400'
             }`}
           >
             {row.movementType === 'ADJUST_IN' ? `+${row.quantity}` : `-${row.quantity}`}
@@ -164,8 +170,12 @@ export default function StockAdjustmentsListPage() {
     },
     {
       key: 'notes',
-      header: 'Kategori & Alasan (BR-26)',
-      render: (row) => <div className="max-w-xs text-xs text-slate-300">{row.notes || '-'}</div>,
+      header: 'Kategori & Alasan',
+      render: (row) => (
+        <div className="max-w-xs text-xs text-slate-700 dark:text-slate-300">
+          {row.notes || '-'}
+        </div>
+      ),
     },
     {
       key: 'user',
@@ -173,7 +183,9 @@ export default function StockAdjustmentsListPage() {
       sortable: true,
       render: (row) => (
         <div>
-          <div className="text-xs font-medium text-slate-200">{row.user.name}</div>
+          <div className="text-xs font-medium text-slate-900 dark:text-slate-200">
+            {row.user.name}
+          </div>
           <div className="text-[11px] text-slate-500">Role: {row.user.role}</div>
         </div>
       ),
@@ -188,10 +200,12 @@ export default function StockAdjustmentsListPage() {
       {/* Page Header */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-white">Penyesuaian Stok Manual</h1>
-          <p className="text-sm text-slate-400">
+          <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">
+            Penyesuaian Stok Manual
+          </h1>
+          <p className="text-sm text-slate-500 dark:text-slate-400">
             Pencatatan penyesuaian stok di luar opname (pemusnahan expired, barang rusak, koreksi
-            dokumen) oleh Manager/Admin (BR-26).
+            dokumen) oleh Manager atau Admin.
           </p>
         </div>
         <div>
@@ -213,30 +227,40 @@ export default function StockAdjustmentsListPage() {
 
       {/* KPI Cards */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-        <div className="rounded-xl border border-slate-800 bg-slate-900/60 p-4 backdrop-blur">
-          <div className="text-xs font-medium text-slate-400">Total Mutasi Penyesuaian</div>
-          <div className="mt-1 text-2xl font-bold text-white">{adjustments.length}</div>
+        <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-xs dark:border-slate-800 dark:bg-slate-900/60">
+          <div className="text-xs font-medium text-slate-500 dark:text-slate-400">
+            Total Mutasi Penyesuaian
+          </div>
+          <div className="mt-1 text-2xl font-bold text-slate-900 dark:text-white">
+            {adjustments.length}
+          </div>
         </div>
-        <div className="rounded-xl border border-emerald-900/40 bg-emerald-950/20 p-4 backdrop-blur">
-          <div className="text-xs font-medium text-emerald-400">Penambahan Stok (ADJUST_IN)</div>
-          <div className="mt-1 text-2xl font-bold text-emerald-300">{inCount}</div>
+        <div className="rounded-xl border border-emerald-200 bg-emerald-50/70 p-4 shadow-xs dark:border-emerald-900/40 dark:bg-emerald-950/20">
+          <div className="text-xs font-medium text-emerald-800 dark:text-emerald-400">
+            Penambahan Stok (ADJUST_IN)
+          </div>
+          <div className="mt-1 text-2xl font-bold text-emerald-700 dark:text-emerald-300">
+            {inCount}
+          </div>
         </div>
-        <div className="rounded-xl border border-rose-900/40 bg-rose-950/20 p-4 backdrop-blur">
-          <div className="text-xs font-medium text-rose-400">Pengurangan Stok (ADJUST_OUT)</div>
-          <div className="mt-1 text-2xl font-bold text-rose-300">{outCount}</div>
+        <div className="rounded-xl border border-rose-200 bg-rose-50/70 p-4 shadow-xs dark:border-rose-900/40 dark:bg-rose-950/20">
+          <div className="text-xs font-medium text-rose-800 dark:text-rose-400">
+            Pengurangan Stok (ADJUST_OUT)
+          </div>
+          <div className="mt-1 text-2xl font-bold text-rose-700 dark:text-rose-300">{outCount}</div>
         </div>
       </div>
 
       {/* Filter Bar */}
-      <div className="flex flex-col gap-3 rounded-xl border border-slate-800 bg-slate-900/60 p-4 backdrop-blur sm:flex-row sm:items-center">
+      <div className="flex flex-col gap-3 rounded-xl border border-slate-200 bg-white p-4 shadow-xs sm:flex-row sm:items-center dark:border-slate-800 dark:bg-slate-900/60">
         <div className="flex items-center gap-2">
-          <span className="text-xs font-semibold tracking-wider text-slate-400 uppercase">
+          <span className="text-xs font-semibold tracking-wider text-slate-600 uppercase dark:text-slate-400">
             Jenis:
           </span>
           <select
             value={selectedType}
             onChange={(e) => setSelectedType(e.target.value)}
-            className="rounded-lg border border-slate-700 bg-slate-950 px-3 py-1.5 text-sm text-slate-200 focus:border-emerald-500 focus:outline-none"
+            className="rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-sm text-slate-900 focus:border-emerald-500 focus:outline-none dark:border-slate-700 dark:bg-slate-950 dark:text-slate-200"
           >
             <option value="ALL">Semua Jenis</option>
             <option value="ADJUST_IN">ADJUST IN (Penambahan)</option>
@@ -249,7 +273,7 @@ export default function StockAdjustmentsListPage() {
             size="sm"
             variant="ghost"
             onClick={() => setRefreshKey((k) => k + 1)}
-            className="text-slate-400 hover:text-white"
+            className="text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white"
           >
             Refresh
           </Button>
@@ -257,19 +281,17 @@ export default function StockAdjustmentsListPage() {
       </div>
 
       {/* Data Table */}
-      <div className="rounded-xl border border-slate-800 bg-slate-900/60 p-4 backdrop-blur">
-        <DataTable
-          columns={columns}
-          data={adjustments}
-          isLoading={isLoading}
-          searchPlaceholder="Cari no. dokumen, produk, batch, alasan, otorisator..."
-          searchField={(row) =>
-            `${row.refNo} ${row.product.name} ${row.product.sku} ${row.batch.batchNo} ${row.notes || ''} ${row.user.name}`
-          }
-          emptyTitle="Belum ada catatan penyesuaian stok manual"
-          emptyDescription="Belum ada mutasi penyesuaian stok yang sesuai dengan filter."
-        />
-      </div>
+      <DataTable
+        columns={columns}
+        data={adjustments}
+        isLoading={isLoading}
+        searchPlaceholder="Cari no. dokumen, produk, batch, alasan, otorisator..."
+        searchField={(row) =>
+          `${row.refNo} ${row.product.name} ${row.product.sku} ${row.batch.batchNo} ${row.notes || ''} ${row.user.name}`
+        }
+        emptyTitle="Belum ada catatan penyesuaian stok manual"
+        emptyDescription="Belum ada mutasi penyesuaian stok yang sesuai dengan filter."
+      />
     </div>
   );
 }

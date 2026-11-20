@@ -117,7 +117,7 @@ export function DataTable<T extends object>({
         <div className="flex items-center justify-between gap-4">
           <div className="relative w-full max-w-sm">
             <svg
-              className="absolute top-2.5 left-3 h-4 w-4 text-slate-400"
+              className="absolute top-2.5 left-3 h-4 w-4 text-zinc-400"
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
               viewBox="0 0 24 24"
@@ -139,27 +139,33 @@ export function DataTable<T extends object>({
                 setCurrentPage(1);
               }}
               placeholder={searchPlaceholder}
-              className="w-full rounded-lg border border-slate-800 bg-slate-900/60 py-1.5 pr-3.5 pl-9 text-xs text-white placeholder-slate-500 transition focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 focus:outline-none"
+              className="w-full rounded-lg border border-zinc-300 bg-white py-1.5 pr-3.5 pl-9 text-xs text-zinc-900 placeholder-zinc-400 transition focus:border-amber-500 focus:ring-1 focus:ring-amber-500 focus:outline-none dark:border-zinc-800 dark:bg-zinc-900/60 dark:text-zinc-100 dark:placeholder-zinc-500"
             />
           </div>
-          <div className="text-xs text-slate-400">
-            Total <span className="font-semibold text-white">{sortedData.length}</span> baris
+          <div className="text-xs text-zinc-500 dark:text-zinc-400">
+            Total{' '}
+            <span className="font-semibold text-zinc-900 dark:text-zinc-100">
+              {sortedData.length}
+            </span>{' '}
+            baris
           </div>
         </div>
       )}
 
       {/* Table Container */}
-      <div className="overflow-hidden rounded-xl border border-slate-800 bg-slate-900/40">
+      <div className="overflow-hidden rounded-xl border border-zinc-200 bg-white shadow-xs dark:border-zinc-800 dark:bg-[#111113]">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs">
-            <thead className="border-b border-slate-800 bg-slate-900/80 text-[11px] font-semibold tracking-wider text-slate-300 uppercase">
+            <thead className="border-b border-zinc-200 bg-zinc-50/80 text-[11px] font-semibold tracking-wider text-zinc-600 uppercase dark:border-zinc-800 dark:bg-zinc-900/80 dark:text-zinc-400">
               <tr>
                 {columns.map((col) => (
                   <th
                     key={col.key}
                     scope="col"
                     className={`px-4 py-3 select-none ${col.className || ''} ${
-                      col.sortable ? 'cursor-pointer hover:text-white' : ''
+                      col.sortable
+                        ? 'cursor-pointer hover:text-zinc-900 dark:hover:text-zinc-100'
+                        : ''
                     } ${
                       col.align === 'right'
                         ? 'text-right'
@@ -180,7 +186,7 @@ export function DataTable<T extends object>({
                     >
                       <span>{col.header}</span>
                       {col.sortable && (
-                        <span className="text-slate-500">
+                        <span className="text-zinc-400 dark:text-zinc-500">
                           {sortKey === col.key ? (sortDirection === 'asc' ? '▲' : '▼') : '↕'}
                         </span>
                       )}
@@ -189,7 +195,7 @@ export function DataTable<T extends object>({
                 ))}
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-800/60">
+            <tbody className="divide-y divide-zinc-100 dark:divide-zinc-800/60">
               {isLoading ? (
                 Array.from({ length: pageSize > 5 ? 5 : pageSize }).map((_, rIdx) => (
                   <tr key={`skeleton-${rIdx}`}>
@@ -216,7 +222,7 @@ export function DataTable<T extends object>({
                   <tr
                     key={`row-${rIdx}`}
                     onClick={() => onRowClick && onRowClick(row)}
-                    className={`transition-colors hover:bg-slate-800/40 ${
+                    className={`transition-colors hover:bg-zinc-50 dark:hover:bg-zinc-900/50 ${
                       onRowClick ? 'cursor-pointer' : ''
                     }`}
                   >
@@ -229,7 +235,7 @@ export function DataTable<T extends object>({
                       return (
                         <td
                           key={col.key}
-                          className={`px-4 py-3 text-slate-200 ${col.className || ''} ${
+                          className={`px-4 py-3 text-zinc-800 dark:text-zinc-200 ${col.className || ''} ${
                             col.align === 'right'
                               ? 'text-right'
                               : col.align === 'center'
@@ -250,10 +256,12 @@ export function DataTable<T extends object>({
 
         {/* Footer Pagination */}
         {!isLoading && sortedData.length > 0 && (
-          <div className="flex items-center justify-between border-t border-slate-800 px-4 py-3 text-xs text-slate-400">
+          <div className="flex items-center justify-between border-t border-zinc-200 px-4 py-3 text-xs text-zinc-500 dark:border-zinc-800 dark:text-zinc-400">
             <div>
-              Halaman <span className="font-medium text-white">{currentPage}</span> dari{' '}
-              <span className="font-medium text-white">{totalPages}</span>
+              Halaman{' '}
+              <span className="font-medium text-zinc-900 dark:text-zinc-100">{currentPage}</span>{' '}
+              dari{' '}
+              <span className="font-medium text-zinc-900 dark:text-zinc-100">{totalPages}</span>
             </div>
             <div className="flex items-center gap-1.5">
               <Button

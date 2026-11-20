@@ -32,12 +32,12 @@ export function ExpiryBadge({
   if (!expiryDate && initialDays === undefined && !initialStatus) {
     return (
       <span
-        className={`inline-flex items-center gap-1 rounded-md border border-slate-200 bg-slate-100 font-medium text-slate-600 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-400 ${
+        className={`inline-flex items-center gap-1 rounded-md border border-zinc-200 bg-zinc-100 font-medium text-zinc-600 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-400 ${
           size === 'sm' ? 'px-2 py-0.5 text-[11px]' : 'px-2.5 py-1 text-xs'
         } ${className}`}
         {...props}
       >
-        <span className="h-1.5 w-1.5 rounded-full bg-slate-400 dark:bg-slate-500" />
+        <span className="h-1.5 w-1.5 rounded-full bg-zinc-400 dark:bg-zinc-500" />
         Tanpa Kedaluwarsa
       </span>
     );

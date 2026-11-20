@@ -62,12 +62,12 @@ export default function CustomerReturnsListPage() {
         <div>
           <Link
             href={`/customer-returns/${encodeURIComponent(row.returnNo)}`}
-            className="font-mono font-bold text-indigo-600 hover:underline"
+            className="font-mono font-bold text-amber-600 hover:underline dark:text-amber-400"
           >
             {row.returnNo}
           </Link>
-          <div className="text-[11px] text-slate-500">
-            {new Date(row.createdAt).toLocaleDateString('id-ID', {
+          <div className="text-[11px] text-zinc-500 dark:text-zinc-400">
+            {new Date(row.createdAt).toLocaleString('id-ID', {
               day: 'numeric',
               month: 'short',
               year: 'numeric',
@@ -83,8 +83,10 @@ export default function CustomerReturnsListPage() {
       header: 'Gudang Tujuan',
       render: (row) => (
         <div>
-          <span className="font-semibold text-slate-800">{row.warehouse.name}</span>
-          <span className="ml-1.5 rounded bg-slate-100 px-1 py-0.5 font-mono text-[11px] text-slate-500">
+          <span className="font-semibold text-zinc-800 dark:text-zinc-200">
+            {row.warehouse.name}
+          </span>
+          <span className="ml-1.5 rounded bg-zinc-100 px-1 py-0.5 font-mono text-[11px] text-zinc-600 dark:bg-zinc-800 dark:text-zinc-300">
             {row.warehouse.code}
           </span>
         </div>
@@ -95,16 +97,18 @@ export default function CustomerReturnsListPage() {
       header: 'Produk Diretur',
       render: (row) => (
         <div>
-          <div className="text-xs font-medium text-slate-800">
+          <div className="text-xs font-medium text-zinc-800 dark:text-zinc-200">
             {row.sampleProducts.join(', ')}
             {row.itemsCount > row.sampleProducts.length && (
-              <span className="text-slate-400">
+              <span className="text-zinc-400 dark:text-zinc-500">
                 {' '}
                 +{row.itemsCount - row.sampleProducts.length} lainnya
               </span>
             )}
           </div>
-          <div className="text-[11px] text-slate-500">{row.itemsCount} baris item / batch</div>
+          <div className="text-[11px] text-zinc-500 dark:text-zinc-400">
+            {row.itemsCount} baris item / batch
+          </div>
         </div>
       ),
     },
@@ -113,7 +117,7 @@ export default function CustomerReturnsListPage() {
       header: 'Total Unit',
       sortable: true,
       render: (row) => (
-        <span className="rounded-md border border-emerald-200 bg-emerald-50 px-2.5 py-1 font-mono text-xs font-bold text-emerald-700">
+        <span className="rounded-md border border-emerald-200 bg-emerald-50 px-2.5 py-1 font-mono text-xs font-bold text-emerald-700 dark:border-emerald-800 dark:bg-emerald-950/50 dark:text-emerald-400">
           +{row.totalUnits.toLocaleString('id-ID')} unit
         </span>
       ),
@@ -122,7 +126,10 @@ export default function CustomerReturnsListPage() {
       key: 'notes',
       header: 'Keterangan & Alasan',
       render: (row) => (
-        <div className="max-w-xs truncate text-xs text-slate-600" title={row.notes || ''}>
+        <div
+          className="max-w-xs truncate text-xs text-zinc-600 dark:text-zinc-400"
+          title={row.notes || ''}
+        >
           {row.notes || '-'}
         </div>
       ),
@@ -132,7 +139,7 @@ export default function CustomerReturnsListPage() {
       header: 'Petugas',
       render: (row) => (
         <div className="text-xs">
-          <div className="font-medium text-slate-800">{row.user.name}</div>
+          <div className="font-medium text-zinc-800 dark:text-zinc-200">{row.user.name}</div>
           <Badge variant="neutral" className="mt-0.5 text-[10px]">
             {row.user.role}
           </Badge>
@@ -144,11 +151,7 @@ export default function CustomerReturnsListPage() {
       header: 'Aksi',
       render: (row) => (
         <Link href={`/customer-returns/${encodeURIComponent(row.returnNo)}`}>
-          <Button
-            size="sm"
-            variant="outline"
-            className="h-7 border-indigo-200 text-xs text-indigo-600 hover:bg-indigo-50"
-          >
+          <Button size="sm" variant="outline" className="h-7 text-xs">
             Rincian
           </Button>
         </Link>
@@ -159,19 +162,19 @@ export default function CustomerReturnsListPage() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex flex-col gap-4 border-b border-slate-200 pb-5 sm:flex-row sm:items-center sm:justify-between">
+      <div className="flex flex-col gap-4 border-b border-zinc-200 pb-5 sm:flex-row sm:items-center sm:justify-between dark:border-zinc-800">
         <div>
           <div className="flex items-center gap-3">
-            <h1 className="text-2xl font-bold tracking-tight text-slate-900">
+            <h1 className="text-2xl font-bold tracking-tight text-zinc-900 dark:text-zinc-100">
               Retur Penjualan (Customer Returns)
             </h1>
-            <span className="rounded-full border border-indigo-200 bg-indigo-50 px-2.5 py-0.5 text-xs font-medium text-indigo-700">
+            <span className="rounded-full border border-amber-500/30 bg-amber-500/10 px-2.5 py-0.5 text-xs font-medium text-amber-800 dark:text-amber-300">
               {totalReturnsCount} Dokumen
             </span>
           </div>
-          <p className="mt-1 text-sm text-slate-500">
+          <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
             Pencatatan penerimaan kembali barang dari Delivery Order (DO) yang sudah dikirim ke
-            customer (BR-18).
+            customer.
           </p>
         </div>
 
@@ -210,31 +213,37 @@ export default function CustomerReturnsListPage() {
 
       {/* KPI Cards */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
-          <div className="text-xs font-semibold text-slate-500">Total Dokumen Retur</div>
+        <div className="rounded-xl border border-zinc-200 bg-white p-4 shadow-xs dark:border-zinc-800 dark:bg-[#111113]">
+          <div className="text-xs font-semibold text-zinc-500 dark:text-zinc-400">
+            Total Dokumen Retur
+          </div>
           <div className="mt-1 flex items-baseline gap-2">
-            <span className="text-2xl font-bold text-slate-900">{totalReturnsCount}</span>
-            <span className="text-xs text-slate-500">transaksi</span>
+            <span className="text-2xl font-bold text-zinc-900 dark:text-zinc-100">
+              {totalReturnsCount}
+            </span>
+            <span className="text-xs text-zinc-500 dark:text-zinc-400">transaksi</span>
           </div>
         </div>
 
-        <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
-          <div className="text-xs font-semibold text-slate-500">
+        <div className="rounded-xl border border-zinc-200 bg-white p-4 shadow-xs dark:border-zinc-800 dark:bg-[#111113]">
+          <div className="text-xs font-semibold text-zinc-500 dark:text-zinc-400">
             Total Unit Fisik Diterima Kembali
           </div>
           <div className="mt-1 flex items-baseline gap-2">
-            <span className="text-2xl font-bold text-emerald-600">
+            <span className="text-2xl font-bold text-emerald-600 dark:text-emerald-400">
               +{totalUnitsReturned.toLocaleString('id-ID')}
             </span>
-            <span className="text-xs text-slate-500">unit</span>
+            <span className="text-xs text-zinc-500 dark:text-zinc-400">unit</span>
           </div>
         </div>
 
-        <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
-          <div className="text-xs font-semibold text-slate-500">Kepatuhan Aturan Bisnis</div>
-          <div className="mt-1 text-xs text-slate-600">
-            Mengacu pada <strong>BR-18</strong>: DO status SHIPPED diverifikasi dan stok
-            dikembalikan ke rak tujuan dengan mutasi IN yang tercatat di kartu stok.
+        <div className="rounded-xl border border-zinc-200 bg-white p-4 shadow-xs dark:border-zinc-800 dark:bg-[#111113]">
+          <div className="text-xs font-semibold text-zinc-500 dark:text-zinc-400">
+            Integritas Riwayat Stok
+          </div>
+          <div className="mt-1 text-xs text-zinc-600 dark:text-zinc-400">
+            Pengembalian diverifikasi terhadap dokumen pengiriman dan stok dikembalikan ke rak
+            tujuan dengan mutasi masuk yang tercatat resmi.
           </div>
         </div>
       </div>

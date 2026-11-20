@@ -28,7 +28,7 @@ export function BarcodeSvg({
   if (!value || encoded.bars.length === 0) {
     return (
       <div
-        className={`flex h-12 items-center justify-center rounded border border-dashed border-slate-300 text-xs text-slate-400 ${className}`}
+        className={`flex h-12 items-center justify-center rounded border border-dashed border-zinc-300 text-xs text-zinc-400 dark:border-zinc-700 dark:text-zinc-500 ${className}`}
       >
         (Barcode Kosong)
       </div>
@@ -55,7 +55,7 @@ export function BarcodeSvg({
             fontSize={10}
             fontWeight="bold"
             textAnchor="middle"
-            fill="#1e293b"
+            fill="#18181b"
           >
             {displayText}
           </text>

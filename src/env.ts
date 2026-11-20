@@ -7,7 +7,7 @@ const envSchema = z.object({
   AUTH_URL: z.string().url().default('http://localhost:3000'),
   NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
   LOG_LEVEL: z.enum(['trace', 'debug', 'info', 'warn', 'error', 'fatal']).default('info'),
-  SEED_DEMO_PASSWORD: z.string().default('Password123!'),
+  SEED_DEMO_PASSWORD: z.string().default('Juntak12345!'),
 });
 
 export type Env = z.infer<typeof envSchema>;

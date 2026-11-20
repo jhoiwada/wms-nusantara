@@ -20,19 +20,19 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     ref,
   ) => {
     const baseClasses =
-      'inline-flex items-center justify-center font-medium rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-slate-950 disabled:opacity-50 disabled:cursor-not-allowed select-none';
+      'inline-flex items-center justify-center font-medium rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-zinc-950 disabled:opacity-50 disabled:cursor-not-allowed select-none';
 
     const variantClasses = {
       primary:
-        'bg-emerald-600 hover:bg-emerald-500 text-white focus:ring-emerald-500 border border-emerald-500/30',
+        'bg-amber-500 hover:bg-amber-400 text-zinc-950 font-semibold focus:ring-amber-500 border border-amber-500/60 shadow-xs dark:bg-amber-500 dark:hover:bg-amber-400 dark:text-zinc-950',
       secondary:
-        'bg-slate-800 hover:bg-slate-700 text-slate-100 focus:ring-slate-600 border border-slate-700',
+        'bg-zinc-100 hover:bg-zinc-200 text-zinc-800 border border-zinc-200 focus:ring-zinc-400 dark:bg-zinc-800 dark:hover:bg-zinc-700 dark:text-zinc-100 dark:border-zinc-700 dark:focus:ring-zinc-600',
       outline:
-        'bg-transparent hover:bg-slate-800 text-slate-300 hover:text-white border border-slate-700 focus:ring-slate-600',
+        'bg-transparent hover:bg-zinc-100 text-zinc-700 hover:text-zinc-900 border border-zinc-300 focus:ring-amber-500 dark:hover:bg-zinc-800/80 dark:text-zinc-300 dark:hover:text-white dark:border-zinc-700 dark:focus:ring-amber-500',
       ghost:
-        'bg-transparent hover:bg-slate-800 text-slate-400 hover:text-white focus:ring-slate-600',
+        'bg-transparent hover:bg-zinc-100 text-zinc-600 hover:text-zinc-900 focus:ring-amber-500 dark:hover:bg-zinc-800/80 dark:text-zinc-400 dark:hover:text-white dark:focus:ring-amber-500',
       danger:
-        'bg-rose-600 hover:bg-rose-500 text-white focus:ring-rose-500 border border-rose-500/30',
+        'bg-rose-600 hover:bg-rose-700 text-white focus:ring-rose-500 border border-rose-600/50 shadow-xs dark:hover:bg-rose-500',
     };
 
     const sizeClasses = {

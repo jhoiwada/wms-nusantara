@@ -107,7 +107,7 @@ export default function NewDeliveryOrderPage() {
         return;
       }
       if (!item.quantity || item.quantity <= 0) {
-        setFormError(`Baris ${idx + 1}: Jumlah barang harus lebih besar dari 0 (BR-03)`);
+        setFormError(`Baris ${idx + 1}: Jumlah barang harus lebih besar dari 0`);
         return;
       }
     }
@@ -135,7 +135,9 @@ export default function NewDeliveryOrderPage() {
         const json = await res.json();
 
         if (!res.ok) {
-          throw new Error(json.message || 'Gagal membuat dokumen Delivery Order');
+          throw new Error(
+            json.error?.message || json.message || 'Gagal membuat dokumen Delivery Order',
+          );
         }
 
         router.push(`/delivery-orders/${json.data.id}`);
@@ -163,8 +165,8 @@ export default function NewDeliveryOrderPage() {
             Buat Dokumen Pengiriman Baru (DO)
           </h1>
           <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
-            Dokumen akan berstatus DRAFT dan nomor dokumen diberikan secara otomatis (BR-15, BR-16).
-            Stok baru dikurangi saat status diubah ke SHIPPED.
+            Dokumen akan berstatus DRAFT dan nomor dokumen diberikan secara berurutan otomatis. Stok
+            baru dikurangi saat status diubah ke SHIPPED.
           </p>
         </div>
       </div>
@@ -201,7 +203,7 @@ export default function NewDeliveryOrderPage() {
                   id="customer-select"
                   value={customerId}
                   onChange={(e) => setCustomerId(e.target.value)}
-                  className="w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm focus:ring-1 focus:ring-slate-950 focus:outline-none dark:border-slate-700 dark:bg-slate-900 dark:focus:ring-slate-300"
+                  className="w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 focus:ring-1 focus:ring-slate-950 focus:outline-none dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:focus:ring-slate-300"
                 >
                   {customers.map((c) => (
                     <option key={c.id} value={c.id}>
@@ -231,7 +233,7 @@ export default function NewDeliveryOrderPage() {
                     setWarehouseId(e.target.value);
                     setItems([]); // Clear line items when warehouse changes to prevent invalid location cross-referencing
                   }}
-                  className="w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm focus:ring-1 focus:ring-slate-950 focus:outline-none dark:border-slate-700 dark:bg-slate-900 dark:focus:ring-slate-300"
+                  className="w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 focus:ring-1 focus:ring-slate-950 focus:outline-none dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:focus:ring-slate-300"
                 >
                   {warehouses.map((wh) => (
                     <option key={wh.id} value={wh.id}>

@@ -46,6 +46,7 @@ export default function GoodsReceiptsListPage() {
   const [selectedStatus, setSelectedStatus] = useState<string>('ALL');
   const [selectedWarehouse, setSelectedWarehouse] = useState<string>('ALL');
   const [isLoading, setIsLoading] = useState(true);
+  const [fetchError, setFetchError] = useState<string | null>(null);
   const [refreshKey, setRefreshKey] = useState(0);
 
   const reloadData = useCallback(() => {
@@ -81,9 +82,14 @@ export default function GoodsReceiptsListPage() {
       .then((json) => {
         if (isMounted && json.data) {
           setReceipts(json.data);
+          setFetchError(null);
+        } else if (isMounted && json.error) {
+          setFetchError(json.error.message || 'Gagal memuat data');
         }
       })
-      .catch(() => {})
+      .catch(() => {
+        if (isMounted) setFetchError('Gagal terhubung ke server');
+      })
       .finally(() => {
         if (isMounted) setIsLoading(false);
       });
@@ -115,11 +121,11 @@ export default function GoodsReceiptsListPage() {
         <div>
           <Link
             href={`/goods-receipts/${item.id}`}
-            className="font-mono text-xs font-bold text-indigo-600 hover:text-indigo-800 hover:underline"
+            className="font-mono text-xs font-bold text-indigo-600 hover:text-indigo-800 hover:underline dark:text-indigo-400 dark:hover:text-indigo-300"
           >
             {item.receiptNo}
           </Link>
-          <div className="mt-0.5 text-[11px] text-slate-400">
+          <div className="mt-0.5 text-[11px] text-slate-500 dark:text-slate-400">
             Dibuat: {new Date(item.createdAt).toLocaleDateString('id-ID', { dateStyle: 'medium' })}
           </div>
         </div>
@@ -131,8 +137,10 @@ export default function GoodsReceiptsListPage() {
       sortable: true,
       render: (item: GoodsReceiptItemSummary) => (
         <div>
-          <div className="font-semibold text-slate-900">{item.supplier.name}</div>
-          <span className="py-0.2 rounded bg-slate-100 px-1.5 font-mono text-[11px] text-slate-500">
+          <div className="font-semibold text-slate-900 dark:text-slate-100">
+            {item.supplier.name}
+          </div>
+          <span className="py-0.2 rounded bg-slate-100 px-1.5 font-mono text-[11px] text-slate-600 dark:bg-slate-800 dark:text-slate-300">
             {item.supplier.code}
           </span>
         </div>
@@ -144,8 +152,12 @@ export default function GoodsReceiptsListPage() {
       sortable: true,
       render: (item: GoodsReceiptItemSummary) => (
         <div>
-          <div className="font-medium text-slate-800">{item.warehouse.name}</div>
-          <span className="font-mono text-[11px] text-slate-500">{item.warehouse.code}</span>
+          <div className="font-medium text-slate-800 dark:text-slate-200">
+            {item.warehouse.name}
+          </div>
+          <span className="font-mono text-[11px] text-slate-500 dark:text-slate-400">
+            {item.warehouse.code}
+          </span>
         </div>
       ),
     },
@@ -160,7 +172,9 @@ export default function GoodsReceiptsListPage() {
       header: 'Jumlah Item',
       sortable: true,
       render: (item: GoodsReceiptItemSummary) => (
-        <span className="text-xs font-medium text-slate-700">{item._count.items} Macam Item</span>
+        <span className="text-xs font-medium text-slate-700 dark:text-slate-300">
+          {item._count.items} Macam Item
+        </span>
       ),
     },
     {
@@ -168,7 +182,7 @@ export default function GoodsReceiptsListPage() {
       header: 'Tanggal Diterima',
       sortable: true,
       render: (item: GoodsReceiptItemSummary) => (
-        <span className="text-xs text-slate-600">
+        <span className="text-xs text-slate-600 dark:text-slate-400">
           {item.receivedAt
             ? new Date(item.receivedAt).toLocaleDateString('id-ID', {
                 dateStyle: 'medium',
@@ -181,7 +195,9 @@ export default function GoodsReceiptsListPage() {
       key: 'createdBy',
       header: 'Petugas Input',
       render: (item: GoodsReceiptItemSummary) => (
-        <span className="text-xs font-medium text-slate-600">{item.createdBy.name}</span>
+        <span className="text-xs font-medium text-slate-600 dark:text-slate-400">
+          {item.createdBy.name}
+        </span>
       ),
     },
     {
@@ -202,17 +218,17 @@ export default function GoodsReceiptsListPage() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex flex-col gap-4 border-b border-slate-200 pb-5 sm:flex-row sm:items-center sm:justify-between">
+      <div className="flex flex-col gap-4 border-b border-slate-200 pb-5 sm:flex-row sm:items-center sm:justify-between dark:border-slate-800">
         <div>
           <div className="flex items-center gap-3">
-            <h1 className="text-2xl font-bold tracking-tight text-slate-900">
+            <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-100">
               Penerimaan Barang (Goods Receipt)
             </h1>
-            <span className="rounded-full border border-indigo-200 bg-indigo-50 px-2.5 py-0.5 text-xs font-medium text-indigo-700">
+            <span className="rounded-full border border-indigo-200 bg-indigo-50 px-2.5 py-0.5 text-xs font-medium text-indigo-700 dark:border-indigo-800 dark:bg-indigo-950/50 dark:text-indigo-300">
               {receipts.length} Dokumen
             </span>
           </div>
-          <p className="mt-1 text-sm text-slate-500">
+          <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
             Catatan penerimaan barang masuk dari supplier, penataan ke lokasi rak gudang, dan
             penambahan stok resmi.
           </p>
@@ -234,13 +250,13 @@ export default function GoodsReceiptsListPage() {
       </div>
 
       {/* Filter Toolbar */}
-      <div className="flex flex-wrap items-center gap-3 rounded-lg border border-slate-200 bg-slate-50 p-3">
+      <div className="flex flex-wrap items-center gap-3 rounded-lg border border-slate-200 bg-slate-50 p-3 dark:border-slate-800 dark:bg-slate-900/60">
         <div className="flex items-center gap-2">
-          <span className="text-xs font-semibold text-slate-700">Status:</span>
+          <span className="text-xs font-semibold text-slate-700 dark:text-slate-300">Status:</span>
           <select
             value={selectedStatus}
             onChange={(e) => setSelectedStatus(e.target.value)}
-            className="h-8 rounded border border-slate-300 bg-white px-2.5 text-xs font-medium text-slate-800 focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+            className="h-8 rounded border border-slate-300 bg-white px-2.5 text-xs font-medium text-slate-800 focus:ring-2 focus:ring-indigo-500 focus:outline-none dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100"
           >
             <option value="ALL">Semua Status</option>
             <option value="DRAFT">DRAFT</option>
@@ -250,11 +266,13 @@ export default function GoodsReceiptsListPage() {
         </div>
 
         <div className="flex items-center gap-2">
-          <span className="text-xs font-semibold text-slate-700">Gudang Tujuan:</span>
+          <span className="text-xs font-semibold text-slate-700 dark:text-slate-300">
+            Gudang Tujuan:
+          </span>
           <select
             value={selectedWarehouse}
             onChange={(e) => setSelectedWarehouse(e.target.value)}
-            className="h-8 rounded border border-slate-300 bg-white px-2.5 text-xs font-medium text-slate-800 focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+            className="h-8 rounded border border-slate-300 bg-white px-2.5 text-xs font-medium text-slate-800 focus:ring-2 focus:ring-indigo-500 focus:outline-none dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100"
           >
             <option value="ALL">Semua Gudang</option>
             {warehouses.map((wh) => (
@@ -267,7 +285,7 @@ export default function GoodsReceiptsListPage() {
 
         <button
           onClick={reloadData}
-          className="ml-auto flex items-center gap-1 text-xs font-medium text-indigo-600 hover:text-indigo-800"
+          className="ml-auto flex items-center gap-1 text-xs font-medium text-indigo-600 hover:text-indigo-800 dark:text-indigo-400 dark:hover:text-indigo-300"
         >
           <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path
@@ -282,6 +300,11 @@ export default function GoodsReceiptsListPage() {
       </div>
 
       {/* Goods Receipt Table */}
+      {fetchError && (
+        <div className="rounded-lg border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-800 dark:border-rose-800 dark:bg-rose-950/40 dark:text-rose-300">
+          {fetchError}
+        </div>
+      )}
       <DataTable
         columns={columns}
         data={receipts}

@@ -118,9 +118,10 @@ export async function getDashboardSummary(warehouseId?: string): Promise<Dashboa
     totalInventoryValue += s.quantity * (Number(s.product.costPrice) || 0);
   }
 
-  // Low stock products count (BR-04: available stock <= minStock)
+  // Low stock products count (BR-04: available stock < minStock, only if minStock > 0)
   let lowStockCount = 0;
   for (const prod of allProducts) {
+    if (prod.minStock <= 0) continue; // skip produk tanpa batas minimum
     let availableStock = 0;
     for (const s of prod.stocks) {
       const isExpired = s.batch?.expiryDate && new Date(s.batch.expiryDate) < now;
@@ -128,7 +129,7 @@ export async function getDashboardSummary(warehouseId?: string): Promise<Dashboa
         availableStock += s.quantity;
       }
     }
-    if (availableStock <= prod.minStock) {
+    if (availableStock < prod.minStock) {
       lowStockCount++;
     }
   }

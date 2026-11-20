@@ -94,8 +94,17 @@ export async function createWarehouse(input: CreateWarehouseInput) {
   });
 }
 
+export const PROTECTED_WAREHOUSE_CODES = ['WH-PLG-01', 'WH-MM2-01'];
+
 export async function updateWarehouse(id: string, input: UpdateWarehouseInput) {
   const existing = await getWarehouseById(id);
+
+  if (PROTECTED_WAREHOUSE_CODES.includes(existing.code) && input.isActive === false) {
+    throw new AppError(
+      'FORBIDDEN',
+      `Fasilitas gudang utama perusahaan (${existing.name}) tidak dapat dinonaktifkan di server publik untuk menjaga integritas denah dan tata letak rak.`,
+    );
+  }
 
   if (input.code && input.code.toUpperCase() !== existing.code) {
     const duplicate = await prisma.warehouse.findUnique({
@@ -118,7 +127,14 @@ export async function updateWarehouse(id: string, input: UpdateWarehouseInput) {
 }
 
 export async function deactivateWarehouse(id: string) {
-  await getWarehouseById(id);
+  const existing = await getWarehouseById(id);
+
+  if (PROTECTED_WAREHOUSE_CODES.includes(existing.code)) {
+    throw new AppError(
+      'FORBIDDEN',
+      `Fasilitas gudang utama perusahaan (${existing.name}) tidak dapat dinonaktifkan di server publik untuk menjaga integritas denah dan tata letak rak.`,
+    );
+  }
 
   return prisma.warehouse.update({
     where: { id },

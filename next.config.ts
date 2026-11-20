@@ -38,6 +38,7 @@ const securityHeaders = [
 
 const nextConfig: NextConfig = {
   /* config options here */
+  serverExternalPackages: ['pino', 'pino-pretty'],
   cacheComponents: true,
   partialPrefetching: true,
   turbopack: {

@@ -295,13 +295,17 @@ export function DeliveryLineItemsEditor({
           }`}
         >
           <div className="flex items-center gap-2">
-            <span>{scanFeedback.type === 'success' ? '✅' : '⚠️'}</span>
+            <span
+              className={`inline-block h-2 w-2 rounded-full ${
+                scanFeedback.type === 'success' ? 'bg-emerald-500' : 'bg-rose-500'
+              }`}
+            />
             <span>{scanFeedback.text}</span>
           </div>
           <button
             type="button"
             onClick={() => setScanFeedback(null)}
-            className="ml-2 text-slate-400 hover:text-slate-700"
+            className="ml-2 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200"
           >
             &times;
           </button>
@@ -311,7 +315,7 @@ export function DeliveryLineItemsEditor({
       {availableLocations.length === 0 && (
         <div className="rounded-lg border border-amber-200 bg-amber-50 p-3 text-xs text-amber-800 dark:border-amber-800 dark:bg-amber-950/40 dark:text-amber-300">
           Gudang yang dipilih belum memiliki lokasi rak aktif atau semua lokasi sedang dibekukan
-          karena opname (BR-22).
+          karena sedang dalam proses opname fisik.
         </div>
       )}
 
@@ -340,7 +344,7 @@ export function DeliveryLineItemsEditor({
                 <th className="w-12 px-3 py-2.5 text-center font-medium">#</th>
                 <th className="min-w-[200px] px-3 py-2.5 font-medium">Produk *</th>
                 <th className="min-w-[170px] px-3 py-2.5 font-medium">Lokasi Rak Asal *</th>
-                <th className="min-w-[220px] px-3 py-2.5 font-medium">Alokasi Batch (BR-08)</th>
+                <th className="min-w-[220px] px-3 py-2.5 font-medium">Alokasi Batch &amp; FEFO</th>
                 <th className="w-28 px-3 py-2.5 text-right font-medium">Jumlah *</th>
                 {!disabled && <th className="w-16 px-3 py-2.5 text-center font-medium">Aksi</th>}
               </tr>
@@ -411,21 +415,19 @@ export function DeliveryLineItemsEditor({
                         onChange={(e) => handleUpdateItem(index, { batchId: e.target.value })}
                         className="w-full rounded-md border border-slate-300 bg-white px-2 py-1.5 text-xs focus:ring-1 focus:ring-slate-950 focus:outline-none disabled:opacity-60 dark:border-slate-700 dark:bg-slate-900 dark:focus:ring-slate-300"
                       >
-                        <option value="">
-                          ⚡ Otomatis (FEFO - Prioritas Kedaluwarsa Terdekat)
-                        </option>
+                        <option value="">Otomatis (FEFO - Prioritas Kedaluwarsa Terdekat)</option>
                         {availableBatches.map((b) => {
                           const expStr = b.expiryDate
                             ? new Date(b.expiryDate).toLocaleDateString('id-ID')
                             : 'Tanpa Kadaluwarsa';
                           const expiryNote = b.isNearExpiry
-                            ? ` ⚠️ [Hampir Expired - Sisa ${b.daysRemaining} hari]`
+                            ? ` [Hampir Expired - Sisa ${b.daysRemaining} hari]`
                             : b.daysRemaining !== null && b.daysRemaining !== undefined
                               ? ` [Sisa ${b.daysRemaining} hari]`
                               : '';
                           return (
                             <option key={b.batchId} value={b.batchId}>
-                              {b.isFefoRecommended ? '★ [FEFO] ' : ''}
+                              {b.isFefoRecommended ? '[FEFO Prioritas] ' : ''}
                               {b.batchNo} | Exp: {expStr}
                               {expiryNote} (Stok: {b.availableQuantity})
                             </option>

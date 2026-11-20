@@ -189,27 +189,27 @@ export default function BarcodeLabelsPage() {
       {/* Page Title (Hidden in print) */}
       <div className="no-print flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-xl font-bold tracking-tight text-slate-900 sm:text-2xl">
+          <h1 className="text-xl font-bold tracking-tight text-slate-900 sm:text-2xl dark:text-slate-100">
             Cetak Label Barcode
           </h1>
-          <p className="mt-1 text-xs text-slate-500 sm:text-sm">
+          <p className="mt-1 text-xs text-slate-500 sm:text-sm dark:text-slate-400">
             Pusat pencetakan stiker label barcode untuk produk, rak lokasi gudang, dan identifikasi
-            batch (T3.3).
+            batch.
           </p>
         </div>
       </div>
 
       {/* Tabs & Source Selection (Hidden in print) */}
-      <div className="no-print rounded-xl border border-slate-200 bg-white p-5 shadow-xs">
+      <div className="no-print rounded-xl border border-slate-200 bg-white p-5 shadow-xs dark:border-slate-800 dark:bg-slate-950">
         {/* Tab Buttons */}
-        <div className="flex border-b border-slate-200">
+        <div className="flex border-b border-slate-200 dark:border-slate-800">
           <button
             type="button"
             onClick={() => setActiveTab('products')}
             className={`border-b-2 px-4 py-2.5 text-xs font-semibold transition-colors ${
               activeTab === 'products'
-                ? 'border-indigo-600 text-indigo-600'
-                : 'border-transparent text-slate-500 hover:text-slate-900'
+                ? 'border-indigo-600 text-indigo-600 dark:border-indigo-400 dark:text-indigo-400'
+                : 'border-transparent text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-200'
             }`}
           >
             Pilih dari Produk ({products.length})
@@ -219,8 +219,8 @@ export default function BarcodeLabelsPage() {
             onClick={() => setActiveTab('locations')}
             className={`border-b-2 px-4 py-2.5 text-xs font-semibold transition-colors ${
               activeTab === 'locations'
-                ? 'border-indigo-600 text-indigo-600'
-                : 'border-transparent text-slate-500 hover:text-slate-900'
+                ? 'border-indigo-600 text-indigo-600 dark:border-indigo-400 dark:text-indigo-400'
+                : 'border-transparent text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-200'
             }`}
           >
             Pilih dari Lokasi / Rak ({locations.length})
@@ -230,8 +230,8 @@ export default function BarcodeLabelsPage() {
             onClick={() => setActiveTab('custom')}
             className={`border-b-2 px-4 py-2.5 text-xs font-semibold transition-colors ${
               activeTab === 'custom'
-                ? 'border-indigo-600 text-indigo-600'
-                : 'border-transparent text-slate-500 hover:text-slate-900'
+                ? 'border-indigo-600 text-indigo-600 dark:border-indigo-400 dark:text-indigo-400'
+                : 'border-transparent text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-200'
             }`}
           >
             Label Bebas / Kustom
@@ -258,15 +258,15 @@ export default function BarcodeLabelsPage() {
               </Button>
             </div>
 
-            <div className="max-h-60 divide-y divide-slate-100 overflow-y-auto rounded-lg border border-slate-200">
+            <div className="max-h-60 divide-y divide-slate-100 overflow-y-auto rounded-lg border border-slate-200 dark:divide-slate-800 dark:border-slate-800">
               {filteredProducts.map((p) => {
                 const isSelected = selectedProductIds.has(p.id);
                 return (
                   <div
                     key={p.id}
                     onClick={() => handleToggleProduct(p.id)}
-                    className={`flex cursor-pointer items-center justify-between p-2.5 text-xs transition-colors hover:bg-slate-50 ${
-                      isSelected ? 'bg-indigo-50/70' : ''
+                    className={`flex cursor-pointer items-center justify-between p-2.5 text-xs transition-colors hover:bg-slate-50 dark:hover:bg-slate-900/50 ${
+                      isSelected ? 'bg-indigo-50/70 dark:bg-indigo-950/40' : ''
                     }`}
                   >
                     <div className="flex items-center gap-3">
@@ -274,30 +274,39 @@ export default function BarcodeLabelsPage() {
                         type="checkbox"
                         checked={isSelected}
                         onChange={() => {}} // handled by row click
-                        className="h-4 w-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500"
+                        className="h-4 w-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500 dark:border-slate-700 dark:bg-slate-900"
                       />
                       <div>
-                        <div className="font-semibold text-slate-900">{p.name}</div>
-                        <div className="text-[11px] text-slate-500">
-                          SKU: <span className="font-mono font-bold text-slate-700">{p.sku}</span>
+                        <div className="font-semibold text-slate-900 dark:text-slate-100">
+                          {p.name}
+                        </div>
+                        <div className="text-[11px] text-slate-500 dark:text-slate-400">
+                          SKU:{' '}
+                          <span className="font-mono font-bold text-slate-700 dark:text-slate-300">
+                            {p.sku}
+                          </span>
                           {p.barcode && (
                             <span className="ml-2">
                               • Barcode:{' '}
-                              <span className="font-mono text-slate-700">{p.barcode}</span>
+                              <span className="font-mono text-slate-700 dark:text-slate-300">
+                                {p.barcode}
+                              </span>
                             </span>
                           )}
-                          <span className="ml-2 text-indigo-600">• {p.category.name}</span>
+                          <span className="ml-2 text-indigo-600 dark:text-indigo-400">
+                            • {p.category.name}
+                          </span>
                         </div>
                       </div>
                     </div>
-                    <div className="text-right font-medium text-emerald-700">
+                    <div className="text-right font-medium text-emerald-700 dark:text-emerald-400">
                       Rp {Number(p.costPrice).toLocaleString('id-ID')} / {p.uom}
                     </div>
                   </div>
                 );
               })}
               {filteredProducts.length === 0 && (
-                <div className="p-6 text-center text-xs text-slate-400">
+                <div className="p-6 text-center text-xs text-slate-400 dark:text-slate-500">
                   Tidak ada produk yang cocok dengan pencarian.
                 </div>
               )}
@@ -325,15 +334,15 @@ export default function BarcodeLabelsPage() {
               </Button>
             </div>
 
-            <div className="max-h-60 divide-y divide-slate-100 overflow-y-auto rounded-lg border border-slate-200">
+            <div className="max-h-60 divide-y divide-slate-100 overflow-y-auto rounded-lg border border-slate-200 dark:divide-slate-800 dark:border-slate-800">
               {filteredLocations.map((l) => {
                 const isSelected = selectedLocationIds.has(l.id);
                 return (
                   <div
                     key={l.id}
                     onClick={() => handleToggleLocation(l.id)}
-                    className={`flex cursor-pointer items-center justify-between p-2.5 text-xs transition-colors hover:bg-slate-50 ${
-                      isSelected ? 'bg-indigo-50/70' : ''
+                    className={`flex cursor-pointer items-center justify-between p-2.5 text-xs transition-colors hover:bg-slate-50 dark:hover:bg-slate-900/50 ${
+                      isSelected ? 'bg-indigo-50/70 dark:bg-indigo-950/40' : ''
                     }`}
                   >
                     <div className="flex items-center gap-3">
@@ -341,25 +350,25 @@ export default function BarcodeLabelsPage() {
                         type="checkbox"
                         checked={isSelected}
                         onChange={() => {}}
-                        className="h-4 w-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500"
+                        className="h-4 w-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500 dark:border-slate-700 dark:bg-slate-900"
                       />
                       <div>
-                        <span className="rounded bg-slate-100 px-2 py-0.5 font-mono text-xs font-bold text-slate-900">
+                        <span className="rounded bg-slate-100 px-2 py-0.5 font-mono text-xs font-bold text-slate-900 dark:bg-slate-800 dark:text-slate-100">
                           {l.code}
                         </span>
-                        <span className="ml-2 text-[11px] text-slate-500">
+                        <span className="ml-2 text-[11px] text-slate-500 dark:text-slate-400">
                           {l.warehouse.name} ({l.warehouse.code})
                         </span>
                       </div>
                     </div>
-                    <div className="text-right text-[11px] text-slate-500">
+                    <div className="text-right text-[11px] text-slate-500 dark:text-slate-400">
                       Zona {l.zone} • Rak {l.rack} • Tkt {l.level}
                     </div>
                   </div>
                 );
               })}
               {filteredLocations.length === 0 && (
-                <div className="p-6 text-center text-xs text-slate-400">
+                <div className="p-6 text-center text-xs text-slate-400 dark:text-slate-500">
                   Tidak ada lokasi yang cocok dengan pencarian.
                 </div>
               )}
@@ -374,7 +383,7 @@ export default function BarcodeLabelsPage() {
             className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2"
           >
             <div>
-              <label className="mb-1 block text-xs font-medium text-slate-700">
+              <label className="mb-1 block text-xs font-semibold text-slate-700 dark:text-slate-300">
                 Judul Label <span className="text-rose-500">*</span>
               </label>
               <Input
@@ -386,7 +395,7 @@ export default function BarcodeLabelsPage() {
               />
             </div>
             <div>
-              <label className="mb-1 block text-xs font-medium text-slate-700">
+              <label className="mb-1 block text-xs font-semibold text-slate-700 dark:text-slate-300">
                 Isi Barcode (Code 128) <span className="text-rose-500">*</span>
               </label>
               <Input
@@ -398,7 +407,7 @@ export default function BarcodeLabelsPage() {
               />
             </div>
             <div>
-              <label className="mb-1 block text-xs font-medium text-slate-700">
+              <label className="mb-1 block text-xs font-semibold text-slate-700 dark:text-slate-300">
                 Subjudul / Keterangan
               </label>
               <Input
@@ -409,7 +418,7 @@ export default function BarcodeLabelsPage() {
               />
             </div>
             <div>
-              <label className="mb-1 block text-xs font-medium text-slate-700">
+              <label className="mb-1 block text-xs font-semibold text-slate-700 dark:text-slate-300">
                 Teks Bawah / Sekunder
               </label>
               <Input
@@ -420,14 +429,16 @@ export default function BarcodeLabelsPage() {
               />
             </div>
             <div>
-              <label className="mb-1 block text-xs font-medium text-slate-700">Jumlah Copies</label>
+              <label className="mb-1 block text-xs font-semibold text-slate-700 dark:text-slate-300">
+                Jumlah Copies
+              </label>
               <input
                 type="number"
                 min={1}
                 max={500}
                 value={customCopies}
                 onChange={(e) => setCustomCopies(parseInt(e.target.value, 10) || 1)}
-                className="w-full rounded-md border border-slate-300 px-3 py-1.5 text-xs text-slate-900"
+                className="w-full rounded-md border border-slate-300 bg-white px-3 py-1.5 text-xs text-slate-900 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100"
               />
             </div>
             <div className="flex items-end">

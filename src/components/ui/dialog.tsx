@@ -67,19 +67,24 @@ export function Dialog({
       {/* Modal Surface */}
       <div
         ref={dialogRef}
-        className={`relative z-10 w-full ${maxWidthClasses[maxWidth]} animate-in fade-in zoom-in-95 rounded-2xl border border-slate-800 bg-slate-900/95 p-6 text-slate-100 shadow-2xl backdrop-blur-md duration-150`}
+        className={`relative z-10 w-full ${maxWidthClasses[maxWidth]} animate-in fade-in zoom-in-95 rounded-2xl border border-zinc-200 bg-white p-6 text-zinc-900 shadow-2xl backdrop-blur-md duration-150 dark:border-zinc-800 dark:bg-zinc-900/95 dark:text-zinc-100`}
       >
         <div className="mb-4 flex items-start justify-between">
           <div>
-            <h2 id="dialog-title" className="text-base font-semibold text-white">
+            <h2
+              id="dialog-title"
+              className="text-base font-semibold text-zinc-900 dark:text-zinc-100"
+            >
               {title}
             </h2>
-            {description && <p className="mt-0.5 text-xs text-slate-400">{description}</p>}
+            {description && (
+              <p className="mt-0.5 text-xs text-zinc-500 dark:text-zinc-400">{description}</p>
+            )}
           </div>
           <button
             type="button"
             onClick={onClose}
-            className="rounded-lg p-1 text-slate-400 transition hover:bg-slate-800 hover:text-white"
+            className="rounded-lg p-1 text-zinc-400 transition hover:bg-zinc-100 hover:text-zinc-700 dark:hover:bg-zinc-800 dark:hover:text-white"
             aria-label="Tutup dialog"
           >
             <svg

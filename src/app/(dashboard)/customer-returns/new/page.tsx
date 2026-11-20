@@ -203,7 +203,7 @@ export default function NewCustomerReturnPage() {
     }
 
     if (!notes.trim() || notes.trim().length < 5) {
-      setFormError('Keterangan & alasan retur wajib diisi minimal 5 karakter (BR-18).');
+      setFormError('Keterangan & alasan retur wajib diisi minimal 5 karakter.');
       return;
     }
 
@@ -254,31 +254,31 @@ export default function NewCustomerReturnPage() {
   return (
     <div className="max-w-5xl space-y-6">
       {/* Header */}
-      <div className="flex flex-col gap-2 border-b border-slate-200 pb-4 sm:flex-row sm:items-center sm:justify-between">
+      <div className="flex flex-col gap-2 border-b border-zinc-200 pb-4 sm:flex-row sm:items-center sm:justify-between dark:border-zinc-800">
         <div>
           <div className="flex items-center gap-2">
             <Link
               href="/customer-returns"
-              className="text-xs font-semibold text-slate-500 hover:text-slate-800"
+              className="text-xs font-semibold text-zinc-500 hover:text-zinc-800 dark:text-zinc-400 dark:hover:text-zinc-200"
             >
               ← Kembali ke Daftar Retur
             </Link>
           </div>
-          <h1 className="mt-1 text-2xl font-bold tracking-tight text-slate-900">
+          <h1 className="mt-1 text-2xl font-bold tracking-tight text-zinc-900 dark:text-zinc-100">
             Penerimaan Retur Customer
           </h1>
-          <p className="mt-1 text-sm text-slate-500">
+          <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
             Form penerimaan kembali barang dari customer berdasarkan dokumen Delivery Order (DO)
-            yang telah terkirim (BR-18).
+            yang telah terkirim.
           </p>
         </div>
       </div>
 
       {formError && (
-        <div className="rounded-lg border border-rose-200 bg-rose-50 p-4 text-xs font-medium text-rose-800 shadow-sm">
+        <div className="rounded-lg border border-rose-200 bg-rose-50 p-4 text-xs font-medium text-rose-800 shadow-sm dark:border-rose-900/60 dark:bg-rose-950/40 dark:text-rose-300">
           <div className="flex items-center gap-2">
             <svg
-              className="h-4 w-4 text-rose-500"
+              className="h-4 w-4 text-rose-500 dark:text-rose-400"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -298,17 +298,19 @@ export default function NewCustomerReturnPage() {
 
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* Step 1: Select Shipped Delivery Order */}
-        <div className="space-y-4 rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
-          <div className="flex items-center gap-2 border-b border-slate-100 pb-3">
-            <span className="flex h-6 w-6 items-center justify-center rounded-full bg-indigo-600 text-xs font-bold text-white">
+        <div className="space-y-4 rounded-xl border border-zinc-200 bg-white p-5 shadow-xs dark:border-zinc-800 dark:bg-[#111113]">
+          <div className="flex items-center gap-2 border-b border-zinc-100 pb-3 dark:border-zinc-800">
+            <span className="flex h-6 w-6 items-center justify-center rounded-full bg-amber-500 text-xs font-bold text-zinc-950">
               1
             </span>
-            <h2 className="text-sm font-bold text-slate-900">Pilih Delivery Order (DO) Terkirim</h2>
+            <h2 className="text-sm font-bold text-zinc-900 dark:text-zinc-100">
+              Pilih Delivery Order (DO) Terkirim
+            </h2>
           </div>
 
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div>
-              <label className="mb-1 block text-xs font-semibold text-slate-700">
+              <label className="mb-1 block text-xs font-semibold text-zinc-700 dark:text-zinc-300">
                 Pilih Dokumen DO (Status SHIPPED) <span className="text-rose-500">*</span>
               </label>
               <select
@@ -316,7 +318,7 @@ export default function NewCustomerReturnPage() {
                 onChange={(e) => handleSelectDO(e.target.value)}
                 disabled={isDosLoading || isPending}
                 aria-label="Pilih Delivery Order"
-                className="h-9 w-full rounded-lg border border-slate-300 bg-white px-3 text-xs text-slate-800 shadow-sm focus:border-indigo-500 focus:outline-none"
+                className="h-9 w-full rounded-lg border border-zinc-300 bg-white px-3 text-xs text-zinc-900 shadow-xs focus:border-amber-500 focus:outline-none dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100"
               >
                 <option value="">-- Pilih Nomor DO Terkirim --</option>
                 {shippedDOs.map((d) => (
@@ -326,21 +328,21 @@ export default function NewCustomerReturnPage() {
                 ))}
               </select>
               {isDosLoading && (
-                <p className="mt-1 text-[11px] text-slate-400">Memuat daftar DO terkirim...</p>
+                <p className="mt-1 text-[11px] text-zinc-400">Memuat daftar DO terkirim...</p>
               )}
             </div>
 
             {customerInfo && warehouseInfo && (
-              <div className="space-y-1 rounded-lg border border-indigo-100 bg-indigo-50/60 p-3 text-xs">
+              <div className="space-y-1 rounded-lg border border-amber-500/30 bg-amber-500/10 p-3 text-xs dark:border-amber-500/30 dark:bg-amber-500/10">
                 <div>
-                  <span className="text-slate-500">Customer:</span>{' '}
-                  <strong className="text-slate-900">{customerInfo.name}</strong> (
-                  {customerInfo.code})
+                  <span className="text-zinc-500 dark:text-zinc-400">Customer:</span>{' '}
+                  <strong className="text-zinc-900 dark:text-zinc-100">{customerInfo.name}</strong>{' '}
+                  ({customerInfo.code})
                 </div>
                 <div>
-                  <span className="text-slate-500">Gudang Asal DO:</span>{' '}
-                  <strong className="text-slate-900">{warehouseInfo.name}</strong> (
-                  {warehouseInfo.code})
+                  <span className="text-zinc-500 dark:text-zinc-400">Gudang Asal DO:</span>{' '}
+                  <strong className="text-zinc-900 dark:text-zinc-100">{warehouseInfo.name}</strong>{' '}
+                  ({warehouseInfo.code})
                 </div>
               </div>
             )}
@@ -349,33 +351,33 @@ export default function NewCustomerReturnPage() {
 
         {/* Step 2: Items Table */}
         {selectedDoId && (
-          <div className="space-y-4 rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
-            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+          <div className="space-y-4 rounded-xl border border-zinc-200 bg-white p-5 shadow-xs dark:border-zinc-800 dark:bg-[#111113]">
+            <div className="flex items-center justify-between border-b border-zinc-100 pb-3 dark:border-zinc-800">
               <div className="flex items-center gap-2">
-                <span className="flex h-6 w-6 items-center justify-center rounded-full bg-indigo-600 text-xs font-bold text-white">
+                <span className="flex h-6 w-6 items-center justify-center rounded-full bg-amber-500 text-xs font-bold text-zinc-950">
                   2
                 </span>
-                <h2 className="text-sm font-bold text-slate-900">
+                <h2 className="text-sm font-bold text-zinc-900 dark:text-zinc-100">
                   Rincian Barang yang Diretur ({selectedCount} dipilih, +{totalReturnUnits} unit)
                 </h2>
               </div>
-              <span className="text-xs text-slate-500">
+              <span className="text-xs text-zinc-500 dark:text-zinc-400">
                 Centang item dan tentukan jumlah yang dikembalikan
               </span>
             </div>
 
             {isDetailsLoading ? (
-              <div className="py-8 text-center text-xs text-slate-500">
+              <div className="py-8 text-center text-xs text-zinc-500">
                 Memuat rincian item barang dari DO...
               </div>
             ) : returnItems.length === 0 ? (
-              <div className="py-6 text-center text-xs text-slate-500">
+              <div className="py-6 text-center text-xs text-zinc-500">
                 Semua item pada DO ini telah selesai diretur sebelumnya.
               </div>
             ) : (
               <div className="overflow-x-auto">
-                <table className="w-full rounded-lg border border-slate-200 text-left text-xs">
-                  <thead className="border-b border-slate-200 bg-slate-50 text-[11px] font-semibold text-slate-600 uppercase">
+                <table className="w-full rounded-lg border border-zinc-200 text-left text-xs dark:border-zinc-800">
+                  <thead className="border-b border-zinc-200 bg-zinc-50 text-[11px] font-semibold text-zinc-700 uppercase dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-300">
                     <tr>
                       <th className="w-10 p-3 text-center">Pilih</th>
                       <th className="p-3">Produk &amp; SKU</th>
@@ -387,13 +389,15 @@ export default function NewCustomerReturnPage() {
                       <th className="w-44 p-3">Lokasi Rak Masuk</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-slate-100">
+                  <tbody className="divide-y divide-zinc-100 dark:divide-zinc-800">
                     {returnItems.map((item, idx) => {
                       const isDisabled = item.returnableQuantity <= 0;
                       return (
                         <tr
                           key={`${item.productId}-${item.batchId}-${idx}`}
-                          className={item.isSelected ? 'bg-indigo-50/30' : 'opacity-70'}
+                          className={
+                            item.isSelected ? 'bg-amber-500/10 dark:bg-amber-500/10' : 'opacity-70'
+                          }
                         >
                           <td className="p-3 text-center">
                             <input
@@ -401,12 +405,14 @@ export default function NewCustomerReturnPage() {
                               checked={item.isSelected}
                               disabled={isDisabled || isPending}
                               onChange={() => handleToggleItem(idx)}
-                              className="h-4 w-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500"
+                              className="h-4 w-4 rounded border-zinc-300 text-amber-600 focus:ring-amber-500 dark:border-zinc-700 dark:bg-zinc-900"
                             />
                           </td>
                           <td className="p-3">
-                            <div className="font-semibold text-slate-900">{item.productName}</div>
-                            <div className="font-mono text-[11px] text-slate-500">
+                            <div className="font-semibold text-zinc-900 dark:text-zinc-100">
+                              {item.productName}
+                            </div>
+                            <div className="font-mono text-[11px] text-zinc-500 dark:text-zinc-400">
                               {item.productSku}
                             </div>
                             {item.isSelected && (
@@ -416,27 +422,27 @@ export default function NewCustomerReturnPage() {
                                 value={item.itemNotes}
                                 disabled={isDisabled || isPending}
                                 onChange={(e) => handleUpdateItemNotes(idx, e.target.value)}
-                                className="mt-1 h-6 w-full rounded border border-slate-200 px-1.5 text-[10px] text-slate-600 focus:border-indigo-500 focus:outline-none"
+                                className="mt-1 h-6 w-full rounded border border-zinc-200 bg-white px-1.5 text-[10px] text-zinc-700 focus:border-amber-500 focus:outline-none dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-200"
                               />
                             )}
                           </td>
                           <td className="p-3">
-                            <div className="font-mono font-medium text-slate-800">
+                            <div className="font-mono font-medium text-zinc-800 dark:text-zinc-200">
                               {item.batchNo}
                             </div>
-                            <div className="text-[10px] text-slate-400">
+                            <div className="text-[10px] text-zinc-400 dark:text-zinc-500">
                               {item.expiryDate
                                 ? new Date(item.expiryDate).toLocaleDateString('id-ID')
                                 : 'No Expiry'}
                             </div>
                           </td>
-                          <td className="p-3 text-right font-medium text-slate-700">
+                          <td className="p-3 text-right font-medium text-zinc-700 dark:text-zinc-300">
                             {item.shippedQuantity} {item.uom}
                           </td>
-                          <td className="p-3 text-right text-slate-500">
+                          <td className="p-3 text-right text-zinc-500 dark:text-zinc-400">
                             {item.returnedQuantity} {item.uom}
                           </td>
-                          <td className="p-3 text-right font-bold text-slate-900">
+                          <td className="p-3 text-right font-bold text-zinc-900 dark:text-zinc-100">
                             {item.returnableQuantity} {item.uom}
                           </td>
                           <td className="p-3 text-right">
@@ -456,7 +462,7 @@ export default function NewCustomerReturnPage() {
                               disabled={!item.isSelected || isDisabled || isPending}
                               onChange={(e) => handleUpdateLocation(idx, e.target.value)}
                               aria-label={`Lokasi tujuan untuk ${item.productName}`}
-                              className="h-8 w-full rounded border border-slate-300 bg-white px-2 font-mono text-xs text-slate-800"
+                              className="h-8 w-full rounded border border-zinc-300 bg-white px-2 font-mono text-xs text-zinc-800 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100"
                             >
                               {availableLocations.map((loc) => (
                                 <option key={loc.id} value={loc.id} disabled={loc.isFrozen}>
@@ -477,19 +483,19 @@ export default function NewCustomerReturnPage() {
 
         {/* Step 3: Reason & General Notes */}
         {selectedDoId && (
-          <div className="space-y-4 rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
-            <div className="flex items-center gap-2 border-b border-slate-100 pb-3">
-              <span className="flex h-6 w-6 items-center justify-center rounded-full bg-indigo-600 text-xs font-bold text-white">
+          <div className="space-y-4 rounded-xl border border-zinc-200 bg-white p-5 shadow-xs dark:border-zinc-800 dark:bg-[#111113]">
+            <div className="flex items-center gap-2 border-b border-zinc-100 pb-3 dark:border-zinc-800">
+              <span className="flex h-6 w-6 items-center justify-center rounded-full bg-amber-500 text-xs font-bold text-zinc-950">
                 3
               </span>
-              <h2 className="text-sm font-bold text-slate-900">
-                Alasan &amp; Keterangan Retur (BR-18)
+              <h2 className="text-sm font-bold text-zinc-900 dark:text-zinc-100">
+                Alasan &amp; Keterangan Retur
               </h2>
             </div>
 
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div>
-                <label className="mb-1 block text-xs font-semibold text-slate-700">
+                <label className="mb-1 block text-xs font-semibold text-zinc-700 dark:text-zinc-300">
                   Kategori Alasan Retur <span className="text-rose-500">*</span>
                 </label>
                 <select
@@ -497,7 +503,7 @@ export default function NewCustomerReturnPage() {
                   onChange={(e) => setReasonCategory(e.target.value as CustomerReturnReasonType)}
                   disabled={isPending}
                   aria-label="Kategori Alasan Retur"
-                  className="h-9 w-full rounded-lg border border-slate-300 bg-white px-3 text-xs text-slate-800 shadow-sm focus:border-indigo-500 focus:outline-none"
+                  className="h-9 w-full rounded-lg border border-zinc-300 bg-white px-3 text-xs text-zinc-900 shadow-xs focus:border-amber-500 focus:outline-none dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100"
                 >
                   {Object.entries(CustomerReturnReasonLabels).map(([key, label]) => (
                     <option key={key} value={key}>
@@ -508,7 +514,7 @@ export default function NewCustomerReturnPage() {
               </div>
 
               <div>
-                <label className="mb-1 block text-xs font-semibold text-slate-700">
+                <label className="mb-1 block text-xs font-semibold text-zinc-700 dark:text-zinc-300">
                   Penjelasan &amp; Berita Acara Retur <span className="text-rose-500">*</span>
                 </label>
                 <textarea
@@ -518,9 +524,9 @@ export default function NewCustomerReturnPage() {
                   required
                   rows={3}
                   placeholder="Contoh: Barang retur dari customer PT ABC dikarenakan 5 karton rusak penyok saat dibongkar di gudang customer..."
-                  className="w-full rounded-lg border border-slate-300 p-2.5 text-xs text-slate-800 shadow-sm focus:border-indigo-500 focus:outline-none"
+                  className="w-full rounded-lg border border-zinc-300 bg-white p-2.5 text-xs text-zinc-900 shadow-xs focus:border-amber-500 focus:outline-none dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100"
                 />
-                <p className="mt-1 text-[11px] text-slate-500">
+                <p className="mt-1 text-[11px] text-zinc-500 dark:text-zinc-400">
                   Wajib diisi minimal 5 karakter sebagai dasar mutasi penerimaan kembali ke stok.
                 </p>
               </div>
@@ -530,7 +536,7 @@ export default function NewCustomerReturnPage() {
 
         {/* Footer Actions */}
         {selectedDoId && (
-          <div className="flex items-center justify-end gap-3 rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+          <div className="flex items-center justify-end gap-3 rounded-xl border border-zinc-200 bg-white p-4 shadow-xs dark:border-zinc-800 dark:bg-[#111113]">
             <Link href="/customer-returns">
               <Button type="button" variant="outline" disabled={isPending}>
                 Batal

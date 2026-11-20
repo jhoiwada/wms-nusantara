@@ -280,7 +280,7 @@ describe('Delivery Order Service (BR-08, BR-09, BR-15, BR-16, BR-17, BR-18, BR-2
 
       vi.mocked(prisma.deliveryOrder.findUnique).mockResolvedValue(mockDO as never);
 
-      // Available stocks ordered by FEFO: batch-fefo (2026-12) comes before batch-later (2027-06)
+      // Available stocks ordered by FEFO: batch-fefo (unexpired) comes before batch-later
       const mockCandidateStocks = [
         {
           id: 'stock-fefo',
@@ -292,7 +292,7 @@ describe('Delivery Order Service (BR-08, BR-09, BR-15, BR-16, BR-17, BR-18, BR-2
             id: 'batch-fefo',
             productId: 'prod-1',
             batchNo: 'FEFO-01',
-            expiryDate: new Date('2026-12-01'),
+            expiryDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
           },
         },
       ];
@@ -458,8 +458,8 @@ describe('Delivery Order Service (BR-08, BR-09, BR-15, BR-16, BR-17, BR-18, BR-2
 
       vi.mocked(prisma.deliveryOrder.findUnique).mockResolvedValue(mockDO as never);
 
-      // Batch 1: expires sooner (2026-11-15), has 18 units (< 30)
-      // Batch 2: expires later (2027-01-20), has 25 units
+      // Batch 1: expires sooner (+15 days), has 18 units (< 30)
+      // Batch 2: expires later (+60 days), has 25 units
       // Total unexpired available = 43 units (>= 30)
       const mockCandidateStocks = [
         {
@@ -472,7 +472,7 @@ describe('Delivery Order Service (BR-08, BR-09, BR-15, BR-16, BR-17, BR-18, BR-2
             id: 'batch-earlier',
             productId: 'prod-1',
             batchNo: 'EARLY-01',
-            expiryDate: new Date('2026-11-15'),
+            expiryDate: new Date(Date.now() + 15 * 24 * 60 * 60 * 1000),
           },
         },
         {
@@ -485,7 +485,7 @@ describe('Delivery Order Service (BR-08, BR-09, BR-15, BR-16, BR-17, BR-18, BR-2
             id: 'batch-later',
             productId: 'prod-1',
             batchNo: 'LATER-02',
-            expiryDate: new Date('2027-01-20'),
+            expiryDate: new Date(Date.now() + 60 * 24 * 60 * 60 * 1000),
           },
         },
       ];

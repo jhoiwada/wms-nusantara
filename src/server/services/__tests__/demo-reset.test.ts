@@ -10,7 +10,10 @@ const mockTx = {
     createMany: vi.fn().mockResolvedValue({ count: 8 }),
   },
   stockOpnameItem: { deleteMany: vi.fn().mockResolvedValue({ count: 0 }) },
-  stockOpname: { deleteMany: vi.fn().mockResolvedValue({ count: 0 }) },
+  stockOpname: {
+    deleteMany: vi.fn().mockResolvedValue({ count: 0 }),
+    create: vi.fn().mockResolvedValue({ id: 'so-2026-0001', opnameNo: 'SO-2026-0001' }),
+  },
   deliveryOrderItem: { deleteMany: vi.fn().mockResolvedValue({ count: 0 }) },
   deliveryOrder: {
     deleteMany: vi.fn().mockResolvedValue({ count: 0 }),
@@ -59,7 +62,7 @@ const mockTx = {
   },
   user: {
     deleteMany: vi.fn().mockResolvedValue({ count: 0 }),
-    createMany: vi.fn().mockResolvedValue({ count: 4 }),
+    createMany: vi.fn().mockResolvedValue({ count: 5 }),
   },
 };
 
@@ -86,15 +89,18 @@ describe('Demo Reset Service (Penutup Portofolio)', () => {
     const result = await resetDemoDatabase();
 
     expect(result.success).toBe(true);
-    expect(result.counts.users).toBe(4);
+    expect(result.counts.users).toBe(5);
     expect(result.counts.warehouses).toBe(2);
-    expect(result.counts.locations).toBe(8);
-    expect(result.counts.categories).toBe(4);
-    expect(result.counts.products).toBe(6);
-    expect(result.counts.stocks).toBe(7);
-    expect(result.counts.movements).toBe(8);
-    expect(result.counts.goodsReceipts).toBe(1);
-    expect(result.counts.deliveryOrders).toBe(1);
+    expect(result.counts.locations).toBe(20);
+    expect(result.counts.categories).toBe(5);
+    expect(result.counts.products).toBe(15);
+    expect(result.counts.suppliers).toBe(5);
+    expect(result.counts.customers).toBe(8);
+    expect(result.counts.stocks).toBe(29);
+    expect(result.counts.movements).toBe(55);
+    expect(result.counts.goodsReceipts).toBe(8);
+    expect(result.counts.deliveryOrders).toBe(10);
+    expect(result.counts.stockOpnames).toBe(2);
 
     // Pastikan deleteMany terpanggil untuk seluruh entitas
     expect(mockTx.auditLog.deleteMany).toHaveBeenCalled();

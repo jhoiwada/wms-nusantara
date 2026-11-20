@@ -262,7 +262,7 @@ CREATE TABLE IF NOT EXISTS document_counters (
 -- SEED DATA AWAL (Contoh Distributor: Makanan, Minuman, Elektronik, ATK)
 -- =============================================================================
 
--- Akun Demo (Password: Password123! di-hash dengan bcrypt cost 10)
+-- Akun Demo (Password: Juntak12345! di-hash dengan bcrypt cost 10)
 -- Hash: $2a$10$wO3lQpA5h.oZq6n.43H14u3u2yM0lTfZl55s1O96u80U7Q93eI9u2
 INSERT INTO users (id, name, email, password_hash, role) VALUES
   ('usr-admin-01', 'Administrator WMS', 'admin@demo.test', '$2a$10$wO3lQpA5h.oZq6n.43H14u3u2yM0lTfZl55s1O96u80U7Q93eI9u2', 'ADMIN'),

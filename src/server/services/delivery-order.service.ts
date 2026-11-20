@@ -219,7 +219,20 @@ async function validateDeliveryOrderItems(
  * Create a new Delivery Order draft (BR-15, BR-16, BR-19).
  * Generates an atomic sequential order number DO-YYYY-XXXX.
  */
+export const MAX_PUBLIC_DOCUMENTS_LIMIT = 100;
+
 export async function createDeliveryOrder(input: CreateDeliveryOrderInput, userId: string) {
+  // Proteksi Kuota Transaksi di Server Publik (Anti-Flooding Storage Exhaustion)
+  if (typeof prisma.deliveryOrder?.count === 'function') {
+    const currentCount = await prisma.deliveryOrder.count();
+    if (currentCount >= MAX_PUBLIC_DOCUMENTS_LIMIT) {
+      throw new AppError(
+        'FORBIDDEN',
+        `Kapasitas penyimpanan dokumen pengiriman showcase telah mencapai batas wajar (${MAX_PUBLIC_DOCUMENTS_LIMIT} dokumen). Silakan gunakan tombol 'Pulihkan Data' di menu Pengguna atau tunggu siklus reset otomatis berkala.`,
+      );
+    }
+  }
+
   return prisma.$transaction(async (tx) => {
     // 1. Validate Customer (BR-32)
     const customer = await tx.customer.findUnique({

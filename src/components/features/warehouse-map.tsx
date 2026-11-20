@@ -228,37 +228,51 @@ export function WarehouseMap({ initialWarehouseId, className = '' }: WarehouseMa
 
     if (viewMode === 'occupancy') {
       if (!loc.isActive) {
-        style = 'bg-slate-100 border-slate-300 text-slate-400 opacity-60';
+        style =
+          'bg-slate-100 border-slate-300 text-slate-400 opacity-60 dark:bg-slate-950 dark:border-slate-800 dark:text-slate-600';
       } else if (loc.isFrozen) {
-        style = 'bg-rose-50 border-rose-400 text-rose-900 shadow-sm';
+        style =
+          'bg-rose-50 border-rose-400 text-rose-900 shadow-xs dark:bg-rose-950/60 dark:border-rose-700/60 dark:text-rose-200';
       } else if (loc.occupancyStatus === 'EMPTY') {
-        style = 'bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100';
+        style =
+          'bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100 dark:bg-slate-900/60 dark:border-slate-800 dark:text-slate-400 dark:hover:bg-slate-800/60';
       } else if (loc.occupancyStatus === 'FULL') {
-        style = 'bg-indigo-50 border-indigo-400 text-indigo-950 shadow-sm hover:bg-indigo-100';
+        style =
+          'bg-indigo-50 border-indigo-400 text-indigo-950 shadow-xs hover:bg-indigo-100 dark:bg-indigo-950/60 dark:border-indigo-700/60 dark:text-indigo-200 dark:hover:bg-indigo-900/60';
       } else {
-        style = 'bg-emerald-50 border-emerald-400 text-emerald-950 shadow-sm hover:bg-emerald-100';
+        style =
+          'bg-emerald-50 border-emerald-400 text-emerald-950 shadow-xs hover:bg-emerald-100 dark:bg-emerald-950/60 dark:border-emerald-700/60 dark:text-emerald-200 dark:hover:bg-emerald-900/60';
       }
     } else if (viewMode === 'density') {
       if (loc.totalQuantity === 0) {
-        style = 'bg-slate-50 border-slate-200 text-slate-400';
+        style =
+          'bg-slate-50 border-slate-200 text-slate-400 dark:bg-slate-900/60 dark:border-slate-800 dark:text-slate-600';
       } else if (loc.totalQuantity <= 25) {
-        style = 'bg-cyan-50 border-cyan-300 text-cyan-900';
+        style =
+          'bg-cyan-50 border-cyan-300 text-cyan-900 dark:bg-cyan-950/60 dark:border-cyan-800 dark:text-cyan-200';
       } else if (loc.totalQuantity <= 75) {
-        style = 'bg-sky-100 border-sky-400 text-sky-950 font-medium';
+        style =
+          'bg-sky-100 border-sky-400 text-sky-950 font-medium dark:bg-sky-950/70 dark:border-sky-700 dark:text-sky-200';
       } else if (loc.totalQuantity <= 150) {
-        style = 'bg-blue-200 border-blue-500 text-blue-950 font-semibold';
+        style =
+          'bg-blue-200 border-blue-500 text-blue-950 font-semibold dark:bg-blue-900/70 dark:border-blue-600 dark:text-blue-100';
       } else {
-        style = 'bg-indigo-300 border-indigo-600 text-indigo-950 font-bold';
+        style =
+          'bg-indigo-300 border-indigo-600 text-indigo-950 font-bold dark:bg-indigo-900/80 dark:border-indigo-500 dark:text-indigo-100';
       }
     } else if (viewMode === 'expiry') {
       if (loc.hasExpired) {
-        style = 'bg-rose-100 border-rose-500 text-rose-950 font-semibold animate-pulse';
+        style =
+          'bg-rose-100 border-rose-500 text-rose-950 font-semibold animate-pulse dark:bg-rose-950/80 dark:border-rose-600 dark:text-rose-200';
       } else if (loc.hasExpiringSoon) {
-        style = 'bg-amber-100 border-amber-500 text-amber-950 font-medium';
+        style =
+          'bg-amber-100 border-amber-500 text-amber-950 font-medium dark:bg-amber-950/80 dark:border-amber-600 dark:text-amber-200';
       } else if (loc.totalQuantity > 0) {
-        style = 'bg-slate-100 border-slate-300 text-slate-700';
+        style =
+          'bg-slate-100 border-slate-300 text-slate-700 dark:bg-slate-800/80 dark:border-slate-700 dark:text-slate-300';
       } else {
-        style = 'bg-slate-50 border-slate-200 text-slate-400';
+        style =
+          'bg-slate-50 border-slate-200 text-slate-400 dark:bg-slate-900/50 dark:border-slate-800 dark:text-slate-600';
       }
     }
 
@@ -371,28 +385,34 @@ export function WarehouseMap({ initialWarehouseId, className = '' }: WarehouseMa
 
       {/* KPI Summary Cards */}
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
-        <div className="rounded-xl border border-slate-200 bg-white p-3.5 shadow-sm">
-          <div className="text-[11px] font-semibold text-slate-500">Total Kapasitas Rak</div>
+        <div className="rounded-xl border border-slate-200 bg-white p-3.5 shadow-xs transition-colors dark:border-slate-800 dark:bg-slate-900">
+          <div className="text-[11px] font-semibold text-slate-500 dark:text-slate-400">
+            Total Kapasitas Rak
+          </div>
           <div className="mt-1 flex items-baseline gap-1.5">
-            <span className="text-2xl font-bold text-slate-900">{data.summary.totalLocations}</span>
-            <span className="text-xs text-slate-500">lokasi</span>
+            <span className="text-2xl font-bold text-slate-900 dark:text-white">
+              {data.summary.totalLocations}
+            </span>
+            <span className="text-xs text-slate-500 dark:text-slate-400">lokasi</span>
           </div>
         </div>
 
-        <div className="rounded-xl border border-slate-200 bg-white p-3.5 shadow-sm">
-          <div className="text-[11px] font-semibold text-slate-500">Tingkat Okupansi</div>
+        <div className="rounded-xl border border-slate-200 bg-white p-3.5 shadow-xs transition-colors dark:border-slate-800 dark:bg-slate-900">
+          <div className="text-[11px] font-semibold text-slate-500 dark:text-slate-400">
+            Tingkat Okupansi
+          </div>
           <div className="mt-1 flex items-baseline gap-1.5">
-            <span className="text-2xl font-bold text-indigo-600">
+            <span className="text-2xl font-bold text-indigo-600 dark:text-indigo-400">
               {data.summary.occupancyRate}%
             </span>
           </div>
-          <div className="mt-1.5 h-1.5 w-full overflow-hidden rounded-full bg-slate-100">
+          <div className="mt-1.5 h-1.5 w-full overflow-hidden rounded-full bg-slate-100 dark:bg-slate-800">
             <div
               className={`h-full transition-all duration-500 ${
                 data.summary.occupancyRate > 85
                   ? 'bg-rose-500'
                   : data.summary.occupancyRate > 50
-                    ? 'bg-indigo-600'
+                    ? 'bg-indigo-600 dark:bg-indigo-500'
                     : 'bg-emerald-500'
               }`}
               style={{ width: `${Math.min(data.summary.occupancyRate, 100)}%` }}
@@ -400,45 +420,57 @@ export function WarehouseMap({ initialWarehouseId, className = '' }: WarehouseMa
           </div>
         </div>
 
-        <div className="rounded-xl border border-slate-200 bg-white p-3.5 shadow-sm">
-          <div className="text-[11px] font-semibold text-slate-500">Lokasi Terisi</div>
+        <div className="rounded-xl border border-slate-200 bg-white p-3.5 shadow-xs transition-colors dark:border-slate-800 dark:bg-slate-900">
+          <div className="text-[11px] font-semibold text-slate-500 dark:text-slate-400">
+            Lokasi Terisi
+          </div>
           <div className="mt-1 flex items-baseline gap-1.5">
-            <span className="text-2xl font-bold text-emerald-600">
+            <span className="text-2xl font-bold text-emerald-600 dark:text-emerald-400">
               {data.summary.occupiedLocations}
             </span>
-            <span className="text-xs text-slate-500">rak</span>
+            <span className="text-xs text-slate-500 dark:text-slate-400">rak</span>
           </div>
         </div>
 
-        <div className="rounded-xl border border-slate-200 bg-white p-3.5 shadow-sm">
-          <div className="text-[11px] font-semibold text-slate-500">Slot Kosong (Tersedia)</div>
+        <div className="rounded-xl border border-slate-200 bg-white p-3.5 shadow-xs transition-colors dark:border-slate-800 dark:bg-slate-900">
+          <div className="text-[11px] font-semibold text-slate-500 dark:text-slate-400">
+            Slot Kosong (Tersedia)
+          </div>
           <div className="mt-1 flex items-baseline gap-1.5">
-            <span className="text-2xl font-bold text-slate-700">{data.summary.emptyLocations}</span>
-            <span className="text-xs text-slate-500">slot</span>
+            <span className="text-2xl font-bold text-slate-700 dark:text-slate-200">
+              {data.summary.emptyLocations}
+            </span>
+            <span className="text-xs text-slate-500 dark:text-slate-400">slot</span>
           </div>
         </div>
 
-        <div className="rounded-xl border border-slate-200 bg-white p-3.5 shadow-sm">
-          <div className="text-[11px] font-semibold text-slate-500">Dibekukan (Opname)</div>
+        <div className="rounded-xl border border-slate-200 bg-white p-3.5 shadow-xs transition-colors dark:border-slate-800 dark:bg-slate-900">
+          <div className="text-[11px] font-semibold text-slate-500 dark:text-slate-400">
+            Dibekukan (Opname)
+          </div>
           <div className="mt-1 flex items-baseline gap-1.5">
-            <span className="text-2xl font-bold text-rose-600">{data.summary.frozenLocations}</span>
-            <span className="text-xs text-slate-500">lokasi</span>
+            <span className="text-2xl font-bold text-rose-600 dark:text-rose-400">
+              {data.summary.frozenLocations}
+            </span>
+            <span className="text-xs text-slate-500 dark:text-slate-400">lokasi</span>
           </div>
         </div>
 
-        <div className="rounded-xl border border-slate-200 bg-white p-3.5 shadow-sm">
-          <div className="text-[11px] font-semibold text-slate-500">Total Stok Fisik</div>
+        <div className="rounded-xl border border-slate-200 bg-white p-3.5 shadow-xs transition-colors dark:border-slate-800 dark:bg-slate-900">
+          <div className="text-[11px] font-semibold text-slate-500 dark:text-slate-400">
+            Total Stok Fisik
+          </div>
           <div className="mt-1 flex items-baseline gap-1.5">
-            <span className="text-2xl font-bold text-slate-900">
+            <span className="text-2xl font-bold text-slate-900 dark:text-white">
               {data.summary.totalUnits.toLocaleString('id-ID')}
             </span>
-            <span className="text-xs text-slate-500">unit</span>
+            <span className="text-xs text-slate-500 dark:text-slate-400">unit</span>
           </div>
         </div>
       </div>
 
       {/* Controls & Filter Bar */}
-      <div className="flex flex-col gap-3 rounded-xl border border-slate-200 bg-white p-4 shadow-sm md:flex-row md:items-center md:justify-between">
+      <div className="flex flex-col gap-3 rounded-xl border border-slate-200 bg-white p-4 shadow-xs transition-colors md:flex-row md:items-center md:justify-between dark:border-slate-800 dark:bg-slate-900">
         {/* Left: View Mode Switcher */}
         <div className="flex items-center gap-1.5">
           <span className="text-xs font-semibold text-slate-500">Mode Tampilan:</span>
@@ -727,25 +759,25 @@ export function WarehouseMap({ initialWarehouseId, className = '' }: WarehouseMa
           )}
 
           {/* Color Legend */}
-          <div className="mt-4 flex flex-wrap items-center gap-4 rounded-xl border border-slate-200 bg-white p-3 text-xs text-slate-600 shadow-sm">
-            <span className="font-semibold text-slate-700">Legenda:</span>
+          <div className="mt-4 flex flex-wrap items-center gap-4 rounded-xl border border-slate-200 bg-white p-3 text-xs text-slate-600 shadow-xs dark:border-slate-800 dark:bg-slate-900 dark:text-slate-300">
+            <span className="font-semibold text-slate-700 dark:text-slate-200">Legenda:</span>
             {viewMode === 'occupancy' && (
               <>
                 <div className="flex items-center gap-1.5">
-                  <span className="h-3 w-3 rounded border border-slate-300 bg-slate-50" />
+                  <span className="h-3 w-3 rounded border border-slate-300 bg-slate-50 dark:border-slate-800 dark:bg-slate-900/60" />
                   <span>Kosong (0 item)</span>
                 </div>
                 <div className="flex items-center gap-1.5">
-                  <span className="h-3 w-3 rounded border border-emerald-400 bg-emerald-50" />
+                  <span className="h-3 w-3 rounded border border-emerald-400 bg-emerald-50 dark:border-emerald-700/60 dark:bg-emerald-950/60" />
                   <span>Terisi (&lt; 100 unit)</span>
                 </div>
                 <div className="flex items-center gap-1.5">
-                  <span className="h-3 w-3 rounded border border-indigo-400 bg-indigo-50" />
+                  <span className="h-3 w-3 rounded border border-indigo-400 bg-indigo-50 dark:border-indigo-700/60 dark:bg-indigo-950/60" />
                   <span>Penuh / Padat (≥ 100 unit)</span>
                 </div>
                 <div className="flex items-center gap-1.5">
-                  <span className="h-3 w-3 rounded border border-rose-400 bg-rose-50" />
-                  <span>Dibekukan (Opname BR-22)</span>
+                  <span className="h-3 w-3 rounded border border-rose-400 bg-rose-50 dark:border-rose-700/60 dark:bg-rose-950/60" />
+                  <span>Dibekukan (Sedang Opname)</span>
                 </div>
               </>
             )}
@@ -797,12 +829,12 @@ export function WarehouseMap({ initialWarehouseId, className = '' }: WarehouseMa
         {/* Right: Location Inspector Drawer */}
         {selectedLocation && (
           <div className="lg:col-span-4">
-            <div className="sticky top-6 rounded-xl border border-indigo-200 bg-white p-5 shadow-md">
+            <div className="sticky top-6 rounded-xl border border-indigo-200 bg-white p-5 shadow-md dark:border-indigo-900/60 dark:bg-slate-900">
               {/* Drawer Header */}
-              <div className="flex items-start justify-between border-b border-slate-100 pb-3">
+              <div className="flex items-start justify-between border-b border-slate-100 pb-3 dark:border-slate-800">
                 <div>
                   <div className="flex items-center gap-2">
-                    <span className="font-mono text-xl font-extrabold text-slate-900">
+                    <span className="font-mono text-xl font-extrabold text-slate-900 dark:text-white">
                       {selectedLocation.code}
                     </span>
                     <Badge
@@ -821,7 +853,7 @@ export function WarehouseMap({ initialWarehouseId, className = '' }: WarehouseMa
                           : 'Nonaktif'}
                     </Badge>
                   </div>
-                  <p className="mt-0.5 text-xs text-slate-500">
+                  <p className="mt-0.5 text-xs text-slate-500 dark:text-slate-400">
                     Zona {selectedLocation.zone} • Rak {selectedLocation.rack} • Level{' '}
                     {selectedLocation.level}
                   </p>
@@ -829,7 +861,7 @@ export function WarehouseMap({ initialWarehouseId, className = '' }: WarehouseMa
 
                 <button
                   onClick={() => setSelectedLocation(null)}
-                  className="rounded-md p-1 text-slate-400 hover:bg-slate-100 hover:text-slate-600"
+                  className="rounded-md p-1 text-slate-400 hover:bg-slate-100 hover:text-slate-600 dark:hover:bg-slate-800 dark:hover:text-slate-300"
                   title="Tutup Inspector"
                 >
                   <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -849,7 +881,7 @@ export function WarehouseMap({ initialWarehouseId, className = '' }: WarehouseMa
                   size="sm"
                   variant="outline"
                   onClick={() => setIsPrintingLabel(true)}
-                  className="flex-1 gap-1.5 border-indigo-200 text-indigo-700 hover:bg-indigo-50"
+                  className="flex-1 gap-1.5 border-indigo-200 text-indigo-700 hover:bg-indigo-50 dark:border-indigo-800/80 dark:text-indigo-300 dark:hover:bg-indigo-950/40"
                 >
                   <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path
@@ -869,26 +901,28 @@ export function WarehouseMap({ initialWarehouseId, className = '' }: WarehouseMa
                   onClick={() => handleToggleFreeze(selectedLocation)}
                   className={`text-xs ${
                     selectedLocation.isFrozen
-                      ? 'border-emerald-300 text-emerald-700 hover:bg-emerald-50'
-                      : 'border-rose-300 text-rose-700 hover:bg-rose-50'
+                      ? 'border-emerald-300 text-emerald-700 hover:bg-emerald-50 dark:border-emerald-700 dark:text-emerald-300 dark:hover:bg-emerald-950/40'
+                      : 'border-rose-300 text-rose-700 hover:bg-rose-50 dark:border-rose-700 dark:text-rose-300 dark:hover:bg-rose-950/40'
                   }`}
                   title={selectedLocation.isFrozen ? 'Buka Pembekuan' : 'Bekukan untuk Opname'}
                 >
-                  {selectedLocation.isFrozen ? 'Buka Kunci' : 'Bekukan (BR-22)'}
+                  {selectedLocation.isFrozen ? 'Buka Kunci' : 'Bekukan untuk Opname'}
                 </Button>
               </div>
 
               {/* Location Stats */}
-              <div className="mt-4 grid grid-cols-2 gap-2 rounded-lg bg-slate-50 p-2.5 text-xs">
+              <div className="mt-4 grid grid-cols-2 gap-2 rounded-lg bg-slate-50 p-2.5 text-xs dark:bg-slate-950/60">
                 <div>
-                  <span className="text-slate-500">Total Kuantitas:</span>
-                  <div className="font-bold text-slate-800">
+                  <span className="text-slate-500 dark:text-slate-400">Total Kuantitas:</span>
+                  <div className="font-bold text-slate-800 dark:text-slate-200">
                     {selectedLocation.totalQuantity.toLocaleString('id-ID')} unit
                   </div>
                 </div>
                 <div>
-                  <span className="text-slate-500">Jumlah Batch:</span>
-                  <div className="font-bold text-slate-800">{selectedLocation.itemCount} batch</div>
+                  <span className="text-slate-500 dark:text-slate-400">Jumlah Batch:</span>
+                  <div className="font-bold text-slate-800 dark:text-slate-200">
+                    {selectedLocation.itemCount} batch
+                  </div>
                 </div>
               </div>
 

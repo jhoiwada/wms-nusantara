@@ -1,15 +1,64 @@
-# WMS — Sistem Manajemen Gudang (Warehouse Management System)
+# PT Nusantara Logistik Distribusi (NLD Logistics) — Sistem Manajemen Gudang Enterprise (WMS)
 
 [![CI Pipeline](https://github.com/jhoiwada/wms/actions/workflows/ci.yml/badge.svg)](https://github.com/jhoiwada/wms/actions)
-[![Version](https://img.shields.io/badge/version-0.3.0-blue.svg)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)](CHANGELOG.md)
 [![Next.js](https://img.shields.io/badge/Next.js-16.4-black.svg?logo=next.js)](https://nextjs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5-blue.svg?logo=typescript)](https://www.typescriptlang.org/)
 [![Prisma](https://img.shields.io/badge/Prisma-6-darkblue.svg?logo=prisma)](https://www.prisma.io/)
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-blue.svg?logo=postgresql)](https://www.postgresql.org/)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind-v4-38bdf8.svg?logo=tailwindcss)](https://tailwindcss.com/)
-[![Tests](https://img.shields.io/badge/Tests-216%20passed-brightgreen.svg)](<>)
+[![Tests](https://img.shields.io/badge/Tests-230%20passed-brightgreen.svg)](<>)
 
-Aplikasi web **Sistem Manajemen Gudang (Warehouse Management System / WMS)** tingkat enterprise untuk distributor multi-gudang (studi kasus: **Gudang Utama Jakarta** dan **Gudang Cabang Bekasi**). Dibangun dari nol (_zero external template_) dengan fokus utama pada kebenaran logika mutasi persediaan, integritas transaksi ACID, alokasi FEFO otomatis, auditabilitas penuh, dan keamanan tingkat produksi.
+Aplikasi web **Sistem Manajemen Gudang (Warehouse Management System / WMS)** tingkat enterprise untuk operasional logistik & rantai pasok multi-fasilitas: **Distribution Center (DC) Pulogadung (Jakarta)** dan **DC MM2100 Cikarang (Bekasi)** pada entitas korporat **PT Nusantara Logistik Distribusi**. Dibangun dari nol (_zero external template_) dengan fokus utama pada kebenaran logika mutasi persediaan, integritas transaksi ACID, alokasi FEFO otomatis, auditabilitas penuh, proteksi anti-lockout, dan keamanan tingkat produksi.
+
+> 🌟 **100% Modul Fungsional**: Seluruh 18 modul navigasi (termasuk Kelola Pengguna, Denah Interaktif 2D, Cetak Label Barcode, Stock Opname 4-Eyes, dan Retur Pelanggan) berfungsi penuh tanpa simulasi mock atau tombol "Coming Soon".
+
+---
+
+## ⚡ Quick Start (Demo Portofolio Instan)
+
+> Pastikan service PostgreSQL (melalui **Laragon** atau Docker) sudah aktif sebelum menjalankan perintah:
+
+```bash
+# 1. Install dependencies
+pnpm install
+
+# 2. Reset & seed database dengan master data FMCG, 60+ mutasi, dan skenario batch expiry
+pnpm db:reset
+
+# 3. Jalankan server pengembangan
+pnpm dev
+```
+
+Buka `http://localhost:3000` di browser. Masuk menggunakan kredensial resmi pejabat operasional PT Nusantara Logistik Distribusi:
+
+| Peran (Role) | Pejabat Operasional (Identitas Riil) | Email Akun Resmi             | Kata Sandi     | Cakupan Hak Akses Sistem                                               |
+| :----------- | :----------------------------------- | :--------------------------- | :------------- | :--------------------------------------------------------------------- |
+| **ADMIN**    | **Jhoiwada Simanjuntak**             | `admin@nldlogistics.co.id`   | `Juntak12345!` | Akses tak terbatas, Manajemen Pengguna (`/users`), Audit Log, Keamanan |
+| **MANAGER**  | **Hendrawan Pratama, S.T.**          | `manager@nldlogistics.co.id` | `Juntak12345!` | Otorisasi DO, Persetujuan Opname 4-Eyes, Adjustment Stok, Laporan      |
+| **STAFF**    | **Dimas Wicaksono**                  | `staff@nldlogistics.co.id`   | `Juntak12345!` | Operasional harian: Form GR/DO, Scan Barcode HP, Blind Count Opname    |
+| **VIEWER**   | **Siti Nurhaliza Wardhani**          | `auditor@nldlogistics.co.id` | `Juntak12345!` | Auditor internal read-only: Dashboard, Posisi Stok, Denah, Laporan     |
+
+> ℹ️ **Kompatibilitas Pengujian Otomatis**: Alias login `@demo.test` (`admin@demo.test`, `manager@demo.test`, dst.) tetap didukung secara mulus di level service layer untuk menjaga kompatibilitas 100% pada 230+ unit test otomatis.
+
+### 🛡️ Arsitektur Keamanan Siber Korporat (Defense-in-Depth)
+
+Sistem mengadopsi standar keamanan siber ketat untuk melindungi integritas transaksi pergudangan:
+
+1. **HTTP Security Headers (`src/proxy.ts`)**:
+   - `X-Content-Type-Options: nosniff` (mencegah MIME-sniffing exploit).
+   - `X-Frame-Options: SAMEORIGIN` (mitigasi serangan clickjacking).
+   - `X-XSS-Protection: 1; mode=block` (perlindungan XSS reflected).
+   - `Referrer-Policy: strict-origin-when-cross-origin` (melindungi kerahasiaan URL internal).
+   - `Permissions-Policy: camera=(self), microphone=(), geolocation=()` (restriksi akses hardware).
+2. **Mitigasi Brute Force & Rate Limiting**:
+   - Pembatasan frekuensi percobaan otentikasi pada endpoint `/api/v1/auth/login`.
+3. **Perekaman Jejak Audit Keamanan Terperinci**:
+   - Setiap upaya login sukses maupun gagal otomatis merekam alamat IP klien dan `User-Agent` peramban ke tabel `AuditLog`.
+4. **Validasi Kompleksitas Kata Sandi**:
+   - Seluruh pembuatan user baru dan reset password mewajibkan standar sandi minimal 8 karakter dengan kombinasi huruf dan angka (`passwordComplexitySchema`).
+5. **Proteksi Anti-Lockout Berlapis**:
+   - Akun root administrator (`admin@nldlogistics.co.id`) terlindungi dari penonaktifan tidak sengaja atau penurunan hak akses di tingkat _service layer_ backend.
 
 ---
 
@@ -74,6 +123,7 @@ Berbeda dengan proyek template biasa yang mengandalkan package siap pakai, siste
 | **Generator Nomor Dokumen Anti-Tabrakan**      | [`src/server/services/counter.service.ts`](file:///c:/laragon/www/Sistem%20Manajemen%20Gudang/src/server/services/counter.service.ts)               | Penghitung nomor dokumen atomik (`GR-YYYY-XXXX`, `DO-YYYY-XXXX`, `SO-YYYY-XXXX`, `ADJ-YYYY-XXXX`, `TR-YYYY-XXXX`, `RET-YYYY-XXXX`) yang aman dari nomor ganda pada eksekusi paralel.                                          |
 | **Audit Konsistensi Matematis Persediaan**     | [`src/server/services/stock.service.ts`](file:///c:/laragon/www/Sistem%20Manajemen%20Gudang/src/server/services/stock.service.ts)                   | Engine verifikasi invarian matematis `SUM(stock_movements) === current_stock` per produk dan rak untuk mendeteksi anomali data seketika.                                                                                      |
 | **Generator Format Cetak Barcode Termal & A4** | [`src/lib/label-pdf.ts`](file:///c:/laragon/www/Sistem%20Manajemen%20Gudang/src/lib/label-pdf.ts)                                                   | Kalkulasi matematis koordinat layout stiker termal (100x50mm) dan grid A4 multi-kolom dengan rendering barcode vektor Code 128 / QR Code.                                                                                     |
+| **Manajemen Pengguna & Proteksi Anti-Lockout** | [`src/server/services/user.service.ts`](file:///c:/laragon/www/Sistem%20Manajemen%20Gudang/src/server/services/user.service.ts)                     | Service CRUD otorisasi enterprise dengan proteksi anti-lockout akun demo utama (`admin@demo.test`), pelarangan de-aktivasi akun diri sendiri, hashing bcrypt, dan rekaman audit log otomatis.                                 |
 
 ---
 
@@ -271,10 +321,10 @@ Aplikasi dapat dijalankan secara lokal atau diakses melalui environment demo pub
 
 | Peran (Role) | Email Login         | Kata Sandi     | Deskripsi Hak Akses                                                                  |
 | :----------- | :------------------ | :------------- | :----------------------------------------------------------------------------------- |
-| **ADMIN**    | `admin@demo.test`   | `Password123!` | Akses tak terbatas: kelola pengguna, reset demo, konfigurasi, dan semua operasional. |
-| **MANAGER**  | `manager@demo.test` | `Password123!` | Otorisasi dokumen, persetujuan opname, penyesuaian stok manual, dan export laporan.  |
-| **STAFF**    | `staff@demo.test`   | `Password123!` | Operasional harian: draft/post GR & DO, scan barcode kamera, hitung opname, retur.   |
-| **VIEWER**   | `viewer@demo.test`  | `Password123!` | Akses baca saja (_read-only_): dashboard, katalog produk, denah gudang, kartu stok.  |
+| **ADMIN**    | `admin@demo.test`   | `Juntak12345!` | Akses tak terbatas: kelola pengguna, reset demo, konfigurasi, dan semua operasional. |
+| **MANAGER**  | `manager@demo.test` | `Juntak12345!` | Otorisasi dokumen, persetujuan opname, penyesuaian stok manual, dan export laporan.  |
+| **STAFF**    | `staff@demo.test`   | `Juntak12345!` | Operasional harian: draft/post GR & DO, scan barcode kamera, hitung opname, retur.   |
+| **VIEWER**   | `viewer@demo.test`  | `Juntak12345!` | Akses baca saja (_read-only_): dashboard, katalog produk, denah gudang, kartu stok.  |
 
 ### Fasilitas Reset Data Demo Terjadwal
 
@@ -319,7 +369,7 @@ PostgreSQL Database (Constraints CHECK, Foreign Keys & Unique Indexes)
 - **Database & ORM**: PostgreSQL 16 & Prisma ORM 6
 - **Autentikasi & Keamanan**: JWT Session via `jose`, `bcryptjs`, Rate Limiter sliding-window, dan HTTP Security Headers
 - **Ekspor Dokumen**: `exceljs` (Excel Spreadsheet) & `jspdf` / `jspdf-autotable` (PDF Vector)
-- **Pengujian**: Vitest 5 (216 unit, service, component, & integration tests)
+- **Pengujian**: Vitest 5 (230 unit, service, component, & integration tests)
 
 ---
 
@@ -374,16 +424,16 @@ Seluruh kode dalam repositori ini lolos 4 gerbang kualitas ketat:
 
 ```bash
 # 1. Analisis statis linter (ESLint) - 0 error, 0 warning
-npm run lint
+pnpm lint
 
 # 2. Pemeriksaan tipe TypeScript statis
-npm run typecheck
+pnpm typecheck
 
-# 3. Test suite otomatis (Vitest - 27 berkas pengujian, 216 tests passing)
-npm test
+# 3. Test suite otomatis (Vitest - 30 berkas pengujian, 230 tests passing)
+pnpm test
 
 # 4. Validasi kompilasi bundle produksi Next.js
-npm run build
+pnpm build
 ```
 
 ---

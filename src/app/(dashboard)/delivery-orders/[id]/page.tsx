@@ -106,7 +106,7 @@ export default function DeliveryOrderDetailPage({ params }: PageProps) {
   const handleShip = () => {
     if (
       !confirm(
-        `Konfirmasi kirim barang untuk dokumen '${doOrder?.orderNo}'?\n\nSistem akan mengunci stok (SELECT ... FOR UPDATE) dan memeriksa kecukupan stok secara atomik. Jika ada item yang kurang, seluruh pengiriman akan ditolak (BR-17).\n\nLanjutkan pengiriman?`,
+        `Konfirmasi kirim barang untuk dokumen '${doOrder?.orderNo}'?\n\nSistem akan memeriksa ketersediaan stok fisik di rak secara real-time. Jika stok mencukupi, mutasi barang keluar akan langsung dicatat.\n\nLanjutkan pengiriman?`,
       )
     ) {
       return;
@@ -141,7 +141,7 @@ export default function DeliveryOrderDetailPage({ params }: PageProps) {
   const handleCancel = () => {
     if (
       !confirm(
-        `Yakin ingin membatalkan dokumen '${doOrder?.orderNo}'?\n\nNomor dokumen tetap dipertahankan dalam arsip (BR-15). Tindakan ini tidak dapat dibatalkan.`,
+        `Yakin ingin membatalkan dokumen '${doOrder?.orderNo}'?\n\nNomor dokumen tetap dipertahankan dalam arsip sistem. Tindakan ini tidak dapat dibatalkan.`,
       )
     ) {
       return;
@@ -267,13 +267,13 @@ export default function DeliveryOrderDetailPage({ params }: PageProps) {
           {doOrder.status === 'SHIPPED' && (
             <div className="flex items-center gap-2">
               <div className="rounded-md border border-emerald-200 bg-emerald-50 px-3 py-1.5 text-xs font-medium text-emerald-600 dark:border-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-400">
-                ✓ Pengiriman Selesai
+                Pengiriman Selesai
               </div>
               <Link href="/customer-returns/new">
                 <Button
                   variant="outline"
                   size="sm"
-                  className="border-indigo-200 text-xs text-indigo-600 hover:bg-indigo-50"
+                  className="border-indigo-200 text-xs text-indigo-600 hover:bg-indigo-50 dark:border-indigo-800 dark:text-indigo-400 dark:hover:bg-indigo-950/50"
                 >
                   Retur Barang
                 </Button>
@@ -283,7 +283,7 @@ export default function DeliveryOrderDetailPage({ params }: PageProps) {
 
           {doOrder.status === 'CANCELLED' && (
             <div className="rounded-md border border-rose-200 bg-rose-50 px-3 py-1.5 text-xs font-medium text-rose-600 dark:border-rose-800 dark:bg-rose-950/40 dark:text-rose-400">
-              ✕ Dokumen Dibatalkan (Nomor Tersimpan)
+              Dokumen Dibatalkan (Nomor Tersimpan)
             </div>
           )}
         </div>
@@ -293,7 +293,19 @@ export default function DeliveryOrderDetailPage({ params }: PageProps) {
       {errorMessage && (
         <div className="rounded-lg border border-rose-200 bg-rose-50 p-4 text-sm text-rose-800 dark:border-rose-800 dark:bg-rose-950/40 dark:text-rose-300">
           <div className="mb-1 flex items-center gap-2 font-bold">
-            <span>⚠</span>
+            <svg
+              className="h-4 w-4 shrink-0 text-rose-600 dark:text-rose-400"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+              />
+            </svg>
             <span>Pengiriman Ditolak / Terjadi Kesalahan:</span>
           </div>
           <p>{errorMessage}</p>
@@ -302,7 +314,22 @@ export default function DeliveryOrderDetailPage({ params }: PageProps) {
 
       {successMessage && (
         <div className="rounded-lg border border-emerald-200 bg-emerald-50 p-4 text-sm text-emerald-800 dark:border-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-300">
-          <div className="mb-1 font-bold">Berhasil:</div>
+          <div className="mb-1 flex items-center gap-2 font-bold">
+            <svg
+              className="h-4 w-4 shrink-0 text-emerald-600 dark:text-emerald-400"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M5 13l4 4L19 7"
+              />
+            </svg>
+            <span>Berhasil:</span>
+          </div>
           <p>{successMessage}</p>
         </div>
       )}
@@ -310,15 +337,27 @@ export default function DeliveryOrderDetailPage({ params }: PageProps) {
       {/* Status Explanatory Alerts */}
       {doOrder.status === 'DRAFT' && (
         <div className="flex items-start gap-2.5 rounded-lg border border-amber-200 bg-amber-50 p-3.5 text-xs text-amber-900 dark:border-amber-800/60 dark:bg-amber-950/30 dark:text-amber-200">
-          <span className="text-base leading-none">ℹ</span>
+          <svg
+            className="mt-0.5 h-4 w-4 shrink-0 text-amber-600 dark:text-amber-400"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+            />
+          </svg>
           <div>
             <div className="font-semibold">Status Dokumen: DRAFT (Belum Memotong Stok)</div>
             <div className="mt-0.5 leading-relaxed text-amber-800/90 dark:text-amber-300/90">
-              Dokumen draft belum mencadangkan atau memotong stok sistem (BR-19). Saat tombol{' '}
-              <strong>&ldquo;Kirim Barang&rdquo;</strong> ditekan, sistem akan mengunci baris stok,
-              mengalokasikan batch secara otomatis berdasarkan prinsip FEFO jika belum dipilih
-              (BR-08), serta memverifikasi kecukupan stok secara atomik. Jika ada stok yang kurang,
-              seluruh dokumen akan ditolak (BR-17).
+              Dokumen draft belum memotong stok sistem. Saat tombol{' '}
+              <strong>&ldquo;Kirim Barang&rdquo;</strong> ditekan, sistem akan mengalokasikan batch
+              secara otomatis berdasarkan prinsip kedaluwarsa terdekat (FEFO) jika belum dipilih,
+              serta memverifikasi kecukupan stok secara atomik. Jika stok tidak mencukupi, seluruh
+              pengiriman akan dibatalkan otomatis.
             </div>
           </div>
         </div>
@@ -326,7 +365,14 @@ export default function DeliveryOrderDetailPage({ params }: PageProps) {
 
       {doOrder.status === 'SHIPPED' && (
         <div className="flex items-start gap-2.5 rounded-lg border border-emerald-200 bg-emerald-50 p-3.5 text-xs text-emerald-900 dark:border-emerald-800/60 dark:bg-emerald-950/30 dark:text-emerald-200">
-          <span className="text-base leading-none">✓</span>
+          <svg
+            className="mt-0.5 h-4 w-4 shrink-0 text-emerald-600 dark:text-emerald-400"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+          </svg>
           <div>
             <div className="font-semibold">
               Status Dokumen: SHIPPED pada{' '}
@@ -334,8 +380,8 @@ export default function DeliveryOrderDetailPage({ params }: PageProps) {
             </div>
             <div className="mt-0.5 leading-relaxed text-emerald-800/90 dark:text-emerald-300/90">
               Barang telah berhasil keluar dari gudang dan saldo stok telah berkurang. Riwayat
-              pergerakan dicatat permanen pada kartu stok (BR-29, BR-30). Dokumen yang sudah SHIPPED
-              tidak dapat dibatalkan atau diedit (BR-18).
+              mutasi dicatat resmi pada kartu stok. Dokumen yang sudah SHIPPED bersifat final dan
+              tidak dapat diedit kembali.
             </div>
           </div>
         </div>
@@ -461,7 +507,7 @@ export default function DeliveryOrderDetailPage({ params }: PageProps) {
                       ) : (
                         <div className="flex items-center gap-1.5">
                           <span className="rounded border border-amber-200 bg-amber-50 px-2 py-0.5 text-[11px] font-medium text-amber-700 dark:border-amber-800 dark:bg-amber-950/50 dark:text-amber-400">
-                            ⚡ Otomatis (FEFO)
+                            FEFO Otomatis
                           </span>
                           <span className="text-[11px] text-slate-400">
                             (Dialokasikan saat kirim)

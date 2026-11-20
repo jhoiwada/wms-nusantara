@@ -156,13 +156,13 @@ export default function NewStockAdjustmentPage() {
 
     if (currentUser && currentUser.role !== 'MANAGER' && currentUser.role !== 'ADMIN') {
       setErrorMessage(
-        'Akses ditolak: Hanya Manager atau Admin yang boleh melakukan penyesuaian stok (BR-26).',
+        'Akses ditolak: Hanya Manager atau Admin yang boleh melakukan penyesuaian stok.',
       );
       return;
     }
 
     if (!notes.trim() || notes.trim().length < 5) {
-      setErrorMessage('Alasan penyesuaian wajib diisi minimal 5 karakter (BR-26).');
+      setErrorMessage('Alasan penyesuaian wajib diisi minimal 5 karakter.');
       return;
     }
 
@@ -181,7 +181,7 @@ export default function NewStockAdjustmentPage() {
 
     const qtyNumber = Number(quantity);
     if (isNaN(qtyNumber) || qtyNumber <= 0 || !Number.isInteger(qtyNumber)) {
-      setErrorMessage('Jumlah penyesuaian harus bilangan bulat positif (BR-03).');
+      setErrorMessage('Jumlah penyesuaian harus bilangan bulat positif.');
       return;
     }
 
@@ -226,31 +226,37 @@ export default function NewStockAdjustmentPage() {
   return (
     <div className="mx-auto max-w-3xl space-y-6">
       {/* Breadcrumb */}
-      <div className="flex items-center gap-2 text-sm text-slate-400">
-        <Link href="/stock-adjustments" className="hover:text-white">
+      <div className="flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400">
+        <Link
+          href="/stock-adjustments"
+          className="transition-colors hover:text-emerald-600 dark:hover:text-white"
+        >
           Penyesuaian Stok
         </Link>
         <span>/</span>
-        <span className="text-slate-200">Buat Penyesuaian Baru</span>
+        <span className="font-medium text-slate-800 dark:text-slate-200">
+          Buat Penyesuaian Baru
+        </span>
       </div>
 
-      <div className="rounded-xl border border-slate-800 bg-slate-900/60 p-6 backdrop-blur">
-        <h1 className="text-xl font-bold text-white">Buat Penyesuaian Stok Manual</h1>
-        <p className="mt-1 text-sm text-slate-400">
+      <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-xs dark:border-slate-800 dark:bg-slate-900/60">
+        <h1 className="text-xl font-bold text-slate-900 dark:text-white">
+          Buat Penyesuaian Stok Manual
+        </h1>
+        <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
           Pencatatan mutasi penyesuaian (ADJUST_IN / ADJUST_OUT) di luar stock opname. Wajib
-          memiliki alasan jelas (BR-26).
+          memiliki alasan jelas.
         </p>
 
         {!isAuthorized && currentUser && (
-          <div className="mt-4 rounded-lg border border-rose-500/30 bg-rose-950/40 p-4 text-sm text-rose-300">
-            Peran Anda ({currentUser.role}) tidak diizinkan. Berdasarkan BR-26, hanya{' '}
-            <strong>Manager</strong> atau <strong>Admin</strong> yang berhak melakukan penyesuaian
-            stok manual.
+          <div className="mt-4 rounded-lg border border-rose-200 bg-rose-50 p-4 text-sm text-rose-800 dark:border-rose-500/30 dark:bg-rose-950/40 dark:text-rose-300">
+            Peran Anda ({currentUser.role}) tidak diizinkan. Hanya <strong>Manager</strong> atau{' '}
+            <strong>Admin</strong> yang berhak melakukan penyesuaian stok manual.
           </div>
         )}
 
         {errorMessage && (
-          <div className="mt-4 rounded-lg border border-rose-500/30 bg-rose-950/40 p-4 text-sm text-rose-300">
+          <div className="mt-4 rounded-lg border border-rose-200 bg-rose-50 p-4 text-sm text-rose-800 dark:border-rose-500/30 dark:bg-rose-950/40 dark:text-rose-300">
             {errorMessage}
           </div>
         )}
@@ -258,14 +264,14 @@ export default function NewStockAdjustmentPage() {
         <form onSubmit={handleSubmit} className="mt-6 space-y-6">
           {/* Reason Category */}
           <div className="space-y-2">
-            <label className="text-sm font-semibold text-slate-300">
-              Kategori Alasan Penyesuaian <span className="text-rose-400">*</span>
+            <label className="text-sm font-semibold text-slate-700 dark:text-slate-300">
+              Kategori Alasan Penyesuaian <span className="text-rose-500">*</span>
             </label>
             <select
               value={reasonCategory}
               onChange={(e) => setReasonCategory(e.target.value as AdjustmentReasonCategory)}
               disabled={isSubmitting}
-              className="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-slate-200 focus:border-emerald-500 focus:outline-none"
+              className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 focus:border-emerald-500 focus:outline-none dark:border-slate-700 dark:bg-slate-950 dark:text-slate-200"
             >
               {AdjustmentReasonCategoryEnum.options.map((cat) => (
                 <option key={cat} value={cat}>
@@ -277,36 +283,38 @@ export default function NewStockAdjustmentPage() {
 
           {/* Explanation Notes */}
           <div className="space-y-2">
-            <label className="text-sm font-semibold text-slate-300">
-              Uraian Alasan Penyesuaian (Wajib Diisi) <span className="text-rose-400">*</span>
+            <label className="text-sm font-semibold text-slate-700 dark:text-slate-300">
+              Uraian Alasan Penyesuaian (Wajib Diisi) <span className="text-rose-500">*</span>
             </label>
             <textarea
               rows={3}
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
               placeholder="Contoh: Pemusnahan 10 pcs produk yang kedaluwarsa sesuai berita acara BA-2026/01..."
-              className="w-full rounded-lg border border-slate-700 bg-slate-950 p-3 text-sm text-slate-200 placeholder-slate-600 focus:border-emerald-500 focus:outline-none"
+              className="w-full rounded-lg border border-slate-300 bg-white p-3 text-sm text-slate-900 placeholder-slate-400 focus:border-emerald-500 focus:outline-none dark:border-slate-700 dark:bg-slate-950 dark:text-slate-200 dark:placeholder-slate-600"
             />
-            <p className="text-xs text-slate-500">
-              Wajib minimal 5 karakter sesuai aturan bisnis BR-26.
+            <p className="text-xs text-slate-500 dark:text-slate-400">
+              Wajib minimal 5 karakter sebagai penjelasan audit.
             </p>
           </div>
 
-          <div className="border-t border-slate-800 pt-4">
-            <h2 className="text-sm font-bold tracking-wider text-slate-400 uppercase">
-              Detail Barang & Lokasi Penyesuaian
+          <div className="border-t border-slate-200 pt-4 dark:border-slate-800">
+            <h2 className="text-sm font-bold tracking-wider text-slate-600 uppercase dark:text-slate-400">
+              Detail Barang &amp; Lokasi Penyesuaian
             </h2>
           </div>
 
           {/* Warehouse and Location */}
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div className="space-y-2">
-              <label className="text-xs font-semibold text-slate-300">Gudang</label>
+              <label className="text-xs font-semibold text-slate-700 dark:text-slate-300">
+                Gudang
+              </label>
               <select
                 value={selectedWarehouseId}
                 onChange={(e) => setSelectedWarehouseId(e.target.value)}
                 disabled={isSubmitting}
-                className="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-slate-200 focus:border-emerald-500 focus:outline-none"
+                className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 focus:border-emerald-500 focus:outline-none dark:border-slate-700 dark:bg-slate-950 dark:text-slate-200"
               >
                 {warehouses.map((w) => (
                   <option key={w.id} value={w.id}>
@@ -317,12 +325,14 @@ export default function NewStockAdjustmentPage() {
             </div>
 
             <div className="space-y-2">
-              <label className="text-xs font-semibold text-slate-300">Lokasi Rak</label>
+              <label className="text-xs font-semibold text-slate-700 dark:text-slate-300">
+                Lokasi Rak
+              </label>
               <select
                 value={selectedLocationId}
                 onChange={(e) => setSelectedLocationId(e.target.value)}
                 disabled={isSubmitting}
-                className="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-slate-200 focus:border-emerald-500 focus:outline-none"
+                className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 focus:border-emerald-500 focus:outline-none dark:border-slate-700 dark:bg-slate-950 dark:text-slate-200"
               >
                 {locations.map((loc) => (
                   <option key={loc.id} value={loc.id} disabled={loc.isFrozen}>
@@ -331,8 +341,8 @@ export default function NewStockAdjustmentPage() {
                 ))}
               </select>
               {selectedLocObj?.isFrozen && (
-                <p className="text-xs font-semibold text-rose-400">
-                  Lokasi ini sedang dibekukan karena proses opname (BR-22) dan tidak dapat dimutasi.
+                <p className="text-xs font-semibold text-rose-600 dark:text-rose-400">
+                  Lokasi ini sedang dibekukan karena proses opname dan tidak dapat dimutasi.
                 </p>
               )}
             </div>
@@ -341,12 +351,14 @@ export default function NewStockAdjustmentPage() {
           {/* Product and Batch */}
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div className="space-y-2">
-              <label className="text-xs font-semibold text-slate-300">Produk</label>
+              <label className="text-xs font-semibold text-slate-700 dark:text-slate-300">
+                Produk
+              </label>
               <select
                 value={selectedProductId}
                 onChange={(e) => setSelectedProductId(e.target.value)}
                 disabled={isSubmitting}
-                className="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-slate-200 focus:border-emerald-500 focus:outline-none"
+                className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 focus:border-emerald-500 focus:outline-none dark:border-slate-700 dark:bg-slate-950 dark:text-slate-200"
               >
                 {products.map((p) => (
                   <option key={p.id} value={p.id}>
@@ -357,12 +369,14 @@ export default function NewStockAdjustmentPage() {
             </div>
 
             <div className="space-y-2">
-              <label className="text-xs font-semibold text-slate-300">Batch Stok di Rak Ini</label>
+              <label className="text-xs font-semibold text-slate-700 dark:text-slate-300">
+                Batch Stok di Rak Ini
+              </label>
               <select
                 value={selectedBatchId}
                 onChange={(e) => setSelectedBatchId(e.target.value)}
                 disabled={isSubmitting || availableStocks.length === 0}
-                className="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-slate-200 focus:border-emerald-500 focus:outline-none"
+                className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 focus:border-emerald-500 focus:outline-none dark:border-slate-700 dark:bg-slate-950 dark:text-slate-200"
               >
                 {availableStocks.length === 0 ? (
                   <option value="">(Tidak ada stok di lokasi ini)</option>
@@ -378,9 +392,11 @@ export default function NewStockAdjustmentPage() {
                 )}
               </select>
               {currentStockRow && (
-                <div className="text-xs text-slate-400">
+                <div className="text-xs text-slate-600 dark:text-slate-400">
                   Stok sistem saat ini:{' '}
-                  <strong className="text-white">{currentStockRow.quantity}</strong>
+                  <strong className="text-slate-900 dark:text-white">
+                    {currentStockRow.quantity}
+                  </strong>
                 </div>
               )}
             </div>
@@ -389,9 +405,11 @@ export default function NewStockAdjustmentPage() {
           {/* Movement Type & Quantity */}
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div className="space-y-2">
-              <label className="text-xs font-semibold text-slate-300">Arah Penyesuaian</label>
+              <label className="text-xs font-semibold text-slate-700 dark:text-slate-300">
+                Arah Penyesuaian
+              </label>
               <div className="flex items-center gap-4 pt-1">
-                <label className="flex cursor-pointer items-center gap-2 text-sm text-rose-300">
+                <label className="flex cursor-pointer items-center gap-2 text-sm font-medium text-rose-700 dark:text-rose-300">
                   <input
                     type="radio"
                     name="movementType"
@@ -402,7 +420,7 @@ export default function NewStockAdjustmentPage() {
                   />
                   - ADJUST OUT (Pengurangan)
                 </label>
-                <label className="flex cursor-pointer items-center gap-2 text-sm text-emerald-300">
+                <label className="flex cursor-pointer items-center gap-2 text-sm font-medium text-emerald-700 dark:text-emerald-300">
                   <input
                     type="radio"
                     name="movementType"
@@ -417,8 +435,8 @@ export default function NewStockAdjustmentPage() {
             </div>
 
             <div className="space-y-2">
-              <label className="text-xs font-semibold text-slate-300">
-                Jumlah Mutasi (Bilangan Bulat) <span className="text-rose-400">*</span>
+              <label className="text-xs font-semibold text-slate-700 dark:text-slate-300">
+                Jumlah Mutasi (Bilangan Bulat) <span className="text-rose-500">*</span>
               </label>
               <input
                 type="number"
@@ -427,14 +445,14 @@ export default function NewStockAdjustmentPage() {
                 value={quantity}
                 onChange={(e) => setQuantity(e.target.value)}
                 disabled={isSubmitting}
-                className="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 font-mono text-sm text-white focus:border-emerald-500 focus:outline-none"
+                className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 font-mono text-sm text-slate-900 focus:border-emerald-500 focus:outline-none dark:border-slate-700 dark:bg-slate-950 dark:text-white"
               />
             </div>
           </div>
 
           {/* Item Extra Note */}
           <div className="space-y-2">
-            <label className="text-xs font-semibold text-slate-300">
+            <label className="text-xs font-semibold text-slate-700 dark:text-slate-300">
               Catatan Khusus Item (Opsional)
             </label>
             <input
@@ -442,12 +460,12 @@ export default function NewStockAdjustmentPage() {
               value={itemNotes}
               onChange={(e) => setItemNotes(e.target.value)}
               placeholder="Contoh: Dus basah saat pengiriman..."
-              className="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-xs text-slate-200 placeholder-slate-600 focus:border-emerald-500 focus:outline-none"
+              className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-xs text-slate-900 placeholder-slate-400 focus:border-emerald-500 focus:outline-none dark:border-slate-700 dark:bg-slate-950 dark:text-slate-200 dark:placeholder-slate-600"
             />
           </div>
 
           {/* Action Buttons */}
-          <div className="flex items-center justify-end gap-3 border-t border-slate-800 pt-4">
+          <div className="flex items-center justify-end gap-3 border-t border-slate-200 pt-4 dark:border-slate-800">
             <Link href="/stock-adjustments">
               <Button type="button" variant="outline" disabled={isSubmitting}>
                 Batal

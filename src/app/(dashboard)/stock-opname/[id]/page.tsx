@@ -292,7 +292,7 @@ export default function StockOpnameDetailPage({ params }: PageProps) {
 
       setShowApproveModal(false);
       setSuccessMessage(
-        'Stock opname DISETUJUI! Penyesuaian stok telah dicatat secara atomik dan lokasi telah dibuka kembali (BR-24).',
+        'Stock opname DISETUJUI! Penyesuaian stok telah dicatat secara otomatis dan lokasi rak telah dibuka kembali.',
       );
       startTransition(() => {
         loadDocument();
@@ -307,7 +307,7 @@ export default function StockOpnameDetailPage({ params }: PageProps) {
   // Reject opname
   const handleReject = async () => {
     if (!rejectionReason.trim()) {
-      setErrorMessage('Alasan penolakan wajib diisi (BR-25)');
+      setErrorMessage('Alasan penolakan wajib diisi');
       return;
     }
 
@@ -328,7 +328,7 @@ export default function StockOpnameDetailPage({ params }: PageProps) {
 
       setShowRejectModal(false);
       setSuccessMessage(
-        'Stock opname DITOLAK. Lokasi telah dibuka kembali tanpa ada perubahan stok (BR-25).',
+        'Stock opname DITOLAK. Lokasi telah dibuka kembali tanpa ada perubahan stok.',
       );
       startTransition(() => {
         loadDocument();
@@ -410,12 +410,17 @@ export default function StockOpnameDetailPage({ params }: PageProps) {
     <div className="space-y-6">
       {/* Breadcrumb & Navigation */}
       <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex items-center gap-2 text-sm text-slate-400">
-          <Link href="/stock-opname" className="hover:text-white">
+        <div className="flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400">
+          <Link
+            href="/stock-opname"
+            className="transition-colors hover:text-emerald-600 dark:hover:text-white"
+          >
             Stock Opname
           </Link>
           <span>/</span>
-          <span className="font-mono font-medium text-slate-200">{opname.opnameNo}</span>
+          <span className="font-mono font-medium text-slate-800 dark:text-slate-200">
+            {opname.opnameNo}
+          </span>
         </div>
 
         <div className="flex items-center gap-2">
@@ -429,34 +434,34 @@ export default function StockOpnameDetailPage({ params }: PageProps) {
 
       {/* Messages */}
       {errorMessage && (
-        <div className="rounded-lg border border-rose-500/30 bg-rose-950/40 p-4 text-sm text-rose-300">
+        <div className="rounded-lg border border-rose-200 bg-rose-50 p-4 text-sm text-rose-800 dark:border-rose-500/30 dark:bg-rose-950/40 dark:text-rose-300">
           {errorMessage}
         </div>
       )}
       {successMessage && (
-        <div className="rounded-lg border border-emerald-500/30 bg-emerald-950/40 p-4 text-sm text-emerald-300">
+        <div className="rounded-lg border border-emerald-200 bg-emerald-50 p-4 text-sm text-emerald-800 dark:border-emerald-500/30 dark:bg-emerald-950/40 dark:text-emerald-300">
           {successMessage}
         </div>
       )}
 
       {/* Header Card */}
-      <div className="rounded-xl border border-slate-800 bg-slate-900/60 p-6 backdrop-blur">
+      <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-xs dark:border-slate-800 dark:bg-slate-900/60">
         <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
           <div>
             <div className="flex items-center gap-3">
-              <h1 className="font-mono text-2xl font-bold tracking-tight text-white">
+              <h1 className="font-mono text-2xl font-bold tracking-tight text-slate-900 dark:text-white">
                 {opname.opnameNo}
               </h1>
               {getStatusBadge(opname.status)}
             </div>
-            <p className="mt-1 text-sm text-slate-400">
+            <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
               Gudang:{' '}
-              <strong className="text-slate-200">
+              <strong className="text-slate-800 dark:text-slate-200">
                 {opname.warehouse.name} ({opname.warehouse.code})
               </strong>
             </p>
             {opname.displayNotes && (
-              <p className="mt-2 text-xs text-slate-400 italic">
+              <p className="mt-2 text-xs text-slate-500 italic dark:text-slate-400">
                 Catatan: &ldquo;{opname.displayNotes}&rdquo;
               </p>
             )}
@@ -471,7 +476,7 @@ export default function StockOpnameDetailPage({ params }: PageProps) {
                   variant="outline"
                   onClick={handleCancelDraft}
                   disabled={isSubmitting}
-                  className="text-rose-400 hover:bg-rose-950/30 hover:text-rose-300"
+                  className="text-rose-600 hover:bg-rose-50 hover:text-rose-700 dark:text-rose-400 dark:hover:bg-rose-950/30 dark:hover:text-rose-300"
                 >
                   Batalkan Draft
                 </Button>
@@ -503,7 +508,7 @@ export default function StockOpnameDetailPage({ params }: PageProps) {
                       variant="outline"
                       onClick={() => setShowRejectModal(true)}
                       disabled={isSubmitting}
-                      className="border-rose-800 text-rose-400 hover:bg-rose-950/40"
+                      className="border-rose-300 text-rose-600 hover:bg-rose-50 dark:border-rose-800 dark:text-rose-400 dark:hover:bg-rose-950/40"
                     >
                       Tolak Opname
                     </Button>
@@ -514,17 +519,17 @@ export default function StockOpnameDetailPage({ params }: PageProps) {
                       disabled={isSubmitting}
                       className="bg-emerald-600 hover:bg-emerald-500"
                     >
-                      Setujui & Rekonsiliasi Stok
+                      Setujui &amp; Rekonsiliasi Stok
                     </Button>
                   </>
                 ) : isCreator ? (
-                  <div className="rounded-lg border border-amber-500/30 bg-amber-950/20 px-3 py-1.5 text-xs text-amber-300">
-                    Prinsip Four-Eyes (BR-23): Anda pembuat dokumen ini. Persetujuan harus dilakukan
+                  <div className="rounded-lg border border-amber-200 bg-amber-50 px-3 py-1.5 text-xs text-amber-900 dark:border-amber-500/30 dark:bg-amber-950/20 dark:text-amber-300">
+                    Prinsip Otorisasi Ganda: Anda pembuat dokumen ini. Persetujuan harus dilakukan
                     oleh akun Manager/Admin lain.
                   </div>
                 ) : !isManagerOrAdmin ? (
-                  <div className="rounded-lg border border-slate-700 bg-slate-950/40 px-3 py-1.5 text-xs text-slate-400">
-                    Menunggu persetujuan Manager atau Admin (BR-23).
+                  <div className="rounded-lg border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs text-slate-600 dark:border-slate-700 dark:bg-slate-950/40 dark:text-slate-400">
+                    Menunggu persetujuan Manager atau Admin.
                   </div>
                 ) : null}
               </>
@@ -533,24 +538,28 @@ export default function StockOpnameDetailPage({ params }: PageProps) {
         </div>
 
         {/* Audit Meta Grid */}
-        <div className="mt-6 grid grid-cols-2 gap-4 border-t border-slate-800/80 pt-4 text-xs sm:grid-cols-4">
+        <div className="mt-6 grid grid-cols-2 gap-4 border-t border-slate-200 pt-4 text-xs sm:grid-cols-4 dark:border-slate-800/80">
           <div>
-            <span className="text-slate-500">Dibuat Oleh:</span>
-            <div className="font-medium text-slate-200">{opname.createdBy.name}</div>
+            <span className="text-slate-500 dark:text-slate-400">Dibuat Oleh:</span>
+            <div className="font-medium text-slate-900 dark:text-slate-200">
+              {opname.createdBy.name}
+            </div>
             <div className="text-slate-500">
               {opname.createdBy.role} · {new Date(opname.createdAt).toLocaleDateString('id-ID')}
             </div>
           </div>
           <div>
-            <span className="text-slate-500">Status Lokasi:</span>
-            <div className="font-medium text-slate-200">
+            <span className="text-slate-500 dark:text-slate-400">Status Lokasi:</span>
+            <div className="font-medium text-slate-900 dark:text-slate-200">
               {opname.status === 'DRAFT' || opname.status === 'SUBMITTED' ? (
-                <span className="flex items-center gap-1 font-semibold text-amber-400">
-                  <span className="h-2 w-2 animate-pulse rounded-full bg-amber-400"></span>
+                <span className="flex items-center gap-1 font-semibold text-amber-700 dark:text-amber-400">
+                  <span className="h-2 w-2 animate-pulse rounded-full bg-amber-500"></span>
                   DIBEKUKAN (FROZEN)
                 </span>
               ) : (
-                <span className="font-semibold text-emerald-400">DIBUKA KEMBALI</span>
+                <span className="font-semibold text-emerald-700 dark:text-emerald-400">
+                  DIBUKA KEMBALI
+                </span>
               )}
             </div>
             <div className="text-slate-500">
@@ -558,10 +567,10 @@ export default function StockOpnameDetailPage({ params }: PageProps) {
             </div>
           </div>
           <div>
-            <span className="text-slate-500">Pengajuan (Submitted):</span>
-            <div className="font-medium text-slate-200">
+            <span className="text-slate-500 dark:text-slate-400">Pengajuan (Submitted):</span>
+            <div className="font-medium text-slate-900 dark:text-slate-200">
               {opname.submittedAt
-                ? new Date(opname.submittedAt).toLocaleDateString('id-ID', {
+                ? new Date(opname.submittedAt).toLocaleString('id-ID', {
                     day: 'numeric',
                     month: 'short',
                     hour: '2-digit',
@@ -571,8 +580,8 @@ export default function StockOpnameDetailPage({ params }: PageProps) {
             </div>
           </div>
           <div>
-            <span className="text-slate-500">Persetujuan / Penolakan:</span>
-            <div className="font-medium text-slate-200">
+            <span className="text-slate-500 dark:text-slate-400">Persetujuan / Penolakan:</span>
+            <div className="font-medium text-slate-900 dark:text-slate-200">
               {opname.approvedBy ? (
                 <>
                   <div>
@@ -593,8 +602,8 @@ export default function StockOpnameDetailPage({ params }: PageProps) {
 
         {/* Rejection notice if REJECTED */}
         {opname.status === 'REJECTED' && (
-          <div className="mt-4 rounded-lg border border-rose-500/30 bg-rose-950/30 p-4 text-sm text-rose-300">
-            <strong className="font-semibold">Alasan Penolakan (BR-25):</strong>
+          <div className="mt-4 rounded-lg border border-rose-200 bg-rose-50 p-4 text-sm text-rose-800 dark:border-rose-500/30 dark:bg-rose-950/30 dark:text-rose-300">
+            <strong className="font-semibold">Alasan Penolakan:</strong>
             <p className="mt-1">
               {opname.rejectionReason || 'Tidak ada alasan penolakan tercatat.'}
             </p>
@@ -603,45 +612,53 @@ export default function StockOpnameDetailPage({ params }: PageProps) {
       </div>
 
       {/* Snapshot Items Table */}
-      <div className="space-y-4 rounded-xl border border-slate-800 bg-slate-900/60 p-6 backdrop-blur">
+      <div className="space-y-4 rounded-xl border border-slate-200 bg-white p-6 shadow-xs dark:border-slate-800 dark:bg-slate-900/60">
         <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <h2 className="text-lg font-bold text-white">Snapshot Stok & Hitung Fisik</h2>
-            <p className="text-xs text-slate-400">
-              Staf mengisi hitung fisik per batch di lokasi rak. Selisih dihitung otomatis (BR-21).
+            <h2 className="text-lg font-bold text-slate-900 dark:text-white">
+              Snapshot Stok &amp; Hitung Fisik
+            </h2>
+            <p className="text-xs text-slate-500 dark:text-slate-400">
+              Staf mengisi hitung fisik per batch di lokasi rak. Selisih dihitung otomatis.
             </p>
           </div>
           <div className="flex items-center gap-3 text-xs">
-            <span className="text-slate-400">
-              Terhitung: <strong className="text-white">{opname.summary.countedItems}</strong> /{' '}
-              {opname.summary.totalItems}
+            <span className="text-slate-500 dark:text-slate-400">
+              Terhitung:{' '}
+              <strong className="text-slate-900 dark:text-white">
+                {opname.summary.countedItems}
+              </strong>{' '}
+              / {opname.summary.totalItems}
             </span>
-            <span className="text-slate-400">
+            <span className="text-slate-500 dark:text-slate-400">
               Ada Selisih:{' '}
-              <strong className="text-amber-400">{opname.summary.itemsWithDiscrepancy}</strong> item
+              <strong className="text-amber-700 dark:text-amber-400">
+                {opname.summary.itemsWithDiscrepancy}
+              </strong>{' '}
+              item
             </span>
           </div>
         </div>
 
         {opname.items.length === 0 ? (
-          <div className="py-8 text-center text-sm text-slate-400">
+          <div className="py-8 text-center text-sm text-slate-500 dark:text-slate-400">
             Tidak ada item stok pada lokasi yang dipilih saat snapshot diambil.
           </div>
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full text-left text-sm text-slate-300">
-              <thead className="border-b border-slate-800 text-xs font-semibold tracking-wider text-slate-400 uppercase">
+            <table className="w-full text-left text-sm">
+              <thead className="border-b border-slate-200 text-xs font-semibold tracking-wider text-slate-600 uppercase dark:border-slate-800 dark:text-slate-400">
                 <tr>
                   <th className="px-3 py-3">Lokasi</th>
                   <th className="px-3 py-3">Produk / SKU</th>
-                  <th className="px-3 py-3">Batch & Expired</th>
+                  <th className="px-3 py-3">Batch &amp; Expired</th>
                   <th className="px-3 py-3 text-right">Stok Sistem</th>
                   <th className="px-3 py-3 text-right">Hitung Fisik</th>
                   <th className="px-3 py-3 text-right">Selisih</th>
                   <th className="px-3 py-3">Catatan Item</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-800/60 font-normal">
+              <tbody className="divide-y divide-slate-100 font-normal dark:divide-slate-800/60">
                 {opname.items.map((item) => {
                   const currentPhysical = counts[item.id]?.physicalQty;
                   const parsedPhysical =
@@ -655,41 +672,48 @@ export default function StockOpnameDetailPage({ params }: PageProps) {
                       : null;
 
                   return (
-                    <tr key={item.id} className="hover:bg-slate-800/20">
+                    <tr
+                      key={item.id}
+                      className="transition-colors hover:bg-slate-50/70 dark:hover:bg-slate-800/20"
+                    >
                       {/* Lokasi */}
                       <td className="px-3 py-3">
-                        <span className="font-mono font-medium text-slate-200">
+                        <span className="font-mono font-medium text-slate-900 dark:text-slate-200">
                           {item.location.code}
                         </span>
-                        <div className="text-xs text-slate-500">
+                        <div className="text-xs text-slate-500 dark:text-slate-400">
                           Z:{item.location.zone} R:{item.location.rack} L:{item.location.level}
                         </div>
                       </td>
 
                       {/* Produk */}
                       <td className="px-3 py-3">
-                        <div className="font-medium text-slate-200">{item.product.name}</div>
-                        <div className="font-mono text-xs text-slate-500">
+                        <div className="font-medium text-slate-900 dark:text-slate-200">
+                          {item.product.name}
+                        </div>
+                        <div className="font-mono text-xs text-slate-500 dark:text-slate-400">
                           SKU: {item.product.sku} · {item.product.uom}
                         </div>
                       </td>
 
                       {/* Batch */}
                       <td className="px-3 py-3">
-                        <span className="font-mono text-xs text-slate-300">
+                        <span className="font-mono text-xs text-slate-800 dark:text-slate-300">
                           {item.batch.batchNo}
                         </span>
                         {item.batch.expiryDate ? (
-                          <div className="text-xs text-slate-500">
+                          <div className="text-xs text-slate-500 dark:text-slate-400">
                             Exp: {new Date(item.batch.expiryDate).toLocaleDateString('id-ID')}
                           </div>
                         ) : (
-                          <div className="text-xs text-slate-500">Tanpa Exp</div>
+                          <div className="text-xs text-slate-400 dark:text-slate-500">
+                            Tanpa Exp
+                          </div>
                         )}
                       </td>
 
                       {/* Sistem Qty */}
-                      <td className="px-3 py-3 text-right font-mono font-semibold text-slate-300">
+                      <td className="px-3 py-3 text-right font-mono font-semibold text-slate-800 dark:text-slate-300">
                         {item.systemQty}
                       </td>
 
@@ -705,10 +729,10 @@ export default function StockOpnameDetailPage({ params }: PageProps) {
                               handleCountChange(item.id, 'physicalQty', e.target.value)
                             }
                             placeholder="0"
-                            className="w-24 rounded border border-slate-700 bg-slate-950 px-2.5 py-1 text-right font-mono text-sm text-white focus:border-emerald-500 focus:outline-none"
+                            className="w-24 rounded border border-slate-300 bg-white px-2.5 py-1 text-right font-mono text-sm text-slate-900 focus:border-emerald-500 focus:outline-none dark:border-slate-700 dark:bg-slate-950 dark:text-white"
                           />
                         ) : (
-                          <span className="font-mono font-semibold text-slate-200">
+                          <span className="font-mono font-semibold text-slate-900 dark:text-slate-200">
                             {item.physicalQty !== null ? item.physicalQty : '-'}
                           </span>
                         )}
@@ -717,17 +741,21 @@ export default function StockOpnameDetailPage({ params }: PageProps) {
                       {/* Selisih */}
                       <td className="px-3 py-3 text-right">
                         {liveDiff === null ? (
-                          <span className="text-xs text-slate-500">Belum dihitung</span>
+                          <span className="text-xs text-slate-400 dark:text-slate-500">
+                            Belum dihitung
+                          </span>
                         ) : liveDiff > 0 ? (
-                          <span className="font-mono font-bold text-emerald-400">
+                          <span className="font-mono font-bold text-emerald-700 dark:text-emerald-400">
                             +{liveDiff} (Lebih)
                           </span>
                         ) : liveDiff < 0 ? (
-                          <span className="font-mono font-bold text-rose-400">
+                          <span className="font-mono font-bold text-rose-700 dark:text-rose-400">
                             {liveDiff} (Kurang)
                           </span>
                         ) : (
-                          <span className="font-mono text-slate-400">0 (Sesuai)</span>
+                          <span className="font-mono text-slate-500 dark:text-slate-400">
+                            0 (Sesuai)
+                          </span>
                         )}
                       </td>
 
@@ -739,10 +767,12 @@ export default function StockOpnameDetailPage({ params }: PageProps) {
                             value={counts[item.id]?.notes ?? ''}
                             onChange={(e) => handleCountChange(item.id, 'notes', e.target.value)}
                             placeholder="Catatan..."
-                            className="w-full rounded border border-slate-700 bg-slate-950 px-2 py-1 text-xs text-slate-200 focus:border-emerald-500 focus:outline-none"
+                            className="w-full rounded border border-slate-300 bg-white px-2 py-1 text-xs text-slate-900 focus:border-emerald-500 focus:outline-none dark:border-slate-700 dark:bg-slate-950 dark:text-slate-200"
                           />
                         ) : (
-                          <span className="text-xs text-slate-400">{item.notes || '-'}</span>
+                          <span className="text-xs text-slate-500 dark:text-slate-400">
+                            {item.notes || '-'}
+                          </span>
                         )}
                       </td>
                     </tr>
@@ -757,16 +787,21 @@ export default function StockOpnameDetailPage({ params }: PageProps) {
       {/* Approve Modal */}
       {showApproveModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm">
-          <div className="w-full max-w-lg rounded-xl border border-slate-800 bg-slate-900 p-6 shadow-2xl">
-            <h3 className="text-lg font-bold text-white">Konfirmasi Persetujuan Stock Opname</h3>
-            <div className="mt-3 space-y-3 text-sm text-slate-300">
+          <div className="w-full max-w-lg rounded-xl border border-slate-200 bg-white p-6 shadow-2xl dark:border-slate-800 dark:bg-slate-900">
+            <h3 className="text-lg font-bold text-slate-900 dark:text-white">
+              Konfirmasi Persetujuan Stock Opname
+            </h3>
+            <div className="mt-3 space-y-3 text-sm text-slate-700 dark:text-slate-300">
               <p>
                 Anda akan menyetujui dokumen{' '}
-                <strong className="font-mono text-emerald-400">{opname.opnameNo}</strong>.
+                <strong className="font-mono text-emerald-700 dark:text-emerald-400">
+                  {opname.opnameNo}
+                </strong>
+                .
               </p>
-              <div className="rounded-lg border border-emerald-500/30 bg-emerald-950/20 p-3 text-xs leading-relaxed text-emerald-200/90">
-                <strong className="font-semibold text-emerald-300">
-                  Efek Eksekusi Atomik (BR-24):
+              <div className="rounded-lg border border-emerald-200 bg-emerald-50/80 p-3 text-xs leading-relaxed text-emerald-950 dark:border-emerald-500/30 dark:bg-emerald-950/20 dark:text-emerald-200/90">
+                <strong className="font-semibold text-emerald-800 dark:text-emerald-300">
+                  Efek Penyesuaian Stok:
                 </strong>
                 <ul className="mt-1.5 list-inside list-disc space-y-1">
                   <li>
@@ -812,23 +847,23 @@ export default function StockOpnameDetailPage({ params }: PageProps) {
       {/* Reject Modal */}
       {showRejectModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm">
-          <div className="w-full max-w-lg rounded-xl border border-slate-800 bg-slate-900 p-6 shadow-2xl">
-            <h3 className="text-lg font-bold text-white">Tolak Stock Opname</h3>
-            <p className="mt-2 text-sm text-slate-400">
+          <div className="w-full max-w-lg rounded-xl border border-slate-200 bg-white p-6 shadow-2xl dark:border-slate-800 dark:bg-slate-900">
+            <h3 className="text-lg font-bold text-slate-900 dark:text-white">Tolak Stock Opname</h3>
+            <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">
               Stok fisik tidak akan berubah, lokasi rak akan dibuka kembali, dan alasan penolakan
-              wajib dicatat (BR-25).
+              wajib dicatat.
             </p>
 
             <div className="mt-4 space-y-2">
-              <label className="text-xs font-semibold text-slate-300">
-                Alasan Penolakan <span className="text-rose-400">*</span>
+              <label className="text-xs font-semibold text-slate-700 dark:text-slate-300">
+                Alasan Penolakan <span className="text-rose-500">*</span>
               </label>
               <textarea
                 rows={3}
                 value={rejectionReason}
                 onChange={(e) => setRejectionReason(e.target.value)}
                 placeholder="Contoh: Terjadi kesalahan penomoran batch atau perlu dihitung ulang..."
-                className="w-full rounded-lg border border-slate-700 bg-slate-950 p-3 text-sm text-slate-200 placeholder-slate-600 focus:border-rose-500 focus:outline-none"
+                className="w-full rounded-lg border border-slate-300 bg-white p-3 text-sm text-slate-900 placeholder-slate-400 focus:border-rose-500 focus:outline-none dark:border-slate-700 dark:bg-slate-950 dark:text-slate-200 dark:placeholder-slate-600"
               />
             </div>
 

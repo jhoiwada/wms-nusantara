@@ -14,7 +14,7 @@ export function AppShell({ user, children }: AppShellProps) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   return (
-    <div className="flex h-screen w-full overflow-hidden bg-[#090d16] text-slate-100 selection:bg-emerald-500/30 selection:text-emerald-300">
+    <div className="flex h-screen w-full overflow-hidden bg-[#fbfbfa] text-zinc-900 transition-colors duration-150 selection:bg-amber-500/30 selection:text-amber-950 dark:bg-[#111113] dark:text-zinc-100 dark:selection:bg-amber-500/30 dark:selection:text-amber-200">
       {/* Desktop Sidebar */}
       <div className="hidden md:flex md:w-64 md:flex-shrink-0">
         <Sidebar user={user} className="w-64" />

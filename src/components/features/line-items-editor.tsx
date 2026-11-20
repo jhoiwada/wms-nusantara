@@ -194,14 +194,14 @@ export function LineItemsEditor({
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col justify-between gap-2 border-b border-slate-200 pb-3 sm:flex-row sm:items-center dark:border-slate-800">
         <div>
-          <h3 className="text-sm font-bold text-slate-900">
+          <h3 className="text-sm font-semibold tracking-wide text-slate-900 uppercase dark:text-slate-100">
             Daftar Item Barang ({items.length} Baris)
           </h3>
-          <p className="text-xs text-slate-500">
-            Tentukan produk, lokasi rak simpan, kuantitas, dan konfigurasi batch kedaluwarsa (BR-06,
-            BR-07, BR-13).
+          <p className="mt-0.5 text-xs text-slate-500 dark:text-slate-400">
+            Tentukan produk, lokasi rak simpan, kuantitas, serta konfigurasi batch dan masa
+            kedaluwarsa.
           </p>
         </div>
 
@@ -232,7 +232,7 @@ export function LineItemsEditor({
               variant="outline"
               onClick={() => setIsScannerOpen(true)}
               disabled={disabled || products.length === 0}
-              className="h-8 gap-1.5 border-indigo-200 text-xs font-semibold text-indigo-700 shadow-xs hover:bg-indigo-50"
+              className="h-8 gap-1.5 border-emerald-300 text-xs font-semibold text-emerald-700 shadow-xs hover:bg-emerald-50 dark:border-emerald-800 dark:text-emerald-300 dark:hover:bg-emerald-950/40"
             >
               <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path
@@ -277,18 +277,22 @@ export function LineItemsEditor({
         <div
           className={`flex items-center justify-between rounded-md p-2.5 text-xs font-medium ${
             scanFeedback.type === 'success'
-              ? 'border border-emerald-200 bg-emerald-50 text-emerald-800'
-              : 'border border-rose-200 bg-rose-50 text-rose-800'
+              ? 'border border-emerald-200 bg-emerald-50 text-emerald-800 dark:border-emerald-800 dark:bg-emerald-950/50 dark:text-emerald-300'
+              : 'border border-rose-200 bg-rose-50 text-rose-800 dark:border-rose-800 dark:bg-rose-950/50 dark:text-rose-300'
           }`}
         >
           <div className="flex items-center gap-2">
-            <span>{scanFeedback.type === 'success' ? '✅' : '⚠️'}</span>
+            <span
+              className={`inline-block h-2 w-2 rounded-full ${
+                scanFeedback.type === 'success' ? 'bg-emerald-500' : 'bg-rose-500'
+              }`}
+            />
             <span>{scanFeedback.text}</span>
           </div>
           <button
             type="button"
             onClick={() => setScanFeedback(null)}
-            className="ml-2 text-slate-400 hover:text-slate-700"
+            className="ml-2 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200"
           >
             &times;
           </button>
@@ -296,16 +300,16 @@ export function LineItemsEditor({
       )}
 
       {availableLocations.length === 0 && (
-        <div className="rounded-lg border border-amber-200 bg-amber-50 p-3 text-xs text-amber-800">
-          ⚠️ Tidak ada lokasi rak aktif di gudang yang dipilih. Silakan buat lokasi rak di Master
+        <div className="rounded-lg border border-amber-200 bg-amber-50 p-3 text-xs text-amber-800 dark:border-amber-800 dark:bg-amber-950/40 dark:text-amber-300">
+          Tidak ada lokasi rak aktif di gudang yang dipilih. Silakan buat lokasi rak di Master
           Gudang terlebih dahulu.
         </div>
       )}
 
       {items.length === 0 ? (
-        <div className="rounded-xl border-2 border-dashed border-slate-200 bg-slate-50 py-10 text-center">
+        <div className="rounded-xl border-2 border-dashed border-slate-200 bg-slate-50/50 py-10 text-center dark:border-slate-800 dark:bg-slate-900/30">
           <svg
-            className="mx-auto mb-2 h-8 w-8 text-slate-400"
+            className="mx-auto mb-2 h-8 w-8 text-slate-400 dark:text-slate-600"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -317,44 +321,50 @@ export function LineItemsEditor({
               d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"
             />
           </svg>
-          <p className="text-xs font-semibold text-slate-700">Belum ada item ditambahkan</p>
-          <p className="mt-0.5 text-[11px] text-slate-500">
-            Tekan tombol &quot;Tambah Baris Item&quot; di atas untuk mengisi barang yang diterima.
+          <p className="text-xs font-semibold text-slate-700 dark:text-slate-300">
+            Belum ada item ditambahkan
+          </p>
+          <p className="mt-0.5 text-[11px] text-slate-500 dark:text-slate-400">
+            Tekan tombol &quot;Tambah Baris&quot; di atas untuk mengisi barang yang diterima.
           </p>
         </div>
       ) : (
-        <div className="overflow-x-auto rounded-lg border border-slate-200 bg-white shadow-sm">
+        <div className="overflow-x-auto rounded-lg border border-slate-200 bg-white shadow-xs dark:border-slate-800 dark:bg-slate-950">
           <table className="w-full border-collapse text-left text-xs">
             <thead>
-              <tr className="border-b border-slate-200 bg-slate-50 font-semibold text-slate-600">
+              <tr className="border-b border-slate-200 bg-slate-50 font-semibold text-slate-700 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-300">
                 <th className="w-12 px-3 py-2.5 text-center">#</th>
                 <th className="min-w-[200px] px-3 py-2.5">Produk & SKU</th>
-                <th className="min-w-[160px] px-3 py-2.5">Lokasi Rak (BR-13)</th>
+                <th className="min-w-[160px] px-3 py-2.5">Lokasi Rak Simpan</th>
                 <th className="w-28 px-3 py-2.5">Kuantitas</th>
-                <th className="min-w-[160px] px-3 py-2.5">Batch Kedaluwarsa (BR-06)</th>
+                <th className="min-w-[160px] px-3 py-2.5">Batch & Kedaluwarsa</th>
                 <th className="w-32 px-3 py-2.5">Harga Beli</th>
                 <th className="w-32 px-3 py-2.5 text-right">Subtotal</th>
                 {!disabled && <th className="w-12 px-3 py-2.5 text-center">Aksi</th>}
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100">
+            <tbody className="divide-y divide-slate-100 dark:divide-slate-800/80">
               {items.map((row, index) => {
                 const prod = productMap.get(row.productId);
                 const isTrackExpiry = prod?.trackExpiry ?? false;
                 const subtotal = (Number(row.quantity) || 0) * (Number(row.unitPrice) || 0);
 
                 return (
-                  <tr key={row.key} className="transition-colors hover:bg-slate-50/60">
+                  <tr
+                    key={row.key}
+                    className="transition-colors hover:bg-slate-50/60 dark:hover:bg-slate-900/60"
+                  >
                     {/* Index */}
                     <td className="px-3 py-2 text-center font-mono text-slate-400">{index + 1}</td>
 
                     {/* Product */}
                     <td className="px-3 py-2">
                       <select
+                        aria-label={`Pilih produk baris ${index + 1}`}
                         value={row.productId}
                         onChange={(e) => handleUpdateItem(index, { productId: e.target.value })}
                         disabled={disabled}
-                        className="h-8 w-full rounded border border-slate-300 bg-white px-2 text-xs text-slate-900 focus:ring-1 focus:ring-indigo-500 focus:outline-none"
+                        className="h-8 w-full rounded border border-slate-300 bg-white px-2 text-xs text-slate-900 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 focus:outline-none dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100"
                       >
                         {products.map((p) => (
                           <option key={p.id} value={p.id}>
@@ -363,7 +373,7 @@ export function LineItemsEditor({
                         ))}
                       </select>
                       {prod?.trackExpiry ? (
-                        <span className="py-0.2 mt-1 inline-block rounded border border-amber-200 bg-amber-50 px-1.5 text-[10px] font-medium text-amber-700">
+                        <span className="mt-1 inline-block rounded border border-amber-200 bg-amber-50 px-1.5 py-0.5 text-[10px] font-medium text-amber-700 dark:border-amber-800/50 dark:bg-amber-950/40 dark:text-amber-300">
                           FEFO Expired Aktif
                         </span>
                       ) : null}
@@ -372,10 +382,11 @@ export function LineItemsEditor({
                     {/* Location */}
                     <td className="px-3 py-2">
                       <select
+                        aria-label={`Pilih lokasi rak baris ${index + 1}`}
                         value={row.locationId}
                         onChange={(e) => handleUpdateItem(index, { locationId: e.target.value })}
                         disabled={disabled}
-                        className="h-8 w-full rounded border border-slate-300 bg-white px-2 font-mono text-xs text-slate-900 focus:ring-1 focus:ring-indigo-500 focus:outline-none"
+                        className="h-8 w-full rounded border border-slate-300 bg-white px-2 font-mono text-xs text-slate-900 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 focus:outline-none dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100"
                       >
                         {availableLocations.map((loc) => (
                           <option key={loc.id} value={loc.id}>
@@ -400,7 +411,7 @@ export function LineItemsEditor({
                           disabled={disabled}
                           className="h-8 w-20 font-mono text-xs"
                         />
-                        <span className="text-[11px] font-semibold text-slate-500 uppercase">
+                        <span className="text-[11px] font-semibold text-slate-500 uppercase dark:text-slate-400">
                           {prod?.uom || 'PCS'}
                         </span>
                       </div>
@@ -429,7 +440,7 @@ export function LineItemsEditor({
                             }
                             disabled={disabled}
                             required
-                            className="h-7 w-full rounded border border-slate-300 bg-white px-2 text-xs text-slate-800 focus:ring-1 focus:ring-indigo-500 focus:outline-none"
+                            className="h-7 w-full rounded border border-slate-300 bg-white px-2 text-xs text-slate-800 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 focus:outline-none dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100"
                           />
                           {row.expiryDate && (
                             <div className="text-[10px]">
@@ -444,13 +455,15 @@ export function LineItemsEditor({
                                 return days >= 0 ? (
                                   <span
                                     className={
-                                      days <= 30 ? 'font-medium text-amber-600' : 'text-slate-500'
+                                      days <= 30
+                                        ? 'font-medium text-amber-600 dark:text-amber-400'
+                                        : 'text-slate-500 dark:text-slate-400'
                                     }
                                   >
-                                    {days <= 30 ? '⚠️ ' : ''}Masa simpan: {days} hari
+                                    Masa simpan: {days} hari
                                   </span>
                                 ) : (
-                                  <span className="font-semibold text-rose-600">
+                                  <span className="font-semibold text-rose-600 dark:text-rose-400">
                                     Tanggal sudah terlewati!
                                   </span>
                                 );
@@ -460,7 +473,7 @@ export function LineItemsEditor({
                         </div>
                       ) : (
                         <div className="py-1">
-                          <span className="inline-flex items-center rounded border border-slate-200 bg-slate-100 px-2 py-0.5 text-[11px] font-medium text-slate-600">
+                          <span className="inline-flex items-center rounded border border-slate-200 bg-slate-100 px-2 py-0.5 text-[11px] font-medium text-slate-600 dark:border-slate-800 dark:bg-slate-800 dark:text-slate-300">
                             DEFAULT (Non-Expired)
                           </span>
                         </div>
@@ -484,7 +497,7 @@ export function LineItemsEditor({
                     </td>
 
                     {/* Subtotal */}
-                    <td className="px-3 py-2 text-right font-mono font-semibold text-slate-900">
+                    <td className="px-3 py-2 text-right font-mono font-semibold text-slate-900 dark:text-slate-100">
                       {formatRupiah(subtotal)}
                     </td>
 
@@ -494,7 +507,7 @@ export function LineItemsEditor({
                         <button
                           type="button"
                           onClick={() => handleRemoveItem(index)}
-                          className="rounded p-1 text-slate-400 transition-colors hover:bg-rose-50 hover:text-rose-600"
+                          className="rounded p-1 text-slate-400 transition-colors hover:bg-rose-50 hover:text-rose-600 dark:text-slate-500 dark:hover:bg-rose-950/40 dark:hover:text-rose-400"
                           title="Hapus baris"
                         >
                           <svg
@@ -518,18 +531,18 @@ export function LineItemsEditor({
               })}
             </tbody>
             {/* Table Summary Footer */}
-            <tfoot className="border-t border-slate-200 bg-slate-50 font-semibold text-slate-800">
+            <tfoot className="border-t border-slate-200 bg-slate-50 font-semibold text-slate-800 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-200">
               <tr>
                 <td colSpan={3} className="px-3 py-2.5 text-right">
                   Total Ringkasan:
                 </td>
-                <td className="px-3 py-2.5 font-mono text-indigo-700">
+                <td className="px-3 py-2.5 font-mono text-indigo-700 dark:text-indigo-400">
                   {totalQuantity.toLocaleString('id-ID')} Item
                 </td>
                 <td colSpan={2} className="px-3 py-2.5 text-right">
                   Total Nilai Barang:
                 </td>
-                <td className="px-3 py-2.5 text-right font-mono font-bold text-emerald-700">
+                <td className="px-3 py-2.5 text-right font-mono font-bold text-emerald-700 dark:text-emerald-400">
                   {formatRupiah(totalValue)}
                 </td>
                 {!disabled && <td />}

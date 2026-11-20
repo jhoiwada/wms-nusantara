@@ -255,13 +255,15 @@ export default function ProductsPage() {
       sortable: true,
       render: (item: ProductItem) => (
         <div>
-          <div className="font-medium text-slate-900">{item.name}</div>
+          <div className="font-semibold text-slate-900 dark:text-slate-100">{item.name}</div>
           <div className="mt-0.5 flex items-center gap-2">
-            <span className="rounded border border-indigo-100 bg-indigo-50 px-1.5 py-0.5 text-xs font-medium text-indigo-600">
+            <span className="rounded border border-indigo-100 bg-indigo-50 px-1.5 py-0.5 text-xs font-medium text-indigo-700 dark:border-indigo-900/50 dark:bg-indigo-950/50 dark:text-indigo-300">
               {item.category.name}
             </span>
             {item.description ? (
-              <span className="max-w-xs truncate text-xs text-slate-500">{item.description}</span>
+              <span className="max-w-xs truncate text-xs text-slate-500 dark:text-slate-400">
+                {item.description}
+              </span>
             ) : null}
           </div>
         </div>
@@ -272,7 +274,7 @@ export default function ProductsPage() {
       header: 'Satuan',
       sortable: true,
       render: (item: ProductItem) => (
-        <span className="rounded bg-slate-100 px-2 py-1 text-xs font-semibold text-slate-700">
+        <span className="rounded bg-slate-100 px-2 py-1 text-xs font-semibold text-slate-700 dark:bg-slate-800 dark:text-slate-300">
           {item.uom}
         </span>
       ),
@@ -282,7 +284,7 @@ export default function ProductsPage() {
       header: 'Min Stok',
       sortable: true,
       render: (item: ProductItem) => (
-        <span className="text-xs font-medium text-slate-800">
+        <span className="text-xs font-medium text-slate-800 dark:text-slate-200">
           {item.minStock.toLocaleString('id-ID')} {item.uom}
         </span>
       ),
@@ -292,23 +294,23 @@ export default function ProductsPage() {
       header: 'Harga Beli',
       sortable: true,
       render: (item: ProductItem) => (
-        <span className="font-mono text-xs font-semibold text-emerald-700">
+        <span className="font-mono text-xs font-semibold text-emerald-700 dark:text-emerald-400">
           {formatRupiah(item.costPrice)}
         </span>
       ),
     },
     {
       key: 'trackExpiry',
-      header: 'Kedaluwarsa (BR-06)',
+      header: 'Pelacakan Batch',
       render: (item: ProductItem) =>
         item.trackExpiry ? (
-          <span className="inline-flex items-center gap-1.5 rounded-full border border-amber-200 bg-amber-50 px-2.5 py-1 text-xs font-medium text-amber-700">
+          <span className="inline-flex items-center gap-1.5 rounded-full border border-amber-200 bg-amber-50 px-2.5 py-1 text-xs font-medium text-amber-700 dark:border-amber-900/50 dark:bg-amber-950/40 dark:text-amber-300">
             <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-amber-500" />
-            FEFO Expired
+            Lacak Kedaluwarsa
           </span>
         ) : (
-          <span className="inline-flex items-center gap-1.5 rounded-full border border-slate-200 bg-slate-50 px-2.5 py-1 text-xs font-medium text-slate-600">
-            DEFAULT
+          <span className="inline-flex items-center gap-1.5 rounded-full border border-slate-200 bg-slate-50 px-2.5 py-1 text-xs font-medium text-slate-500 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-400">
+            Tanpa Batch
           </span>
         ),
     },
@@ -330,7 +332,7 @@ export default function ProductsPage() {
             size="sm"
             variant="ghost"
             onClick={() => setPrintingProduct(item)}
-            className="h-7 px-2 text-xs text-indigo-600 hover:bg-indigo-50"
+            className="h-7 px-2 text-xs text-indigo-600 hover:bg-indigo-50 dark:text-indigo-400 dark:hover:bg-indigo-950/50"
             title="Cetak Label Barcode"
           >
             Label
@@ -349,7 +351,7 @@ export default function ProductsPage() {
               variant="outline"
               onClick={() => handleDeactivate(item)}
               disabled={isPending}
-              className="h-7 border-rose-200 px-2 text-xs text-rose-600 hover:bg-rose-50"
+              className="h-7 border-rose-200 px-2 text-xs text-rose-600 hover:bg-rose-50 dark:border-rose-900/50 dark:text-rose-400 dark:hover:bg-rose-950/50"
             >
               Nonaktifkan
             </Button>
@@ -359,7 +361,7 @@ export default function ProductsPage() {
               variant="outline"
               onClick={() => handleToggleActivate(item)}
               disabled={isPending}
-              className="h-7 border-emerald-200 px-2 text-xs text-emerald-600 hover:bg-emerald-50"
+              className="h-7 border-emerald-200 px-2 text-xs text-emerald-600 hover:bg-emerald-50 dark:border-emerald-900/50 dark:text-emerald-400 dark:hover:bg-emerald-950/50"
             >
               Aktifkan
             </Button>
@@ -372,15 +374,17 @@ export default function ProductsPage() {
   return (
     <div className="space-y-6">
       {/* Page Header */}
-      <div className="flex flex-col gap-4 border-b border-slate-200 pb-5 sm:flex-row sm:items-center sm:justify-between">
+      <div className="flex flex-col gap-4 border-b border-slate-200 pb-5 sm:flex-row sm:items-center sm:justify-between dark:border-slate-800">
         <div>
           <div className="flex items-center gap-3">
-            <h1 className="text-2xl font-bold tracking-tight text-slate-900">Master Produk</h1>
-            <span className="rounded-full border border-indigo-200 bg-indigo-50 px-2.5 py-0.5 text-xs font-medium text-indigo-700">
+            <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-100">
+              Master Produk
+            </h1>
+            <span className="rounded-full border border-indigo-200 bg-indigo-50 px-2.5 py-0.5 text-xs font-medium text-indigo-700 dark:border-indigo-800 dark:bg-indigo-950/50 dark:text-indigo-300">
               {products.length} SKU
             </span>
           </div>
-          <p className="mt-1 text-sm text-slate-500">
+          <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
             Katalog barang, SKU/barcode unik, ambang minimum stok, dan konfigurasi pelacakan batch
             kedaluwarsa (FEFO).
           </p>
@@ -390,7 +394,7 @@ export default function ProductsPage() {
           <select
             value={selectedCategory}
             onChange={(e) => setSelectedCategory(e.target.value)}
-            className="h-9 rounded-md border border-slate-300 bg-white px-3 text-xs font-medium text-slate-700 focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+            className="h-9 rounded-md border border-slate-300 bg-white px-3 text-xs font-medium text-slate-900 focus:ring-2 focus:ring-indigo-500 focus:outline-none dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100"
           >
             <option value="ALL">Semua Kategori</option>
             {categories.map((cat) => (
@@ -403,7 +407,7 @@ export default function ProductsPage() {
             <Button
               variant="outline"
               size="sm"
-              className="h-9 gap-1.5 border-indigo-200 text-indigo-700 hover:bg-indigo-50"
+              className="h-9 gap-1.5 border-indigo-200 text-indigo-700 hover:bg-indigo-50 dark:border-indigo-800 dark:text-indigo-300 dark:hover:bg-indigo-950/50"
             >
               <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path
@@ -449,19 +453,19 @@ export default function ProductsPage() {
         isOpen={isDialogOpen}
         onClose={() => setIsDialogOpen(false)}
         title={editingProduct ? 'Edit Data Produk' : 'Tambah Produk Baru'}
-        description="Pastikan SKU dan barcode unik. Produk dengan kedaluwarsa akan mewajibkan batch di setiap penerimaan (BR-06)."
+        description="Pastikan SKU dan barcode unik. Produk dengan fitur kedaluwarsa akan mewajibkan nomor batch dan tanggal expired pada setiap penerimaan."
         maxWidth="lg"
       >
         <form onSubmit={handleSubmit} className="space-y-4">
           {formError ? (
-            <div className="rounded-lg border border-rose-200 bg-rose-50 p-3 text-xs font-medium text-rose-700">
+            <div className="rounded-lg border border-rose-200 bg-rose-50 p-3 text-xs font-medium text-rose-700 dark:border-rose-900/60 dark:bg-rose-950/40 dark:text-rose-300">
               {formError}
             </div>
           ) : null}
 
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div>
-              <label className="mb-1 block text-xs font-semibold text-slate-700">
+              <label className="mb-1 block text-xs font-semibold text-slate-700 dark:text-slate-300">
                 SKU Produk <span className="text-rose-500">*</span>
               </label>
               <Input
@@ -471,13 +475,13 @@ export default function ProductsPage() {
                 required
                 className="font-mono text-sm uppercase"
               />
-              <p className="mt-1 text-[11px] text-slate-500">
-                Kode unik barang (disimpan uppercase, BR-31).
+              <p className="mt-1 text-[11px] text-slate-500 dark:text-slate-400">
+                Kode unik barang, disimpan dalam format huruf besar.
               </p>
             </div>
 
             <div>
-              <label className="mb-1 block text-xs font-semibold text-slate-700">
+              <label className="mb-1 block text-xs font-semibold text-slate-700 dark:text-slate-300">
                 Barcode / EAN (Opsional)
               </label>
               <Input
@@ -486,7 +490,7 @@ export default function ProductsPage() {
                 placeholder="mis. 8998866200112"
                 className="font-mono text-sm"
               />
-              <p className="mt-1 text-[11px] text-slate-500">
+              <p className="mt-1 text-[11px] text-slate-500 dark:text-slate-400">
                 Nomor barcode unik untuk pemindaian scanner.
               </p>
             </div>
@@ -494,7 +498,7 @@ export default function ProductsPage() {
 
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div>
-              <label className="mb-1 block text-xs font-semibold text-slate-700">
+              <label className="mb-1 block text-xs font-semibold text-slate-700 dark:text-slate-300">
                 Nama Produk <span className="text-rose-500">*</span>
               </label>
               <Input
@@ -506,14 +510,14 @@ export default function ProductsPage() {
             </div>
 
             <div>
-              <label className="mb-1 block text-xs font-semibold text-slate-700">
+              <label className="mb-1 block text-xs font-semibold text-slate-700 dark:text-slate-300">
                 Kategori <span className="text-rose-500">*</span>
               </label>
               <select
                 value={formCategoryId}
                 onChange={(e) => setFormCategoryId(e.target.value)}
                 required
-                className="h-10 w-full rounded-md border border-slate-300 bg-white px-3 text-sm text-slate-900 focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+                className="h-10 w-full rounded-md border border-slate-300 bg-white px-3 text-sm text-slate-900 focus:ring-2 focus:ring-indigo-500 focus:outline-none dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100"
               >
                 {categories.length === 0 ? (
                   <option value="">Tidak ada kategori aktif</option>
@@ -530,7 +534,7 @@ export default function ProductsPage() {
 
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
             <div>
-              <label className="mb-1 block text-xs font-semibold text-slate-700">
+              <label className="mb-1 block text-xs font-semibold text-slate-700 dark:text-slate-300">
                 Satuan (UOM) <span className="text-rose-500">*</span>
               </label>
               <Input
@@ -543,7 +547,7 @@ export default function ProductsPage() {
             </div>
 
             <div>
-              <label className="mb-1 block text-xs font-semibold text-slate-700">
+              <label className="mb-1 block text-xs font-semibold text-slate-700 dark:text-slate-300">
                 Min Stok (Ambang Menipis)
               </label>
               <Input
@@ -554,11 +558,13 @@ export default function ProductsPage() {
                 placeholder="0"
                 required
               />
-              <p className="mt-1 text-[11px] text-slate-500">BR-04 dihitung agregat.</p>
+              <p className="mt-1 text-[11px] text-slate-500 dark:text-slate-400">
+                Batas stok minimum sebelum peringatan tampil.
+              </p>
             </div>
 
             <div>
-              <label className="mb-1 block text-xs font-semibold text-slate-700">
+              <label className="mb-1 block text-xs font-semibold text-slate-700 dark:text-slate-300">
                 Harga Beli (Cost Price)
               </label>
               <Input
@@ -569,24 +575,26 @@ export default function ProductsPage() {
                 placeholder="0"
                 required
               />
-              <p className="mt-1 text-[11px] text-slate-500">BR-05 valuasi persediaan.</p>
+              <p className="mt-1 text-[11px] text-slate-500 dark:text-slate-400">
+                Digunakan untuk kalkulasi nilai persediaan.
+              </p>
             </div>
           </div>
 
           {/* Track Expiry Toggle */}
-          <div className="rounded-lg border border-amber-200 bg-amber-50/60 p-3">
+          <div className="rounded-lg border border-amber-200 bg-amber-50/60 p-3 dark:border-amber-900/50 dark:bg-amber-950/30">
             <label className="flex cursor-pointer items-start gap-3">
               <input
                 type="checkbox"
                 checked={formTrackExpiry}
                 onChange={(e) => setFormTrackExpiry(e.target.checked)}
-                className="mt-0.5 h-4 w-4 rounded border-amber-300 text-amber-600 focus:ring-amber-500"
+                className="mt-0.5 h-4 w-4 rounded border-amber-300 text-amber-600 focus:ring-amber-500 dark:border-amber-700 dark:bg-slate-900"
               />
               <div>
-                <span className="text-xs font-bold text-slate-900">
-                  Lacak Kedaluwarsa & Batch (FEFO - BR-06)
+                <span className="text-xs font-bold text-slate-900 dark:text-slate-100">
+                  Lacak Kedaluwarsa &amp; Batch (Metode FEFO)
                 </span>
-                <p className="mt-0.5 text-[11px] text-slate-600">
+                <p className="mt-0.5 text-[11px] text-slate-600 dark:text-slate-400">
                   Jika diaktifkan, setiap penerimaan barang masuk (GR) wajib mengisi nomor batch dan
                   tanggal kedaluwarsa. Pengiriman keluar (DO) otomatis memprioritaskan batch yang
                   paling dekat expired.
@@ -596,7 +604,7 @@ export default function ProductsPage() {
           </div>
 
           <div>
-            <label className="mb-1 block text-xs font-semibold text-slate-700">
+            <label className="mb-1 block text-xs font-semibold text-slate-700 dark:text-slate-300">
               Deskripsi (Opsional)
             </label>
             <textarea
@@ -604,11 +612,11 @@ export default function ProductsPage() {
               onChange={(e) => setFormDesc(e.target.value)}
               placeholder="Catatan spesifikasi produk..."
               rows={2}
-              className="w-full rounded-md border border-slate-300 p-2.5 text-xs text-slate-900 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 focus:outline-none"
+              className="w-full rounded-md border border-slate-300 bg-white p-2.5 text-xs text-slate-900 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 focus:outline-none dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100"
             />
           </div>
 
-          <div className="flex items-center justify-end gap-2 border-t border-slate-200 pt-3">
+          <div className="flex items-center justify-end gap-2 border-t border-slate-200 pt-3 dark:border-slate-800">
             <Button type="button" variant="ghost" onClick={() => setIsDialogOpen(false)}>
               Batal
             </Button>

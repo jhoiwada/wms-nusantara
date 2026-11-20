@@ -217,7 +217,7 @@ export function generateBarcodeSvgString(text: string, options: BarcodeRenderOpt
 
   const textElement =
     showText && encoded.text
-      ? `<text x="${totalWidth / 2}" y="${height + 12}" font-family="monospace, monospace" font-size="10" font-weight="bold" text-anchor="middle" fill="#1e293b">${escapeXml(encoded.text)}</text>`
+      ? `<text x="${totalWidth / 2}" y="${height + 12}" font-family="monospace, monospace" font-size="10" font-weight="bold" text-anchor="middle" fill="#18181b">${escapeXml(encoded.text)}</text>`
       : '';
 
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${totalWidth} ${totalHeight}" width="100%" height="100%" preserveAspectRatio="xMidYMid meet">${rects}${textElement}</svg>`;

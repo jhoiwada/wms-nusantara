@@ -295,7 +295,7 @@ export default function StockOverviewPage() {
     },
     {
       key: 'totalValue',
-      header: 'Nilai Stok (BR-05)',
+      header: 'Nilai Stok',
       sortable: true,
       render: (row) => (
         <div className="font-mono text-xs text-slate-800 dark:text-slate-200">
@@ -344,8 +344,8 @@ export default function StockOverviewPage() {
             Stok & Kartu Stok Gudang
           </h1>
           <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
-            Pantau posisi saldo stok per produk dan lokasi, audit konsistensi mutasi (BR-01 s.d.
-            BR-05, BR-29, BR-30).
+            Pantau saldo stok per produk dan lokasi rak, serta verifikasi konsistensi antara mutasi
+            dan tabel stok secara menyeluruh.
           </p>
         </div>
         <div className="flex items-center gap-2">
@@ -367,7 +367,7 @@ export default function StockOverviewPage() {
         </div>
         <div className="rounded-lg border border-slate-200 bg-white p-4 dark:border-slate-800 dark:bg-slate-950">
           <div className="text-xs font-medium text-slate-500 dark:text-slate-400">
-            Total Nilai Stok (BR-05)
+            Total Nilai Persediaan
           </div>
           <div className="mt-1 font-mono text-2xl font-bold text-slate-900 dark:text-slate-100">
             Rp {totalValue.toLocaleString('id-ID')}
@@ -375,7 +375,7 @@ export default function StockOverviewPage() {
         </div>
         <div className="rounded-lg border border-amber-200 bg-white p-4 dark:border-amber-900/50 dark:bg-slate-950">
           <div className="text-xs font-medium text-amber-600 dark:text-amber-400">
-            Produk Stok Menipis (BR-04)
+            Produk Stok Menipis
           </div>
           <div className="mt-1 font-mono text-2xl font-bold text-amber-700 dark:text-amber-400">
             {lowStockCount} Produk
@@ -421,7 +421,7 @@ export default function StockOverviewPage() {
               : 'border-transparent text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'
           }`}
         >
-          ⚡ Audit Konsistensi Sistem (T1.9)
+          Audit Konsistensi Stok
         </button>
       </div>
 
@@ -433,7 +433,7 @@ export default function StockOverviewPage() {
             <div className="flex items-center gap-2">
               <label
                 htmlFor="filter-stock-category-select"
-                className="text-xs whitespace-nowrap text-slate-500"
+                className="text-xs whitespace-nowrap text-slate-500 dark:text-slate-400"
               >
                 Kategori:
               </label>
@@ -441,7 +441,7 @@ export default function StockOverviewPage() {
                 id="filter-stock-category-select"
                 value={selectedCategory}
                 onChange={(e) => setSelectedCategory(e.target.value)}
-                className="rounded-md border border-slate-300 bg-white px-2 py-1.5 text-xs focus:ring-1 focus:ring-slate-950 focus:outline-none dark:border-slate-700 dark:bg-slate-900 dark:focus:ring-slate-300"
+                className="rounded-md border border-slate-300 bg-white px-2 py-1.5 text-xs text-slate-900 focus:ring-1 focus:ring-slate-950 focus:outline-none dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:focus:ring-slate-300"
               >
                 <option value="ALL">Semua Kategori</option>
                 {categories.map((c) => (
@@ -456,7 +456,7 @@ export default function StockOverviewPage() {
             <div className="flex items-center gap-2">
               <label
                 htmlFor="filter-stock-warehouse-select"
-                className="text-xs whitespace-nowrap text-slate-500"
+                className="text-xs whitespace-nowrap text-slate-500 dark:text-slate-400"
               >
                 Gudang:
               </label>
@@ -464,7 +464,7 @@ export default function StockOverviewPage() {
                 id="filter-stock-warehouse-select"
                 value={selectedWarehouse}
                 onChange={(e) => setSelectedWarehouse(e.target.value)}
-                className="rounded-md border border-slate-300 bg-white px-2 py-1.5 text-xs focus:ring-1 focus:ring-slate-950 focus:outline-none dark:border-slate-700 dark:bg-slate-900 dark:focus:ring-slate-300"
+                className="rounded-md border border-slate-300 bg-white px-2 py-1.5 text-xs text-slate-900 focus:ring-1 focus:ring-slate-950 focus:outline-none dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:focus:ring-slate-300"
               >
                 <option value="ALL">Semua Gudang</option>
                 {warehouses.map((wh) => (
@@ -596,11 +596,11 @@ export default function StockOverviewPage() {
           <div className="flex flex-col justify-between gap-4 rounded-lg border border-slate-200 bg-white p-4 sm:flex-row sm:items-center dark:border-slate-800 dark:bg-slate-950">
             <div>
               <h2 className="text-base font-bold text-slate-900 dark:text-slate-100">
-                Verifikasi Konsistensi Stok (Roadmap Invariant T1.9)
+                Verifikasi Konsistensi Stok
               </h2>
               <p className="mt-0.5 text-xs text-slate-500 dark:text-slate-400">
-                Memvalidasi bahwa <code>SUM(pergerakan stok) == SUM(tabel stok)</code> secara
-                menyeluruh untuk setiap SKU.
+                Memvalidasi bahwa jumlah kumulatif seluruh mutasi stok sesuai dengan saldo stok saat
+                ini untuk setiap SKU.
               </p>
             </div>
             <Button
@@ -608,9 +608,17 @@ export default function StockOverviewPage() {
               disabled={isAuditing}
               size="sm"
               variant="primary"
-              className="text-xs"
+              className="gap-2 text-xs"
             >
-              {isAuditing ? 'Memeriksa...' : '⚡ Jalankan Uji Konsistensi'}
+              <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M13 10V3L4 14h7v7l9-11h-7z"
+                />
+              </svg>
+              {isAuditing ? 'Memeriksa...' : 'Jalankan Uji Konsistensi'}
             </Button>
           </div>
 
@@ -618,7 +626,21 @@ export default function StockOverviewPage() {
             <div className="space-y-4">
               {consistencyData.isConsistent ? (
                 <div className="flex items-center gap-3 rounded-lg border border-emerald-200 bg-emerald-50 p-4 text-emerald-900 dark:border-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-200">
-                  <span className="text-2xl">✓</span>
+                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-emerald-100 dark:bg-emerald-900/60">
+                    <svg
+                      className="h-5 w-5 text-emerald-600 dark:text-emerald-400"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M5 13l4 4L19 7"
+                      />
+                    </svg>
+                  </div>
                   <div>
                     <div className="text-sm font-bold">
                       100% Konsisten: Semua Saldo Stok Sesuai dengan Riwayat Mutasi!
@@ -631,7 +653,21 @@ export default function StockOverviewPage() {
                 </div>
               ) : (
                 <div className="flex items-center gap-3 rounded-lg border border-rose-200 bg-rose-50 p-4 text-rose-900 dark:border-rose-800 dark:bg-rose-950/40 dark:text-rose-200">
-                  <span className="text-2xl">⚠</span>
+                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-rose-100 dark:bg-rose-900/60">
+                    <svg
+                      className="h-5 w-5 text-rose-600 dark:text-rose-400"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+                      />
+                    </svg>
+                  </div>
                   <div>
                     <div className="text-sm font-bold">
                       Ditemukan Selisih pada {consistencyData.inconsistentCount} Produk!
@@ -663,11 +699,19 @@ export default function StockOverviewPage() {
                         key={r.productId}
                         className="hover:bg-slate-50/50 dark:hover:bg-slate-900/50"
                       >
-                        <td className="px-3 py-2.5 font-mono font-semibold">{r.sku}</td>
-                        <td className="px-3 py-2.5 font-medium">{r.name}</td>
-                        <td className="px-3 py-2.5 text-right font-mono">{r.currentStock}</td>
-                        <td className="px-3 py-2.5 text-right font-mono">{r.movementSum}</td>
-                        <td className="px-3 py-2.5 text-right font-mono font-bold">
+                        <td className="px-3 py-2.5 font-mono font-semibold text-slate-900 dark:text-slate-100">
+                          {r.sku}
+                        </td>
+                        <td className="px-3 py-2.5 font-medium text-slate-900 dark:text-slate-100">
+                          {r.name}
+                        </td>
+                        <td className="px-3 py-2.5 text-right font-mono text-slate-700 dark:text-slate-300">
+                          {r.currentStock}
+                        </td>
+                        <td className="px-3 py-2.5 text-right font-mono text-slate-700 dark:text-slate-300">
+                          {r.movementSum}
+                        </td>
+                        <td className="px-3 py-2.5 text-right font-mono font-bold text-slate-900 dark:text-slate-100">
                           {r.difference === 0
                             ? '0'
                             : r.difference > 0
@@ -676,13 +720,9 @@ export default function StockOverviewPage() {
                         </td>
                         <td className="px-3 py-2.5 text-center">
                           {r.isConsistent ? (
-                            <span className="rounded bg-emerald-100 px-2 py-0.5 text-[11px] font-bold text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300">
-                              ✓ Cocok
-                            </span>
+                            <Badge variant="success">Cocok</Badge>
                           ) : (
-                            <span className="rounded bg-rose-100 px-2 py-0.5 text-[11px] font-bold text-rose-800 dark:bg-rose-950 dark:text-rose-300">
-                              ✕ Selisih
-                            </span>
+                            <Badge variant="danger">Selisih</Badge>
                           )}
                         </td>
                       </tr>

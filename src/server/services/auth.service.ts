@@ -9,10 +9,12 @@ import {
   resetLoginRateLimit,
 } from '@/server/auth/rate-limit';
 import { createSessionToken, type SessionUser } from '@/server/auth/session';
+import { recordAuditLog } from './audit-log.service';
 
 export async function loginUser(
   input: LoginInput,
   ip = '127.0.0.1',
+  userAgent?: string,
 ): Promise<{ token: string; user: SessionUser }> {
   const rateLimitKey = getRateLimitKey(ip, input.email);
   const rateLimit = checkLoginRateLimit(rateLimitKey);
@@ -24,9 +26,25 @@ export async function loginUser(
     );
   }
 
-  const user = await prisma.user.findUnique({
-    where: { email: input.email.toLowerCase().trim() },
+  const normalizedEmail = input.email.toLowerCase().trim();
+  const aliasMap: Record<string, string> = {
+    'admin@demo.test': 'admin@nldlogistics.co.id',
+    'manager@demo.test': 'manager@nldlogistics.co.id',
+    'staff@demo.test': 'staff@nldlogistics.co.id',
+    'viewer@demo.test': 'auditor@nldlogistics.co.id',
+  };
+
+  const targetEmail = aliasMap[normalizedEmail] || normalizedEmail;
+
+  let user = await prisma.user.findUnique({
+    where: { email: targetEmail },
   });
+
+  if (!user && targetEmail !== normalizedEmail) {
+    user = await prisma.user.findUnique({
+      where: { email: normalizedEmail },
+    });
+  }
 
   if (!user) {
     recordLoginFailure(rateLimitKey);
@@ -54,6 +72,19 @@ export async function loginUser(
   };
 
   const token = await createSessionToken(sessionUser);
+
+  // Rekam aktivitas login ke Audit Log sentral
+  void recordAuditLog({
+    userId: user.id,
+    userName: user.name,
+    userRole: user.role,
+    action: 'LOGIN',
+    entity: 'AUTH',
+    entityId: user.id,
+    description: `Pengguna '${user.name}' (${user.email}) berhasil masuk ke portal WMS`,
+    ipAddress: ip,
+    userAgent: userAgent || null,
+  });
 
   return { token, user: sessionUser };
 }

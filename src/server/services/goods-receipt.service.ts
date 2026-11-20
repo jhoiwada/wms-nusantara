@@ -266,7 +266,20 @@ async function validateGoodsReceiptItems(
   return validatedItems;
 }
 
+export const MAX_PUBLIC_DOCUMENTS_LIMIT = 100;
+
 export async function createGoodsReceipt(input: CreateGoodsReceiptInput, userId: string) {
+  // Proteksi Kuota Transaksi di Server Publik (Anti-Flooding Storage Exhaustion)
+  if (typeof prisma.goodsReceipt?.count === 'function') {
+    const currentCount = await prisma.goodsReceipt.count();
+    if (currentCount >= MAX_PUBLIC_DOCUMENTS_LIMIT) {
+      throw new AppError(
+        'FORBIDDEN',
+        `Kapasitas penyimpanan dokumen penerimaan showcase telah mencapai batas wajar (${MAX_PUBLIC_DOCUMENTS_LIMIT} dokumen). Silakan gunakan tombol 'Pulihkan Data' di menu Pengguna atau tunggu siklus reset otomatis berkala.`,
+      );
+    }
+  }
+
   // Validate Supplier (BR-32)
   const supplier = await prisma.supplier.findUnique({
     where: { id: input.supplierId },

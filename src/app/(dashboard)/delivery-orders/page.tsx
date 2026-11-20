@@ -221,8 +221,8 @@ export default function DeliveryOrdersListPage() {
             Barang Keluar (Delivery Order)
           </h1>
           <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
-            Kelola pengiriman barang ke customer, validasi stok, dan alokasi batch otomatis FEFO
-            (BR-08, BR-16 s.d. BR-19).
+            Kelola pengiriman barang ke customer, validasi stok, dan alokasi batch otomatis berbasis
+            FEFO.
           </p>
         </div>
         <div className="flex items-center gap-2">
@@ -308,7 +308,7 @@ export default function DeliveryOrdersListPage() {
             id="filter-warehouse-select"
             value={selectedWarehouse}
             onChange={(e) => setSelectedWarehouse(e.target.value)}
-            className="rounded-md border border-slate-300 bg-white px-2 py-1.5 text-xs focus:ring-1 focus:ring-slate-950 focus:outline-none dark:border-slate-700 dark:bg-slate-900 dark:focus:ring-slate-300"
+            className="rounded-md border border-slate-300 bg-white px-2 py-1.5 text-xs text-slate-900 focus:ring-1 focus:ring-slate-950 focus:outline-none dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:focus:ring-slate-300"
           >
             <option value="ALL">Semua Gudang</option>
             {warehouses.map((wh) => (
@@ -331,7 +331,7 @@ export default function DeliveryOrdersListPage() {
             id="filter-customer-select"
             value={selectedCustomer}
             onChange={(e) => setSelectedCustomer(e.target.value)}
-            className="rounded-md border border-slate-300 bg-white px-2 py-1.5 text-xs focus:ring-1 focus:ring-slate-950 focus:outline-none dark:border-slate-700 dark:bg-slate-900 dark:focus:ring-slate-300"
+            className="rounded-md border border-slate-300 bg-white px-2 py-1.5 text-xs text-slate-900 focus:ring-1 focus:ring-slate-950 focus:outline-none dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:focus:ring-slate-300"
           >
             <option value="ALL">Semua Customer</option>
             {customers.map((c) => (

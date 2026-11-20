@@ -1,0 +1,9 @@
+DirectoryIndex index.html
+
+# Laragon Apache Configuration for Next.js WMS
+# If Apache mod_proxy is enabled in Laragon, you can optionally proxy to port 3000:
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    # Uncomment the following lines if you want Apache to directly reverse proxy to Next.js port 3000:
+    # RewriteRule ^(.*)$ http://localhost:3000/$1 [P,L]
+</IfModule>

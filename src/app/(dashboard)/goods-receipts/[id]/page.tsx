@@ -102,7 +102,7 @@ export default function GoodsReceiptDetailPage({ params }: PageProps) {
   const handleReceive = () => {
     if (
       !confirm(
-        `Konfirmasi terima barang untuk dokumen '${gr?.receiptNo}'?\n\nStok fisik di gudang akan langsung bertambah dan mutasi stok dicatat (BR-12). Tindakan ini tidak dapat dibatalkan (BR-14).`,
+        `Konfirmasi terima barang untuk dokumen '${gr?.receiptNo}'?\n\nStok fisik di gudang akan langsung bertambah dan mutasi stok dicatat resmi. Tindakan ini bersifat final dan tidak dapat dibatalkan.`,
       )
     ) {
       return;
@@ -134,7 +134,7 @@ export default function GoodsReceiptDetailPage({ params }: PageProps) {
   const handleCancel = () => {
     if (
       !confirm(
-        `Apakah Anda yakin ingin membatalkan dokumen penerimaan '${gr?.receiptNo}'?\n\nDokumen yang dibatalkan tidak dapat diproses lagi, dan nomor dokumen ini tidak akan dipakai ulang (BR-15).`,
+        `Apakah Anda yakin ingin membatalkan dokumen penerimaan '${gr?.receiptNo}'?\n\nDokumen yang dibatalkan tidak dapat diproses lagi, dan nomor dokumen ini tidak akan dipakai ulang.`,
       )
     ) {
       return;
@@ -255,21 +255,24 @@ export default function GoodsReceiptDetailPage({ params }: PageProps) {
       )}
 
       {/* Header Document Card */}
-      <div className="space-y-6 rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
-        <div className="flex flex-col gap-4 border-b border-slate-100 pb-5 sm:flex-row sm:items-center sm:justify-between">
+      <div className="space-y-6 rounded-xl border border-slate-200 bg-white p-6 shadow-xs transition-colors dark:border-slate-800 dark:bg-slate-900">
+        <div className="flex flex-col gap-4 border-b border-slate-200 pb-5 sm:flex-row sm:items-center sm:justify-between dark:border-slate-800">
           <div>
             <div className="flex items-center gap-3">
-              <h1 className="font-mono text-2xl font-bold tracking-tight text-slate-900">
+              <h1 className="font-mono text-2xl font-bold tracking-tight text-slate-900 dark:text-white">
                 {gr.receiptNo}
               </h1>
               {gr.status === 'DRAFT' && <Badge variant="warning">DRAFT</Badge>}
               {gr.status === 'RECEIVED' && <Badge variant="success">RECEIVED (DITERIMA)</Badge>}
               {gr.status === 'CANCELLED' && <Badge variant="neutral">CANCELLED (BATAL)</Badge>}
             </div>
-            <p className="mt-1 text-xs text-slate-500">
-              Dibuat oleh <span className="font-semibold text-slate-700">{gr.createdBy.name}</span>{' '}
+            <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
+              Dibuat oleh{' '}
+              <span className="font-semibold text-slate-800 dark:text-slate-200">
+                {gr.createdBy.name}
+              </span>{' '}
               pada{' '}
-              {new Date(gr.createdAt).toLocaleDateString('id-ID', {
+              {new Date(gr.createdAt).toLocaleString('id-ID', {
                 dateStyle: 'full',
                 timeStyle: 'short',
               })}
@@ -283,7 +286,7 @@ export default function GoodsReceiptDetailPage({ params }: PageProps) {
                 variant="outline"
                 onClick={handleCancel}
                 disabled={isPending}
-                className="border-rose-200 text-xs text-rose-600 hover:bg-rose-50"
+                className="border-rose-200 text-xs text-rose-600 hover:bg-rose-50 dark:border-rose-800/80 dark:text-rose-400 dark:hover:bg-rose-950/40"
               >
                 Batalkan Dokumen
               </Button>
@@ -308,9 +311,9 @@ export default function GoodsReceiptDetailPage({ params }: PageProps) {
 
         {/* Informational Banner */}
         {gr.status === 'RECEIVED' && (
-          <div className="flex items-center gap-2 rounded-lg border border-emerald-200 bg-emerald-50/80 p-3 text-xs text-emerald-800">
+          <div className="flex items-center gap-2 rounded-lg border border-emerald-200 bg-emerald-50/90 p-3 text-xs text-emerald-900 dark:border-emerald-800/60 dark:bg-emerald-950/40 dark:text-emerald-300">
             <svg
-              className="h-4 w-4 shrink-0 text-emerald-600"
+              className="h-4 w-4 shrink-0 text-emerald-600 dark:text-emerald-400"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -326,14 +329,13 @@ export default function GoodsReceiptDetailPage({ params }: PageProps) {
               Dokumen ini telah resmi diterima pada{' '}
               <strong>
                 {gr.receivedAt
-                  ? new Date(gr.receivedAt).toLocaleDateString('id-ID', {
+                  ? new Date(gr.receivedAt).toLocaleString('id-ID', {
                       dateStyle: 'medium',
                       timeStyle: 'short',
                     })
                   : '-'}
               </strong>
-              . Stok fisik telah dialokasikan ke rak gudang dan tidak dapat diedit atau dibatalkan
-              (BR-14).
+              . Stok fisik telah dialokasikan ke rak gudang dan dokumen ini bersifat final.
             </span>
           </div>
         )}
@@ -341,42 +343,54 @@ export default function GoodsReceiptDetailPage({ params }: PageProps) {
         {/* Two Columns Details */}
         <div className="grid grid-cols-1 gap-6 text-xs md:grid-cols-3">
           {/* Supplier Info */}
-          <div className="rounded-lg border border-slate-100 bg-slate-50 p-4">
-            <div className="mb-1 text-[10px] font-semibold tracking-wider text-slate-400 uppercase">
+          <div className="rounded-lg border border-slate-200 bg-slate-50/80 p-4 dark:border-slate-800 dark:bg-slate-900/60">
+            <div className="mb-1 text-[10px] font-semibold tracking-wider text-slate-500 uppercase dark:text-slate-400">
               Pemasok / Supplier
             </div>
-            <div className="text-sm font-bold text-slate-900">{gr.supplier.name}</div>
-            <div className="mt-0.5 font-mono text-slate-500">Kode: {gr.supplier.code}</div>
+            <div className="text-sm font-bold text-slate-900 dark:text-white">
+              {gr.supplier.name}
+            </div>
+            <div className="mt-0.5 font-mono text-slate-500 dark:text-slate-400">
+              Kode: {gr.supplier.code}
+            </div>
             {gr.supplier.contactName && (
-              <div className="mt-1 text-slate-600">Kontak: {gr.supplier.contactName}</div>
+              <div className="mt-1 text-slate-600 dark:text-slate-300">
+                Kontak: {gr.supplier.contactName}
+              </div>
             )}
-            {gr.supplier.phone && <div className="text-slate-600">Telp: {gr.supplier.phone}</div>}
+            {gr.supplier.phone && (
+              <div className="text-slate-600 dark:text-slate-300">Telp: {gr.supplier.phone}</div>
+            )}
           </div>
 
           {/* Warehouse Info */}
-          <div className="rounded-lg border border-slate-100 bg-slate-50 p-4">
-            <div className="mb-1 text-[10px] font-semibold tracking-wider text-slate-400 uppercase">
+          <div className="rounded-lg border border-slate-200 bg-slate-50/80 p-4 dark:border-slate-800 dark:bg-slate-900/60">
+            <div className="mb-1 text-[10px] font-semibold tracking-wider text-slate-500 uppercase dark:text-slate-400">
               Gudang Tujuan Masuk
             </div>
-            <div className="text-sm font-bold text-slate-900">{gr.warehouse.name}</div>
-            <div className="mt-0.5 font-mono text-slate-500">Kode: {gr.warehouse.code}</div>
+            <div className="text-sm font-bold text-slate-900 dark:text-white">
+              {gr.warehouse.name}
+            </div>
+            <div className="mt-0.5 font-mono text-slate-500 dark:text-slate-400">
+              Kode: {gr.warehouse.code}
+            </div>
             {gr.warehouse.address && (
-              <div className="mt-1 text-slate-600">{gr.warehouse.address}</div>
+              <div className="mt-1 text-slate-600 dark:text-slate-300">{gr.warehouse.address}</div>
             )}
           </div>
 
           {/* Delivery & Notes Info */}
-          <div className="rounded-lg border border-slate-100 bg-slate-50 p-4">
-            <div className="mb-1 text-[10px] font-semibold tracking-wider text-slate-400 uppercase">
+          <div className="rounded-lg border border-slate-200 bg-slate-50/80 p-4 dark:border-slate-800 dark:bg-slate-900/60">
+            <div className="mb-1 text-[10px] font-semibold tracking-wider text-slate-500 uppercase dark:text-slate-400">
               Waktu Penerimaan & Catatan
             </div>
-            <div className="font-semibold text-slate-800">
+            <div className="font-semibold text-slate-800 dark:text-slate-200">
               Kedatangan:{' '}
               {gr.receivedAt
                 ? new Date(gr.receivedAt).toLocaleDateString('id-ID')
                 : 'Sesuai Jadwal'}
             </div>
-            <div className="mt-1 text-slate-600">
+            <div className="mt-1 text-slate-600 dark:text-slate-300">
               Catatan:{' '}
               {gr.notes || <span className="text-slate-400 italic">Tidak ada catatan</span>}
             </div>
@@ -385,14 +399,14 @@ export default function GoodsReceiptDetailPage({ params }: PageProps) {
 
         {/* Line Items Table */}
         <div className="space-y-3 pt-2">
-          <h3 className="text-sm font-bold text-slate-900">
+          <h3 className="text-sm font-bold text-slate-900 dark:text-white">
             Rincian Item Barang Diterima ({gr.items.length} Baris)
           </h3>
 
-          <div className="overflow-x-auto rounded-lg border border-slate-200">
+          <div className="overflow-x-auto rounded-lg border border-slate-200 dark:border-slate-800">
             <table className="w-full border-collapse text-left text-xs">
               <thead>
-                <tr className="border-b border-slate-200 bg-slate-50 font-semibold text-slate-600">
+                <tr className="border-b border-slate-200 bg-slate-50 font-semibold text-slate-600 dark:border-slate-800 dark:bg-slate-900/80 dark:text-slate-300">
                   <th className="w-12 px-3 py-2.5 text-center">#</th>
                   <th className="px-3 py-2.5">Produk & SKU</th>
                   <th className="px-3 py-2.5">Lokasi Rak</th>
@@ -402,25 +416,27 @@ export default function GoodsReceiptDetailPage({ params }: PageProps) {
                   <th className="px-3 py-2.5 text-right">Subtotal</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100">
+              <tbody className="divide-y divide-slate-100 dark:divide-slate-800/60">
                 {gr.items.map((item, idx) => {
                   const subtotal = item.quantity * (Number(item.unitPrice) || 0);
                   return (
-                    <tr key={item.id} className="hover:bg-slate-50/50">
+                    <tr key={item.id} className="hover:bg-slate-50/80 dark:hover:bg-slate-800/40">
                       <td className="px-3 py-2.5 text-center font-mono text-slate-400">
                         {idx + 1}
                       </td>
                       <td className="px-3 py-2.5">
-                        <div className="font-semibold text-slate-900">{item.product.name}</div>
-                        <span className="py-0.2 rounded bg-slate-100 px-1.5 font-mono text-[11px] text-slate-500">
+                        <div className="font-semibold text-slate-900 dark:text-white">
+                          {item.product.name}
+                        </div>
+                        <span className="py-0.2 rounded bg-slate-100 px-1.5 font-mono text-[11px] text-slate-600 dark:bg-slate-800 dark:text-slate-400">
                           {item.product.sku}
                         </span>
                       </td>
                       <td className="px-3 py-2.5">
-                        <span className="rounded border border-indigo-200 bg-indigo-50 px-2 py-0.5 font-mono font-bold text-indigo-900">
+                        <span className="rounded border border-indigo-200 bg-indigo-50 px-2 py-0.5 font-mono font-bold text-indigo-900 dark:border-indigo-800/70 dark:bg-indigo-950/60 dark:text-indigo-300">
                           {item.location.code}
                         </span>
-                        <div className="mt-0.5 text-[11px] text-slate-500">
+                        <div className="mt-0.5 text-[11px] text-slate-500 dark:text-slate-400">
                           Zona {item.location.zone} • Rak {item.location.rack} • Level{' '}
                           {item.location.level}
                         </div>
@@ -428,10 +444,10 @@ export default function GoodsReceiptDetailPage({ params }: PageProps) {
                       <td className="px-3 py-2.5">
                         {item.product.trackExpiry ? (
                           <div>
-                            <span className="py-0.2 rounded border border-amber-200 bg-amber-50 px-1.5 font-mono font-semibold text-amber-800">
+                            <span className="py-0.2 rounded border border-amber-200 bg-amber-50 px-1.5 font-mono font-semibold text-amber-900 dark:border-amber-800/60 dark:bg-amber-950/60 dark:text-amber-300">
                               Batch: {item.batchNo}
                             </span>
-                            <div className="mt-0.5 text-[11px] text-slate-600">
+                            <div className="mt-0.5 text-[11px] text-slate-600 dark:text-slate-400">
                               Exp:{' '}
                               {item.expiryDate
                                 ? new Date(item.expiryDate).toLocaleDateString('id-ID', {
@@ -441,35 +457,37 @@ export default function GoodsReceiptDetailPage({ params }: PageProps) {
                             </div>
                           </div>
                         ) : (
-                          <span className="rounded bg-slate-100 px-2 py-0.5 text-[11px] font-medium text-slate-600">
-                            DEFAULT (Non-Expired)
+                          <span className="rounded bg-slate-100 px-2 py-0.5 text-[11px] font-medium text-slate-600 dark:bg-slate-800 dark:text-slate-400">
+                            Tanpa Kedaluwarsa
                           </span>
                         )}
                       </td>
-                      <td className="px-3 py-2.5 text-right font-mono font-semibold text-slate-900">
+                      <td className="px-3 py-2.5 text-right font-mono font-semibold text-slate-900 dark:text-white">
                         {item.quantity.toLocaleString('id-ID')}{' '}
-                        <span className="text-[10px] text-slate-500">{item.product.uom}</span>
+                        <span className="text-[10px] text-slate-500 dark:text-slate-400">
+                          {item.product.uom}
+                        </span>
                       </td>
-                      <td className="px-3 py-2.5 text-right font-mono text-slate-700">
+                      <td className="px-3 py-2.5 text-right font-mono text-slate-700 dark:text-slate-300">
                         {formatRupiah(item.unitPrice)}
                       </td>
-                      <td className="px-3 py-2.5 text-right font-mono font-bold text-emerald-700">
+                      <td className="px-3 py-2.5 text-right font-mono font-bold text-emerald-700 dark:text-emerald-400">
                         {formatRupiah(subtotal)}
                       </td>
                     </tr>
                   );
                 })}
               </tbody>
-              <tfoot className="border-t border-slate-200 bg-slate-50 font-semibold text-slate-800">
+              <tfoot className="border-t border-slate-200 bg-slate-50 font-semibold text-slate-800 dark:border-slate-800 dark:bg-slate-900/80 dark:text-slate-200">
                 <tr>
                   <td colSpan={4} className="px-3 py-2.5 text-right">
                     Total Keseluruhan:
                   </td>
-                  <td className="px-3 py-2.5 text-right font-mono font-bold text-indigo-700">
+                  <td className="px-3 py-2.5 text-right font-mono font-bold text-indigo-700 dark:text-indigo-400">
                     {totalQuantity.toLocaleString('id-ID')} Item
                   </td>
                   <td className="px-3 py-2.5" />
-                  <td className="px-3 py-2.5 text-right font-mono text-sm font-bold text-emerald-700">
+                  <td className="px-3 py-2.5 text-right font-mono text-sm font-bold text-emerald-700 dark:text-emerald-400">
                     {formatRupiah(totalValue)}
                   </td>
                 </tr>

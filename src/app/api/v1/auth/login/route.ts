@@ -15,7 +15,9 @@ export async function POST(req: NextRequest) {
       req.headers.get('x-real-ip') ||
       '127.0.0.1';
 
-    const { token, user } = await loginUser(validated, clientIp);
+    const userAgent = req.headers.get('user-agent') || undefined;
+
+    const { token, user } = await loginUser(validated, clientIp, userAgent);
 
     const cookieStore = await cookies();
     const cookieOptions = getSessionCookieOptions();

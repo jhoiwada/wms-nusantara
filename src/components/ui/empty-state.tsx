@@ -20,9 +20,9 @@ export function EmptyState({
 }: EmptyStateProps) {
   return (
     <div
-      className={`flex flex-col items-center justify-center rounded-xl border border-dashed border-slate-800 bg-slate-900/30 px-6 py-12 text-center ${className}`}
+      className={`flex flex-col items-center justify-center rounded-xl border border-dashed border-zinc-300 bg-zinc-50/80 px-6 py-12 text-center transition-colors dark:border-zinc-800 dark:bg-zinc-900/30 ${className}`}
     >
-      <div className="mb-3.5 flex h-11 w-11 items-center justify-center rounded-lg bg-slate-800/80 text-slate-400">
+      <div className="mb-3.5 flex h-11 w-11 items-center justify-center rounded-lg bg-zinc-200/80 text-zinc-500 dark:bg-zinc-800/80 dark:text-zinc-400">
         {icon || (
           <svg
             className="h-5 w-5"
@@ -41,8 +41,8 @@ export function EmptyState({
           </svg>
         )}
       </div>
-      <h3 className="text-sm font-semibold text-white">{title}</h3>
-      <p className="mt-1 max-w-sm text-xs text-slate-400">{description}</p>
+      <h3 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">{title}</h3>
+      <p className="mt-1 max-w-sm text-xs text-zinc-600 dark:text-zinc-400">{description}</p>
       {actionLabel && onAction && (
         <div className="mt-4">
           <Button size="sm" onClick={onAction}>

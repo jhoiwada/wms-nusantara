@@ -231,7 +231,7 @@ export default function WarehousesPage() {
     const actionText = loc.isFrozen ? 'Buka pembekuan' : 'Bekukan';
     if (
       !confirm(
-        `${actionText} lokasi '${loc.code}'? Saat dibekukan, transaksi masuk/keluar ditolak (BR-22).`,
+        `${actionText} lokasi '${loc.code}'? Saat dibekukan, transaksi mutasi barang akan dinonaktifkan sementara.`,
       )
     ) {
       return;
@@ -269,7 +269,7 @@ export default function WarehousesPage() {
   const handleDeactivateLoc = (loc: LocationItem) => {
     if (
       !confirm(
-        `Nonaktifkan lokasi '${loc.code}'? Lokasi nonaktif tidak bisa dipilih untuk dokumen baru (BR-32).`,
+        `Nonaktifkan lokasi '${loc.code}'? Lokasi nonaktif tidak dapat dipilih untuk dokumen mutasi baru.`,
       )
     ) {
       return;
@@ -291,7 +291,7 @@ export default function WarehousesPage() {
 
     const normalizedCode = locFormCode.trim().toUpperCase();
     if (!LOCATION_CODE_REGEX.test(normalizedCode)) {
-      setLocFormError('Format kode lokasi harus Zona-Rak-Level, contoh: A-01-02 (BR-33)');
+      setLocFormError('Format kode lokasi harus Zona-Rak-Level, contoh: A-01-02');
       return;
     }
 
@@ -336,7 +336,7 @@ export default function WarehousesPage() {
       header: 'Kode Gudang',
       sortable: true,
       render: (item: WarehouseItem) => (
-        <span className="rounded border border-slate-200 bg-slate-100 px-2.5 py-1 font-mono text-xs font-bold text-slate-900">
+        <span className="rounded border border-slate-200 bg-slate-100 px-2.5 py-1 font-mono text-xs font-bold text-slate-900 dark:border-slate-800 dark:bg-slate-800 dark:text-slate-100">
           {item.code}
         </span>
       ),
@@ -347,9 +347,9 @@ export default function WarehousesPage() {
       sortable: true,
       render: (item: WarehouseItem) => (
         <div>
-          <div className="font-semibold text-slate-900">{item.name}</div>
+          <div className="font-semibold text-slate-900 dark:text-slate-100">{item.name}</div>
           {item.address ? (
-            <div className="mt-0.5 text-xs text-slate-500">{item.address}</div>
+            <div className="mt-0.5 text-xs text-slate-500 dark:text-slate-400">{item.address}</div>
           ) : (
             <div className="mt-0.5 text-xs text-slate-400 italic">Tidak ada alamat tercatat</div>
           )}
@@ -361,7 +361,7 @@ export default function WarehousesPage() {
       header: 'Kapasitas Lokasi Rak',
       sortable: true,
       render: (item: WarehouseItem) => (
-        <span className="inline-flex items-center gap-1.5 rounded border border-blue-200 bg-blue-50 px-2 py-0.5 text-xs font-medium text-blue-700">
+        <span className="inline-flex items-center gap-1.5 rounded border border-blue-200 bg-blue-50 px-2 py-0.5 text-xs font-medium text-blue-700 dark:border-blue-900/50 dark:bg-blue-950/40 dark:text-blue-300">
           <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path
               strokeLinecap="round"
@@ -402,7 +402,7 @@ export default function WarehousesPage() {
               variant="outline"
               onClick={() => handleDeactivateWh(item)}
               disabled={isPending}
-              className="h-7 border-rose-200 px-2 text-xs text-rose-600 hover:bg-rose-50"
+              className="h-7 border-rose-200 px-2 text-xs text-rose-600 hover:bg-rose-50 dark:border-rose-900/50 dark:text-rose-400 dark:hover:bg-rose-950/50"
             >
               Nonaktifkan
             </Button>
@@ -412,7 +412,7 @@ export default function WarehousesPage() {
               variant="outline"
               onClick={() => handleToggleActivateWh(item)}
               disabled={isPending}
-              className="h-7 border-emerald-200 px-2 text-xs text-emerald-600 hover:bg-emerald-50"
+              className="h-7 border-emerald-200 px-2 text-xs text-emerald-600 hover:bg-emerald-50 dark:border-emerald-900/50 dark:text-emerald-400 dark:hover:bg-emerald-950/50"
             >
               Aktifkan
             </Button>
@@ -426,10 +426,10 @@ export default function WarehousesPage() {
   const locationColumns: Column<LocationItem>[] = [
     {
       key: 'code',
-      header: 'Kode Lokasi (BR-33)',
+      header: 'Kode Lokasi',
       sortable: true,
       render: (item: LocationItem) => (
-        <span className="rounded border border-indigo-200 bg-indigo-50 px-2 py-0.5 font-mono text-xs font-bold text-indigo-900">
+        <span className="rounded border border-indigo-200 bg-indigo-50 px-2 py-0.5 font-mono text-xs font-bold text-indigo-900 dark:border-indigo-800 dark:bg-indigo-950/60 dark:text-indigo-300">
           {item.code}
         </span>
       ),
@@ -440,21 +440,21 @@ export default function WarehousesPage() {
       render: (item: LocationItem) => (
         <div className="flex items-center gap-1.5 font-mono text-xs">
           <span
-            className="rounded bg-slate-100 px-1.5 py-0.5 font-semibold text-slate-700"
+            className="rounded bg-slate-100 px-1.5 py-0.5 font-semibold text-slate-700 dark:bg-slate-800 dark:text-slate-300"
             title="Zona"
           >
             Z: {item.zone}
           </span>
-          <span className="text-slate-400">/</span>
+          <span className="text-slate-400 dark:text-slate-600">/</span>
           <span
-            className="rounded bg-slate-100 px-1.5 py-0.5 font-semibold text-slate-700"
+            className="rounded bg-slate-100 px-1.5 py-0.5 font-semibold text-slate-700 dark:bg-slate-800 dark:text-slate-300"
             title="Rak"
           >
             R: {item.rack}
           </span>
-          <span className="text-slate-400">/</span>
+          <span className="text-slate-400 dark:text-slate-600">/</span>
           <span
-            className="rounded bg-slate-100 px-1.5 py-0.5 font-semibold text-slate-700"
+            className="rounded bg-slate-100 px-1.5 py-0.5 font-semibold text-slate-700 dark:bg-slate-800 dark:text-slate-300"
             title="Level"
           >
             L: {item.level}
@@ -468,8 +468,10 @@ export default function WarehousesPage() {
       sortable: true,
       render: (item: LocationItem) => (
         <div className="text-xs">
-          <span className="font-semibold text-slate-800">{item.warehouse.name}</span>
-          <span className="ml-1.5 rounded bg-slate-100 px-1 py-0.5 font-mono text-[11px] text-slate-500">
+          <span className="font-semibold text-slate-800 dark:text-slate-200">
+            {item.warehouse.name}
+          </span>
+          <span className="ml-1.5 rounded bg-slate-100 px-1 py-0.5 font-mono text-[11px] text-slate-600 dark:bg-slate-800 dark:text-slate-300">
             {item.warehouse.code}
           </span>
         </div>
@@ -477,12 +479,12 @@ export default function WarehousesPage() {
     },
     {
       key: 'isFrozen',
-      header: 'Status Opname (BR-22)',
+      header: 'Status Lokasi',
       render: (item: LocationItem) =>
         item.isFrozen ? (
-          <span className="inline-flex items-center gap-1 rounded-full border border-rose-200 bg-rose-50 px-2 py-0.5 text-xs font-medium text-rose-700">
+          <span className="inline-flex items-center gap-1 rounded-full border border-rose-200 bg-rose-50 px-2 py-0.5 text-xs font-medium text-rose-700 dark:border-rose-900/50 dark:bg-rose-950/40 dark:text-rose-300">
             <svg
-              className="h-3 w-3 text-rose-500"
+              className="h-3 w-3 text-rose-500 dark:text-rose-400"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -497,7 +499,7 @@ export default function WarehousesPage() {
             Dibekukan (Frozen)
           </span>
         ) : (
-          <span className="inline-flex items-center gap-1 rounded-full border border-emerald-200 bg-emerald-50 px-2 py-0.5 text-xs font-medium text-emerald-700">
+          <span className="inline-flex items-center gap-1 rounded-full border border-emerald-200 bg-emerald-50 px-2 py-0.5 text-xs font-medium text-emerald-700 dark:border-emerald-900/50 dark:bg-emerald-950/40 dark:text-emerald-300">
             <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
             Normal (Terbuka)
           </span>
@@ -521,7 +523,7 @@ export default function WarehousesPage() {
             size="sm"
             variant="ghost"
             onClick={() => setPrintingLoc(item)}
-            className="h-7 px-2 text-xs text-indigo-600 hover:bg-indigo-50"
+            className="h-7 px-2 text-xs text-indigo-600 hover:bg-indigo-50 dark:text-indigo-400 dark:hover:bg-indigo-950/50"
             title="Cetak Label Rak"
           >
             Label
@@ -541,8 +543,8 @@ export default function WarehousesPage() {
             disabled={isPending}
             className={`h-7 px-2 text-xs ${
               item.isFrozen
-                ? 'border-emerald-200 text-emerald-700 hover:bg-emerald-50'
-                : 'border-amber-200 text-amber-700 hover:bg-amber-50'
+                ? 'border-emerald-200 text-emerald-700 hover:bg-emerald-50 dark:border-emerald-900/50 dark:text-emerald-300 dark:hover:bg-emerald-950/50'
+                : 'border-amber-200 text-amber-700 hover:bg-amber-50 dark:border-amber-900/50 dark:text-amber-300 dark:hover:bg-amber-950/50'
             }`}
           >
             {item.isFrozen ? 'Buka' : 'Bekukan'}
@@ -553,7 +555,7 @@ export default function WarehousesPage() {
               variant="outline"
               onClick={() => handleDeactivateLoc(item)}
               disabled={isPending}
-              className="h-7 border-rose-200 px-2 text-xs text-rose-600 hover:bg-rose-50"
+              className="h-7 border-rose-200 px-2 text-xs text-rose-600 hover:bg-rose-50 dark:border-rose-900/50 dark:text-rose-400 dark:hover:bg-rose-950/50"
             >
               Nonaktifkan
             </Button>
@@ -563,7 +565,7 @@ export default function WarehousesPage() {
               variant="outline"
               onClick={() => handleToggleActivateLoc(item)}
               disabled={isPending}
-              className="h-7 border-emerald-200 px-2 text-xs text-emerald-600 hover:bg-emerald-50"
+              className="h-7 border-emerald-200 px-2 text-xs text-emerald-600 hover:bg-emerald-50 dark:border-emerald-900/50 dark:text-emerald-400 dark:hover:bg-emerald-950/50"
             >
               Aktifkan
             </Button>
@@ -576,19 +578,19 @@ export default function WarehousesPage() {
   return (
     <div className="space-y-6">
       {/* Page Header */}
-      <div className="flex flex-col gap-4 border-b border-slate-200 pb-5 sm:flex-row sm:items-center sm:justify-between">
+      <div className="flex flex-col gap-4 border-b border-slate-200 pb-5 sm:flex-row sm:items-center sm:justify-between dark:border-slate-800">
         <div>
           <div className="flex items-center gap-3">
-            <h1 className="text-2xl font-bold tracking-tight text-slate-900">
+            <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-100">
               Master Gudang & Lokasi Rak
             </h1>
-            <span className="rounded-full border border-indigo-200 bg-indigo-50 px-2.5 py-0.5 text-xs font-medium text-indigo-700">
+            <span className="rounded-full border border-indigo-200 bg-indigo-50 px-2.5 py-0.5 text-xs font-medium text-indigo-700 dark:border-indigo-800 dark:bg-indigo-950/50 dark:text-indigo-300">
               {warehouses.length} Gudang • {locations.length} Lokasi
             </span>
           </div>
-          <p className="mt-1 text-sm text-slate-500">
-            Manajemen multi-gudang dan penataan rak penyimpanan per zona, rak, dan level (BR-33
-            format Zona-Rak-Level).
+          <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
+            Manajemen multi-gudang dan penataan rak penyimpanan per zona, rak, dan level (format
+            Zona-Rak-Level).
           </p>
         </div>
 
@@ -624,7 +626,7 @@ export default function WarehousesPage() {
               href="/warehouse-map"
               target="_blank"
               rel="noreferrer"
-              className="inline-flex items-center gap-2 rounded-lg border border-indigo-200 bg-white px-3 py-1.5 text-xs font-semibold text-indigo-700 shadow-sm hover:bg-indigo-50"
+              className="inline-flex items-center gap-2 rounded-lg border border-indigo-200 bg-white px-3 py-1.5 text-xs font-semibold text-indigo-700 shadow-sm hover:bg-indigo-50 dark:border-indigo-800 dark:bg-slate-950 dark:text-indigo-300 dark:hover:bg-indigo-950/50"
             >
               <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path
@@ -641,13 +643,13 @@ export default function WarehousesPage() {
       </div>
 
       {/* Tabs */}
-      <div className="flex items-center gap-2 border-b border-slate-200">
+      <div className="flex items-center gap-2 border-b border-slate-200 dark:border-slate-800">
         <button
           onClick={() => setActiveTab('warehouses')}
           className={`border-b-2 px-3 pb-3 text-sm font-semibold transition-colors ${
             activeTab === 'warehouses'
-              ? 'border-indigo-600 text-indigo-600'
-              : 'border-transparent text-slate-500 hover:text-slate-800'
+              ? 'border-indigo-600 text-indigo-600 dark:border-indigo-400 dark:text-indigo-400'
+              : 'border-transparent text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200'
           }`}
         >
           Daftar Gudang ({warehouses.length})
@@ -656,8 +658,8 @@ export default function WarehousesPage() {
           onClick={() => setActiveTab('locations')}
           className={`border-b-2 px-3 pb-3 text-sm font-semibold transition-colors ${
             activeTab === 'locations'
-              ? 'border-indigo-600 text-indigo-600'
-              : 'border-transparent text-slate-500 hover:text-slate-800'
+              ? 'border-indigo-600 text-indigo-600 dark:border-indigo-400 dark:text-indigo-400'
+              : 'border-transparent text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200'
           }`}
         >
           Lokasi Rak Penyimpanan ({locations.length})
@@ -666,8 +668,8 @@ export default function WarehousesPage() {
           onClick={() => setActiveTab('map')}
           className={`border-b-2 px-3 pb-3 text-sm font-semibold transition-colors ${
             activeTab === 'map'
-              ? 'border-indigo-600 text-indigo-600'
-              : 'border-transparent text-slate-500 hover:text-slate-800'
+              ? 'border-indigo-600 text-indigo-600 dark:border-indigo-400 dark:text-indigo-400'
+              : 'border-transparent text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200'
           }`}
         >
           Denah Interaktif (2D Map)
@@ -689,12 +691,14 @@ export default function WarehousesPage() {
       ) : (
         /* Content Tab 2: Locations */
         <div className="space-y-4">
-          <div className="flex items-center gap-3 rounded-lg border border-slate-200 bg-slate-50 p-3">
-            <span className="text-xs font-semibold text-slate-700">Filter Gudang:</span>
+          <div className="flex items-center gap-3 rounded-lg border border-slate-200 bg-slate-50 p-3 dark:border-slate-800 dark:bg-slate-900/60">
+            <span className="text-xs font-semibold text-slate-700 dark:text-slate-300">
+              Filter Gudang:
+            </span>
             <select
               value={selectedWarehouseFilter}
               onChange={(e) => setSelectedWarehouseFilter(e.target.value)}
-              className="h-8 rounded border border-slate-300 bg-white px-2.5 text-xs font-medium text-slate-800 focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+              className="h-8 rounded border border-slate-300 bg-white px-2.5 text-xs font-medium text-slate-900 focus:ring-2 focus:ring-indigo-500 focus:outline-none dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100"
             >
               <option value="ALL">Semua Gudang</option>
               {warehouses.map((wh) => (
@@ -703,12 +707,11 @@ export default function WarehousesPage() {
                 </option>
               ))}
             </select>
-            <span className="ml-auto hidden text-xs text-slate-500 sm:inline">
+            <span className="ml-auto hidden text-xs text-slate-500 sm:inline dark:text-slate-400">
               Format kode rak wajib Zona-Rak-Level:{' '}
-              <code className="font-mono font-bold text-indigo-600">
+              <code className="font-mono font-bold text-indigo-600 dark:text-indigo-400">
                 ^[A-Z]-\d&#123;2&#125;-\d&#123;2&#125;$
-              </code>{' '}
-              (BR-33)
+              </code>
             </span>
           </div>
 
@@ -739,7 +742,7 @@ export default function WarehousesPage() {
         isOpen={isWhDialogOpen}
         onClose={() => setIsWhDialogOpen(false)}
         title={editingWh ? 'Edit Data Gudang' : 'Tambah Gudang Baru'}
-        description="Pastikan kode gudang unik. Gudang yang dinonaktifkan tidak dapat menerima mutasi barang baru (BR-31, BR-32)."
+        description="Pastikan kode gudang unik. Gudang yang dinonaktifkan tidak dapat menerima transaksi barang baru."
         maxWidth="md"
       >
         <form onSubmit={handleSubmitWh} className="space-y-4">
@@ -806,7 +809,7 @@ export default function WarehousesPage() {
         isOpen={isLocDialogOpen}
         onClose={() => setIsLocDialogOpen(false)}
         title={editingLoc ? 'Edit Lokasi Rak' : 'Tambah Lokasi Rak Baru'}
-        description="Format kode wajib mengikuti Zona-Rak-Level (mis. A-01-02). Kode unik per gudang (BR-33)."
+        description="Format kode wajib mengikuti Zona-Rak-Level (contoh: A-01-02). Kode harus unik per fasilitas gudang."
         maxWidth="md"
       >
         <form onSubmit={handleSubmitLoc} className="space-y-4">
@@ -851,7 +854,7 @@ export default function WarehousesPage() {
             />
             <p className="mt-1 text-[11px] text-slate-500">
               Pola: 1 huruf zona + strip + 2 digit nomor rak + strip + 2 digit tingkat level
-              (BR-33).
+              (contoh: A-01-02).
             </p>
           </div>
 
@@ -880,7 +883,7 @@ export default function WarehousesPage() {
                         d="M5 13l4 4L19 7"
                       />
                     </svg>
-                    Format Sesuai Aturan BR-33:
+                    Format Kode Lokasi Sesuai:
                   </div>
                   <div className="mt-2 grid grid-cols-3 gap-2 text-center font-mono">
                     <div className="rounded border border-emerald-200 bg-white/80 p-1.5">

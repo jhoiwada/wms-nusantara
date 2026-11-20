@@ -121,11 +121,13 @@ export function BarcodeLabelPrinter({
       `}</style>
 
       {/* Control Bar (Hidden on print) */}
-      <div className="no-print rounded-xl border border-slate-200 bg-white p-5 shadow-xs">
+      <div className="no-print rounded-xl border border-slate-200 bg-white p-5 shadow-xs dark:border-slate-800 dark:bg-slate-950">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
           <div>
-            <h2 className="text-base font-semibold text-slate-900">Pengaturan Cetak Label</h2>
-            <p className="text-xs text-slate-500">
+            <h2 className="text-base font-semibold text-slate-900 dark:text-slate-100">
+              Pengaturan Cetak Label
+            </h2>
+            <p className="text-xs text-slate-500 dark:text-slate-400">
               Total {items.length} item unik ({totalLabels} total label dicetak)
             </p>
           </div>
@@ -142,7 +144,7 @@ export function BarcodeLabelPrinter({
               size="sm"
               onClick={handleDownloadPdf}
               disabled={isExportingPdf || items.length === 0}
-              className="gap-1.5 border-indigo-200 text-indigo-700 hover:bg-indigo-50"
+              className="gap-1.5 border-indigo-200 text-indigo-700 hover:bg-indigo-50 dark:border-indigo-800 dark:text-indigo-300 dark:hover:bg-indigo-950/50"
             >
               <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path
@@ -174,15 +176,15 @@ export function BarcodeLabelPrinter({
         </div>
 
         {/* Preset & Quick Copies */}
-        <div className="mt-4 grid grid-cols-1 gap-4 border-t border-slate-100 pt-4 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="mt-4 grid grid-cols-1 gap-4 border-t border-slate-100 pt-4 sm:grid-cols-2 lg:grid-cols-4 dark:border-slate-800">
           <div>
-            <label className="mb-1 block text-xs font-medium text-slate-700">
+            <label className="mb-1 block text-xs font-semibold text-slate-700 dark:text-slate-300">
               Ukuran / Format Label
             </label>
             <select
               value={preset}
               onChange={(e) => setPreset(e.target.value as LabelSizePreset)}
-              className="w-full rounded-md border border-slate-300 bg-white px-3 py-1.5 text-xs text-slate-900 focus:border-indigo-500 focus:outline-hidden"
+              className="w-full rounded-md border border-slate-300 bg-white px-3 py-1.5 text-xs text-slate-900 focus:border-indigo-500 focus:outline-hidden dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100"
             >
               {(Object.keys(LABEL_PRESETS) as LabelSizePreset[]).map((key) => (
                 <option key={key} value={key}>
@@ -193,7 +195,7 @@ export function BarcodeLabelPrinter({
           </div>
 
           <div>
-            <label className="mb-1 block text-xs font-medium text-slate-700">
+            <label className="mb-1 block text-xs font-semibold text-slate-700 dark:text-slate-300">
               Set Semua Copies
             </label>
             <div className="flex items-center gap-1.5">
@@ -202,7 +204,7 @@ export function BarcodeLabelPrinter({
                   key={num}
                   type="button"
                   onClick={() => handleSetAllCopies(num)}
-                  className="rounded border border-slate-200 bg-slate-50 px-2 py-1 text-xs font-medium text-slate-700 hover:bg-slate-100"
+                  className="rounded border border-slate-200 bg-slate-50 px-2 py-1 text-xs font-medium text-slate-700 hover:bg-slate-100 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
                 >
                   {num}x
                 </button>
@@ -211,8 +213,10 @@ export function BarcodeLabelPrinter({
           </div>
 
           <div className="sm:col-span-2">
-            <span className="mb-1 block text-xs font-medium text-slate-700">Info Preset</span>
-            <div className="rounded bg-slate-50 px-3 py-1.5 text-xs text-slate-600">
+            <span className="mb-1 block text-xs font-semibold text-slate-700 dark:text-slate-300">
+              Info Preset
+            </span>
+            <div className="rounded bg-slate-50 px-3 py-1.5 text-xs text-slate-600 dark:bg-slate-900 dark:text-slate-400">
               {selectedPresetConfig.description}
             </div>
           </div>
@@ -220,36 +224,40 @@ export function BarcodeLabelPrinter({
 
         {/* Selected Items List */}
         {items.length > 0 && (
-          <div className="mt-4 border-t border-slate-100 pt-3">
-            <div className="mb-2 text-xs font-medium text-slate-700">Daftar Item Label:</div>
-            <div className="max-h-48 divide-y divide-slate-100 overflow-y-auto">
+          <div className="mt-4 border-t border-slate-100 pt-3 dark:border-slate-800">
+            <div className="mb-2 text-xs font-semibold text-slate-700 dark:text-slate-300">
+              Daftar Item Label:
+            </div>
+            <div className="max-h-48 divide-y divide-slate-100 overflow-y-auto dark:divide-slate-800">
               {items.map((it) => (
                 <div key={it.id} className="flex items-center justify-between py-1.5 text-xs">
                   <div className="flex items-center gap-2">
-                    <span className="rounded bg-slate-100 px-1.5 py-0.5 font-mono text-[11px] font-bold text-slate-800">
+                    <span className="rounded bg-slate-100 px-1.5 py-0.5 font-mono text-[11px] font-bold text-slate-800 dark:bg-slate-800 dark:text-slate-200">
                       {it.displayCode}
                     </span>
-                    <span className="max-w-xs truncate font-medium text-slate-900">{it.title}</span>
+                    <span className="max-w-xs truncate font-medium text-slate-900 dark:text-slate-100">
+                      {it.title}
+                    </span>
                     {it.secondaryInfo && (
-                      <span className="text-[11px] font-semibold text-emerald-700">
+                      <span className="text-[11px] font-semibold text-emerald-700 dark:text-emerald-400">
                         {it.secondaryInfo}
                       </span>
                     )}
                   </div>
                   <div className="flex items-center gap-2">
-                    <span className="text-slate-500">Jumlah:</span>
+                    <span className="text-slate-500 dark:text-slate-400">Jumlah:</span>
                     <input
                       type="number"
                       min={1}
                       max={999}
                       value={it.copies}
                       onChange={(e) => handleUpdateCopies(it.id, parseInt(e.target.value, 10) || 1)}
-                      className="w-16 rounded border border-slate-300 px-2 py-0.5 text-center font-mono text-xs font-bold"
+                      className="w-16 rounded border border-slate-300 bg-white px-2 py-0.5 text-center font-mono text-xs font-bold text-slate-900 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100"
                     />
                     <button
                       type="button"
                       onClick={() => handleRemoveItem(it.id)}
-                      className="px-1 text-slate-400 hover:text-rose-600"
+                      className="px-1 text-slate-400 hover:text-rose-600 dark:text-slate-500 dark:hover:text-rose-400"
                       title="Hapus dari antrean cetak"
                     >
                       &times;
@@ -265,21 +273,21 @@ export function BarcodeLabelPrinter({
       {/* Live Label Preview Section */}
       <div className="print-container">
         <div className="no-print mb-2 flex items-center justify-between">
-          <h3 className="text-xs font-semibold tracking-wider text-slate-500 uppercase">
+          <h3 className="text-xs font-semibold tracking-wider text-slate-500 uppercase dark:text-slate-400">
             Pratinjau Label ({flattenedLabels.length} Stiker)
           </h3>
-          <span className="text-xs text-slate-400">
+          <span className="text-xs text-slate-400 dark:text-slate-500">
             {preset === 'A4-24' ? 'Tampilan Lembar A4' : 'Tampilan Stiker Gulungan Termal'}
           </span>
         </div>
 
         {flattenedLabels.length === 0 ? (
-          <div className="no-print rounded-xl border border-dashed border-slate-300 bg-white p-12 text-center text-slate-500">
+          <div className="no-print rounded-xl border border-dashed border-slate-300 bg-white p-12 text-center text-slate-500 dark:border-slate-800 dark:bg-slate-950 dark:text-slate-400">
             Tidak ada item label dalam antrean cetak.
           </div>
         ) : (
           <div
-            className={` ${preset === 'A4-24' ? 'print-sheet-grid grid grid-cols-1 gap-3 rounded-xl border border-slate-200 bg-slate-100 p-4 sm:grid-cols-2 md:grid-cols-3' : 'print-thermal-roll flex flex-wrap gap-4 rounded-xl border border-slate-200 bg-slate-100 p-4'} `}
+            className={` ${preset === 'A4-24' ? 'print-sheet-grid grid grid-cols-1 gap-3 rounded-xl border border-slate-200 bg-slate-100 p-4 sm:grid-cols-2 md:grid-cols-3 dark:border-slate-800 dark:bg-slate-900/60' : 'print-thermal-roll flex flex-wrap gap-4 rounded-xl border border-slate-200 bg-slate-100 p-4 dark:border-slate-800 dark:bg-slate-900/60'} `}
           >
             {flattenedLabels.map(({ item, copyIndex }, idx) => (
               <div

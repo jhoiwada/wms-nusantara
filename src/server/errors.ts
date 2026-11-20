@@ -133,6 +133,20 @@ export function formatError(error: unknown): ErrorResult {
     }
   }
 
+  if (error instanceof Prisma.PrismaClientInitializationError) {
+    logger.error({ err: error }, 'Prisma database connection failed');
+    return {
+      statusCode: 503,
+      response: {
+        error: {
+          code: 'INTERNAL_ERROR',
+          message:
+            'Tidak dapat terhubung ke server database (localhost:5432). Pastikan service PostgreSQL sudah berjalan dan file .env sudah sesuai.',
+        },
+      },
+    };
+  }
+
   // Kesalahan tak terduga (Internal Server Error)
   logger.error({ err: error }, 'Unhandled server error captured in handleError');
 

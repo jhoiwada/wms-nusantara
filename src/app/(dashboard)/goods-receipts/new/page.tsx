@@ -103,13 +103,11 @@ export default function NewGoodsReceiptPage() {
       const prod = products.find((p) => p.id === it.productId);
       if (prod?.trackExpiry) {
         if (!it.batchNo || it.batchNo === 'DEFAULT') {
-          setFormError(`Baris #${i + 1}: Produk '${prod.name}' wajib mengisi nomor batch (BR-06)`);
+          setFormError(`Baris #${i + 1}: Produk '${prod.name}' wajib mengisi nomor batch.`);
           return;
         }
         if (!it.expiryDate) {
-          setFormError(
-            `Baris #${i + 1}: Produk '${prod.name}' wajib mengisi tanggal kedaluwarsa (BR-06)`,
-          );
+          setFormError(`Baris #${i + 1}: Produk '${prod.name}' wajib mengisi tanggal kedaluwarsa.`);
           return;
         }
       }
@@ -155,16 +153,19 @@ export default function NewGoodsReceiptPage() {
   return (
     <div className="mx-auto max-w-6xl space-y-6 pb-12">
       {/* Top Header */}
-      <div className="flex items-center justify-between border-b border-slate-200 pb-4">
+      <div className="flex items-center justify-between border-b border-slate-200 pb-4 dark:border-slate-800">
         <div>
-          <div className="mb-1 flex items-center gap-2 text-xs text-slate-500">
-            <Link href="/goods-receipts" className="transition-colors hover:text-indigo-600">
+          <div className="mb-1 flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
+            <Link
+              href="/goods-receipts"
+              className="transition-colors hover:text-indigo-600 dark:hover:text-indigo-400"
+            >
               Penerimaan Barang
             </Link>
             <span>/</span>
-            <span className="font-semibold text-slate-800">Buat Baru</span>
+            <span className="font-semibold text-slate-800 dark:text-slate-200">Buat Baru</span>
           </div>
-          <h1 className="text-2xl font-bold tracking-tight text-slate-900">
+          <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-100">
             Penerimaan Barang Baru (GR Draft)
           </h1>
         </div>
@@ -185,9 +186,9 @@ export default function NewGoodsReceiptPage() {
       </div>
 
       {formError && (
-        <div className="flex items-center gap-2 rounded-xl border border-rose-200 bg-rose-50 p-4 text-xs font-semibold text-rose-800">
+        <div className="flex items-center gap-2 rounded-xl border border-rose-200 bg-rose-50 p-4 text-xs font-semibold text-rose-800 dark:border-rose-900/60 dark:bg-rose-950/40 dark:text-rose-300">
           <svg
-            className="h-5 w-5 shrink-0 text-rose-600"
+            className="h-5 w-5 shrink-0 text-rose-600 dark:text-rose-400"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -204,28 +205,28 @@ export default function NewGoodsReceiptPage() {
       )}
 
       {isLoadingMaster ? (
-        <div className="py-20 text-center text-xs text-slate-500">
+        <div className="py-20 text-center text-xs text-slate-500 dark:text-slate-400">
           Memuat data master supplier, gudang, dan katalog produk...
         </div>
       ) : (
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Document Header Card */}
-          <div className="space-y-4 rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
-            <h2 className="border-b border-slate-100 pb-3 text-sm font-bold text-slate-900">
+          <div className="space-y-4 rounded-xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-950">
+            <h2 className="border-b border-slate-100 pb-3 text-sm font-bold text-slate-900 dark:border-slate-800 dark:text-slate-100">
               Informasi Pengiriman & Pemasok
             </h2>
 
             <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
               {/* Supplier */}
               <div>
-                <label className="mb-1 block text-xs font-semibold text-slate-700">
+                <label className="mb-1 block text-xs font-semibold text-slate-700 dark:text-slate-300">
                   Pemasok / Supplier <span className="text-rose-500">*</span>
                 </label>
                 <select
                   value={supplierId}
                   onChange={(e) => setSupplierId(e.target.value)}
                   required
-                  className="h-10 w-full rounded-md border border-slate-300 bg-white px-3 text-xs font-medium text-slate-900 focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+                  className="h-10 w-full rounded-md border border-slate-300 bg-white px-3 text-xs font-medium text-slate-900 focus:ring-2 focus:ring-indigo-500 focus:outline-none dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100"
                 >
                   {suppliers.map((s) => (
                     <option key={s.id} value={s.id}>
@@ -237,7 +238,7 @@ export default function NewGoodsReceiptPage() {
 
               {/* Warehouse */}
               <div>
-                <label className="mb-1 block text-xs font-semibold text-slate-700">
+                <label className="mb-1 block text-xs font-semibold text-slate-700 dark:text-slate-300">
                   Gudang Tujuan Masuk <span className="text-rose-500">*</span>
                 </label>
                 <select
@@ -248,7 +249,7 @@ export default function NewGoodsReceiptPage() {
                     setItems([]);
                   }}
                   required
-                  className="h-10 w-full rounded-md border border-slate-300 bg-white px-3 text-xs font-medium text-slate-900 focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+                  className="h-10 w-full rounded-md border border-slate-300 bg-white px-3 text-xs font-medium text-slate-900 focus:ring-2 focus:ring-indigo-500 focus:outline-none dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100"
                 >
                   {warehouses.map((w) => (
                     <option key={w.id} value={w.id}>
@@ -256,14 +257,14 @@ export default function NewGoodsReceiptPage() {
                     </option>
                   ))}
                 </select>
-                <p className="mt-1 text-[11px] text-slate-500">
-                  Lokasi rak item otomatis dibatasi ke gudang ini (BR-13).
+                <p className="mt-1 text-[11px] text-slate-500 dark:text-slate-400">
+                  Lokasi rak item otomatis dibatasi hanya pada fasilitas gudang yang dipilih.
                 </p>
               </div>
 
               {/* Received Date */}
               <div>
-                <label className="mb-1 block text-xs font-semibold text-slate-700">
+                <label className="mb-1 block text-xs font-semibold text-slate-700 dark:text-slate-300">
                   Tanggal Kedatangan Barang
                 </label>
                 <Input
@@ -277,7 +278,7 @@ export default function NewGoodsReceiptPage() {
 
             {/* Notes */}
             <div>
-              <label className="mb-1 block text-xs font-semibold text-slate-700">
+              <label className="mb-1 block text-xs font-semibold text-slate-700 dark:text-slate-300">
                 Catatan Dokumen / No. Surat Jalan Supplier (Opsional)
               </label>
               <Input
@@ -290,7 +291,7 @@ export default function NewGoodsReceiptPage() {
           </div>
 
           {/* Line Items Editor Section */}
-          <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+          <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-950">
             <LineItemsEditor
               items={items}
               onChange={setItems}
@@ -301,7 +302,7 @@ export default function NewGoodsReceiptPage() {
           </div>
 
           {/* Form Actions */}
-          <div className="flex items-center justify-between border-t border-slate-200 pt-4">
+          <div className="flex items-center justify-between border-t border-slate-200 pt-4 dark:border-slate-800">
             <Link href="/goods-receipts">
               <Button type="button" variant="ghost">
                 Batal
